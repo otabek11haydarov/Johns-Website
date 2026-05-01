@@ -1,74 +1,5 @@
 const THEME_KEY = "edu-dashboard-theme";
 
-const groupCatalog = {
-  A1: {
-    level: "A1",
-    title: "A1 Beginner Group",
-    description: "Starter level learners focused on basic grammar, vocabulary, and first speaking practice.",
-    studentsCount: 18,
-    mentor: "Malika Rahimova",
-    lessonsPerWeek: 3,
-    room: "Room 101",
-    status: "Active",
-    focus: "Alphabet review, greetings, present simple, and confidence-building speaking tasks.",
-  },
-  A2: {
-    level: "A2",
-    title: "A2 Elementary Group",
-    description: "Elementary learners building stronger sentence patterns, reading confidence, and listening routine.",
-    studentsCount: 20,
-    mentor: "Javohir Tursunov",
-    lessonsPerWeek: 3,
-    room: "Room 102",
-    status: "Active",
-    focus: "Daily routines, question forms, short writing, and controlled conversation tasks.",
-  },
-  B1: {
-    level: "B1",
-    title: "B1 Intermediate Group",
-    description: "Intermediate communication group with balanced grammar, speaking, and comprehension practice.",
-    studentsCount: 16,
-    mentor: "Dilnoza Karimova",
-    lessonsPerWeek: 4,
-    room: "Room 201",
-    status: "Active",
-    focus: "Opinion speaking, paragraph writing, past and future forms, and classroom discussion.",
-  },
-  B2: {
-    level: "B2",
-    title: "B2 Upper-Intermediate Group",
-    description: "Upper-intermediate learners improving fluency, accuracy, and exam-oriented communication skills.",
-    studentsCount: 14,
-    mentor: "Bekzod Islomov",
-    lessonsPerWeek: 4,
-    room: "Room 202",
-    status: "Active",
-    focus: "Argument building, listening detail, extended speaking, and correction-driven review.",
-  },
-  C1: {
-    level: "C1",
-    title: "C1 Advanced Group",
-    description: "Advanced fluency group with deeper writing structure, nuanced vocabulary, and fast-paced discussion.",
-    studentsCount: 12,
-    mentor: "Nigina Qodirova",
-    lessonsPerWeek: 5,
-    room: "Room 301",
-    status: "Active",
-    focus: "Academic vocabulary, presentation speaking, essay structure, and advanced listening analysis.",
-  },
-  C2: {
-    level: "C2",
-    title: "C2 Mastery Group",
-    description: "Mastery and expert-level group for high-precision speaking, writing, and exam excellence.",
-    studentsCount: 10,
-    mentor: "Sardor Yuldashev",
-    lessonsPerWeek: 5,
-    room: "Room 302",
-    status: "Active",
-    focus: "High-level debate, refined writing, idiomatic control, and advanced feedback cycles.",
-  },
-};
-
 const defaultLessons = {
   A1: [
     {
@@ -192,12 +123,6 @@ function renderGroupDetails() {
   document.getElementById("groupLevelBadge").textContent = groupData.level;
   document.getElementById("groupHeroTitle").textContent = groupData.title;
   document.getElementById("groupDescription").textContent = groupData.description;
-  document.getElementById("studentsCount").textContent = groupData.studentsCount;
-  document.getElementById("lessonsPerWeek").textContent = groupData.lessonsPerWeek;
-  document.getElementById("mentorName").textContent = groupData.mentor;
-  document.getElementById("roomName").textContent = groupData.room;
-  document.getElementById("groupStatus").textContent = groupData.status;
-  document.getElementById("groupFocusText").textContent = groupData.focus;
 }
 
 function renderLessons() {
@@ -298,3 +223,21 @@ lessonList.addEventListener("click", (event) => {
 renderGroupDetails();
 renderLessons();
 applyTheme(localStorage.getItem(THEME_KEY) || "light");
+
+async function groupLoad() {
+  const tbody = document.getElementById("dashboard-activity-tbody");
+  tbody.innerHTML = `<tr><td colspan="6" class="empty-row">Loading...</td></tr>`;
+
+  const response = await fetch(BASE_URL + "/api/admin/dashboard", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  const data = await response.json();
+
+  renderDashboardActivity(data.data.activity);
+  renderStudents(data.data.students);
+  renderGroups(data.data.groups);
+}
