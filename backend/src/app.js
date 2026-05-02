@@ -3,6 +3,7 @@ import cors from "cors";
 import authRoute from "./routes/authRoutes.js";
 import bookRoutes from "./routes/bookRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import groupRoutes from "./routes/groupRoutes.js";
 const app = express();
 
 app.use(cors());
@@ -17,6 +18,7 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRoute);
 app.use("/api/books", bookRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/groups", groupRoutes);
 
 app.use((error, req, res, next) => {
   if (!error) {

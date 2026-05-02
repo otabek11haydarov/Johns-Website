@@ -73,7 +73,6 @@ export const demoStudents = [
     status: "Offline",
   },
 ];
-
 export const demoGroups = [
   {
     id: uuidv4(),
@@ -146,5 +145,91 @@ export const demoGroups = [
     lessonsPerWeek: 5,
     room: "Room 302",
     status: "Active",
+  },
+];
+
+export const lessons = [
+  {
+    id: uuidv4(),
+    title: "Introducing Yourself",
+    groupLevel: "A1",
+    description: "Students practice basic greetings and simple self-introduction phrases.",
+    tasks: [
+      {
+        id: uuidv4(),
+        description: "Write 5 sentences to introduce yourself in English.",
+      },
+      {
+        id: uuidv4(),
+        description: "Practice a short greeting dialogue with a partner.",
+      },
+    ],
+  },
+  {
+    id: uuidv4(),
+    title: "Daily Routines",
+    groupLevel: "A2",
+    description: "Students describe everyday habits using present simple tense.",
+    tasks: [
+      {
+        id: uuidv4(),
+        description: "Create a daily routine paragraph with at least 8 sentences.",
+      },
+      {
+        id: uuidv4(),
+        description: "Match common routine verbs with the correct pictures.",
+      },
+    ],
+  },
+  {
+    id: uuidv4(),
+    title: "Travel and Experiences",
+    groupLevel: "B1",
+    description: "Students talk about past trips and memorable life experiences.",
+    tasks: [
+      {
+        id: uuidv4(),
+        description: "Describe your last trip using past tense verbs.",
+      },
+      {
+        id: uuidv4(),
+        description: "Prepare 3 questions to interview a classmate about travel.",
+      },
+    ],
+  },
+  {
+    id: uuidv4(),
+    title: "Debate and Opinion",
+    groupLevel: "C1",
+    description: "Students build arguments and support opinions in spoken discussion.",
+    tasks: [
+      {
+        id: uuidv4(),
+        description: "Write a short opinion essay on online education.",
+      },
+      {
+        id: uuidv4(),
+        description: "List 4 arguments for a classroom debate activity.",
+      },
+    ],
+  },
+];
+
+export const tasks = [
+  {
+    id: uuidv4(),
+    description: "Complete the vocabulary worksheet for lesson review.",
+  },
+  {
+    id: uuidv4(),
+    description: "Record a 1-minute speaking task and submit it.",
+  },
+  {
+    id: uuidv4(),
+    description: "Read the short passage and answer comprehension questions.",
+  },
+  {
+    id: uuidv4(),
+    description: "Prepare 10 new words from the lesson with translations.",
   },
 ];
