@@ -1,5 +1,13 @@
 import { v4 as uuidv4 } from 'uuid';
-export const users =[];
+export const users =[
+  {
+    id: "admin-1",
+    username: "Admin",
+    email: "admin@johns.com",
+    password: "$2b$10$Spi5yutewnwuh.9cAl/SF.oKL9pdJIXBdBGgNjMLQMdOmeQNS1jKm",
+    role: "admin",
+  },
+];
 export const Library = [];
 export const books = [];
 export const demoActivity = [

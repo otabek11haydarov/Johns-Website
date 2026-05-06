@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import {users} from "../data/db.js";
 import jwt from "jsonwebtoken";
+import { JWT_SECRET } from "../config/auth.js";
 
 export async function register(req, res) {
   const { username, password } = req.body;
@@ -26,6 +27,7 @@ export async function register(req, res) {
     username: username.trim(),
     email,
     password: passwordHash,
+    role: "student",
   };
   users.push(newUser);
 
@@ -56,13 +58,18 @@ export async function login(req, res) {
 
   // token generation
   const token = jwt.sign(
-    { id: existingUser.id, email: existingUser.email },
-    "SECRET_KEY_FOR_TECH_HOUSE",
+    { id: existingUser.id, email: existingUser.email, role: existingUser.role },
+    JWT_SECRET,
     {
       expiresIn: "7d",
     },
   );
 
   // success response
-  return res.status(200).json({ message: "Login successfull", token });
+  return res.status(200).json({
+    message: "Login successfull",
+    token,
+    id: existingUser.id,
+    role: existingUser.role,
+  });
 }
