@@ -1,5 +1,7 @@
-const THEME_KEY = "edu-dashboard-theme";
+const groupPageParams = new URLSearchParams(window.location.search);
+const groupPageLevel = window.TaskManagerPage.resolveGroup(groupPageParams.get("level"));
 
+<<<<<<< HEAD
 const defaultLessons = {
   A1: [
     {
@@ -241,3 +243,9 @@ async function groupLoad() {
   renderStudents(data.data.students);
   renderGroups(data.data.groups);
 }
+=======
+window.TaskManagerPage.createPage({
+  currentGroup: groupPageLevel,
+  pageTitleSuffix: "Task Planning",
+});
+>>>>>>> 00663b802a2ef4c6905047ae7b237cdaa3df6b69

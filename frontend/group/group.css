@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 *,
 *::before,
 *::after {
@@ -564,3 +565,6 @@ body.dark-mode .theme-toggle-core {
 body.dark-mode .modal-overlay {
   background: rgba(8, 5, 4, 0.58);
 }
+=======
+@import url("../Task Manager/task.css");
+>>>>>>> 00663b802a2ef4c6905047ae7b237cdaa3df6b69

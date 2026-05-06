@@ -21,8 +21,10 @@ const THEME_KEY = "edu-dashboard-theme";
 function applyTheme(theme) {
   const isDark = theme === "dark";
   document.body.classList.toggle("dark-mode", isDark);
-  themeToggle.setAttribute("aria-label", isDark ? "Switch to light mode" : "Switch to dark mode");
-  themeToggle.setAttribute("title", isDark ? "Light mode" : "Dark mode");
+  if (themeToggle) {
+    themeToggle.setAttribute("aria-label", isDark ? "Switch to light mode" : "Switch to dark mode");
+    themeToggle.setAttribute("title", isDark ? "Light mode" : "Dark mode");
+  }
 }
 
 function toggleTheme() {
@@ -151,10 +153,10 @@ navLinks.forEach((link) => {
   });
 });
 
-sidebarToggle.addEventListener("click", openSidebar);
-sidebarClose.addEventListener("click", closeSidebar);
-sidebarOverlay.addEventListener("click", closeSidebar);
-themeToggle.addEventListener("click", toggleTheme);
+sidebarToggle?.addEventListener("click", openSidebar);
+sidebarClose?.addEventListener("click", closeSidebar);
+sidebarOverlay?.addEventListener("click", closeSidebar);
+themeToggle?.addEventListener("click", toggleTheme);
 
 function clearFormErrors() {
   document.querySelectorAll(".field-error").forEach((el) => {
@@ -615,10 +617,15 @@ deleteBookModalConfirm?.addEventListener("click", async () => {
   }
 });
 
-loadData();
-renderStudents();
-applyTheme(localStorage.getItem(THEME_KEY) || "light");
-showSection("dashboard");
+if (themeToggle) {
+  applyTheme(localStorage.getItem(THEME_KEY) || "light");
+}
+
+if (document.getElementById("section-dashboard")) {
+  loadData();
+  renderStudents();
+  showSection("dashboard");
+}
 
 async function loadData() {
   const tbody = document.getElementById("dashboard-activity-tbody");

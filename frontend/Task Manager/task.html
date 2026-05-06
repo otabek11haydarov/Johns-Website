@@ -4,11 +4,11 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Group Task Planning</title>
+    <title>Task Manager</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <link rel="stylesheet" href="../admin/admin.css" />
-    <link rel="stylesheet" href="group.css" />
+    <link rel="stylesheet" href="task.css" />
 </head>
 
 <body>
@@ -82,32 +82,6 @@
                     </nav>
                 </section>
             </div>
-<<<<<<< HEAD
-          </section>
-
-          <section class="content-grid">
-            <article class="panel panel-main">
-              <div class="panel-header">
-                <div>
-                  <h2 class="panel-title">Lessons</h2>
-                  <p class="panel-subtitle">Create and manage this group's active lessons.</p>
-                </div>
-                <span class="panel-chip" id="lessonCountChip">0 Lessons</span>
-              </div>
-
-              <div class="lesson-list" id="lessonList"></div>
-            </article>
-          </section>
-        </main>
-      </div>
-    </div>
-
-    <div class="modal-overlay" id="lessonModalOverlay">
-      <div class="modal">
-        <div class="modal-header">
-          <h3 class="modal-title">Create Lesson</h3>
-          <button class="modal-close" id="lessonModalClose" type="button">&times;</button>
-=======
         </aside>
 
         <div class="dashboard-main">
@@ -127,8 +101,8 @@
                             </a>
 
                             <div class="task-page__heading-copy">
-                                <p class="task-page__eyebrow">Admin Dashboard / Groups</p>
-                                <h1 class="task-page__title" id="taskPageTitle">A1 Task Planning</h1>
+                                <p class="task-page__eyebrow">Admin Dashboard / Task Manager</p>
+                                <h1 class="task-page__title" id="taskPageTitle">A1 Task Manager</h1>
                             </div>
                         </div>
 
@@ -158,8 +132,8 @@
                                 <span class="hero-panel__chip" id="heroChip">A1 Foundations</span>
                                 <h2 class="hero-panel__title" id="heroTitle">Task planning for A1 learners</h2>
                                 <p class="hero-panel__text" id="heroDescription">
-                                    Curate beginner-friendly tasks, keep the workflow organized, and manage each group
-                                    inside one shared planning system.
+                                    Curate beginner-friendly tasks, keep the workflow organized, and simulate quick
+                                    category-based filtering inside a polished admin dashboard layout.
                                 </p>
                             </div>
 
@@ -202,14 +176,13 @@
                             <div class="task-empty" id="taskEmpty" hidden>
                                 <h3 class="task-empty__title">No tasks in this category</h3>
                                 <p class="task-empty__text">
-                                    Switch categories in the sidebar to preview another task set for this group.
+                                    Switch categories in the sidebar to simulate filtering.
                                 </p>
                             </div>
                         </section>
                     </main>
                 </div>
             </div>
->>>>>>> 00663b802a2ef4c6905047ae7b237cdaa3df6b69
         </div>
     </div>
 
@@ -325,7 +298,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../shared/task-manager-page.js"></script>
-    <script src="group.js"></script>
+    <script src="task.js"></script>
     <script src="../admin/admin.js"></script>
 </body>
 
