@@ -177,7 +177,7 @@ function ensureStudentAccess() {
   const token = localStorage.getItem("token");
   const role = localStorage.getItem("role");
 
-  if (!token || role !== "student") {
+  if (!token || !role || role.toLowerCase() !== "student") {
     redirectToLogin();
     return false;
   }
