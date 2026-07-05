@@ -111,13 +111,20 @@ async function login() {
       emailInput.value = "";
       alert(data.message);
 
-      if (data.role === "admin") {
+      const role = data.role.toLowerCase();
+
+      if (role === "admin") {
         window.location.href = "../admin/index.html";
         return;
       }
 
-      if (data.role === "student") {
+      if (role === "student") {
         window.location.href = "../student/student.html";
+        return;
+      }
+
+      if (role === "teacher") {
+        window.location.href = "../teacher-dashboard.html";
         return;
       }
 
