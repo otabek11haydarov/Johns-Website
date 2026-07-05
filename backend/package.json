@@ -1,5 +1,5 @@
 {
-  "name": "johns-website",
+  "name": "johns-website - backend",
   "version": "1.0.0",
   "description": "Node.jsda_birinchi_ish",
   "keywords": [
@@ -7,23 +7,24 @@
     "node",
     "johns"
   ],
-  "homepage": "https://github.com/Goldder12/Jons-website#readme",
+  "homepage": "https://github.com/otabek11haydarov/Johns-Website#readme",
   "bugs": {
-    "url": "https://github.com/Goldder12/Jons-website/issues"
+    "url": "https://github.com/otabek11haydarov/Johns-Website/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Goldder12/Jons-website.git"
+    "url": "git+https://github.com/otabek11haydarov/Johns-Website.git"
   },
   "license": "ISC",
   "author": "Golden Fire",
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "start ": "node src/index.js",
+    "start": "node src/index.js",
     "dev": "nodemon src/index.js"
   },
   "dependencies": {
+    "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.8.0",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.6",

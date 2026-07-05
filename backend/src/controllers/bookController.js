@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { books } from "../data/db.js";
+import prisma from "../config/db.js";
 
 const DEFAULT_BOOK_IMAGE = "default-book.png";
 
@@ -16,14 +16,19 @@ function removeUploadedFile(filePath) {
   }
 }
 
-export function getBooks(req, res) {
-  return res.status(200).json({
-    message: "Books fetched successfully!",
-    data: books,
-  });
+export async function getBooks(req, res) {
+  try {
+    const books = await prisma.book.findMany();
+    return res.status(200).json({
+      message: "Books fetched successfully!",
+      data: books,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Error fetching books", error: error.message });
+  }
 }
 
-export function createBook(req, res) {
+export async function createBook(req, res) {
   const title = req.body.title?.trim();
   const author = req.body.author?.trim();
   const level = req.body.level?.trim();
@@ -42,93 +47,115 @@ export function createBook(req, res) {
     return res.status(400).json({ message: "Title, author, level, and PDF file are required!" });
   }
 
-  const newBook = {
-    id: books.length ? Math.max(...books.map((book) => Number(book.id) || 0)) + 1 : 1,
-    title,
-    author,
-    level,
-    pdf: `uploads/books/${pdfFile.filename}`,
-    image: imageFile ? `uploads/covers/${imageFile.filename}` : DEFAULT_BOOK_IMAGE,
-  };
+  try {
+    const newBook = await prisma.book.create({
+      data: {
+        title,
+        author,
+        level,
+        pdf: `uploads/books/${pdfFile.filename}`,
+        image: imageFile ? `uploads/covers/${imageFile.filename}` : DEFAULT_BOOK_IMAGE,
+      }
+    });
 
-  books.push(newBook);
-
-  return res.status(201).json({
-    message: "Book created successfully!",
-    data: newBook,
-  });
+    return res.status(201).json({
+      message: "Book created successfully!",
+      data: newBook,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Error creating book", error: error.message });
+  }
 }
 
-export function updateBook(req, res) {
+export async function updateBook(req, res) {
   const id = Number(req.params.id);
-  const existingBook = books.find((book) => Number(book.id) === id);
 
-  if (!existingBook) {
+  try {
+    const existingBook = await prisma.book.findUnique({ where: { id } });
+
+    if (!existingBook) {
+      const pdfFile = req.files?.pdf?.[0];
+      const imageFile = req.files?.image?.[0];
+
+      if (pdfFile) {
+        removeUploadedFile(`uploads/books/${pdfFile.filename}`);
+      }
+
+      if (imageFile) {
+        removeUploadedFile(`uploads/covers/${imageFile.filename}`);
+      }
+
+      return res.status(404).json({ message: "Book not found!" });
+    }
+
+    const title = req.body.title?.trim();
+    const author = req.body.author?.trim();
+    const level = req.body.level?.trim();
     const pdfFile = req.files?.pdf?.[0];
     const imageFile = req.files?.image?.[0];
 
+    if (!title || !author || !level) {
+      if (pdfFile) {
+        removeUploadedFile(`uploads/books/${pdfFile.filename}`);
+      }
+
+      if (imageFile) {
+        removeUploadedFile(`uploads/covers/${imageFile.filename}`);
+      }
+
+      return res.status(400).json({ message: "Title, author, and level are required!" });
+    }
+
+    let updatedPdf = existingBook.pdf;
+    let updatedImage = existingBook.image;
+
     if (pdfFile) {
-      removeUploadedFile(`uploads/books/${pdfFile.filename}`);
+      removeUploadedFile(existingBook.pdf);
+      updatedPdf = `uploads/books/${pdfFile.filename}`;
     }
 
     if (imageFile) {
-      removeUploadedFile(`uploads/covers/${imageFile.filename}`);
+      removeUploadedFile(existingBook.image);
+      updatedImage = `uploads/covers/${imageFile.filename}`;
     }
 
-    return res.status(404).json({ message: "Book not found!" });
+    const updatedBook = await prisma.book.update({
+      where: { id },
+      data: {
+        title,
+        author,
+        level,
+        pdf: updatedPdf,
+        image: updatedImage,
+      }
+    });
+
+    return res.status(200).json({
+      message: "Book updated successfully!",
+      data: updatedBook,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Error updating book", error: error.message });
   }
-
-  const title = req.body.title?.trim();
-  const author = req.body.author?.trim();
-  const level = req.body.level?.trim();
-  const pdfFile = req.files?.pdf?.[0];
-  const imageFile = req.files?.image?.[0];
-
-  if (!title || !author || !level) {
-    if (pdfFile) {
-      removeUploadedFile(`uploads/books/${pdfFile.filename}`);
-    }
-
-    if (imageFile) {
-      removeUploadedFile(`uploads/covers/${imageFile.filename}`);
-    }
-
-    return res.status(400).json({ message: "Title, author, and level are required!" });
-  }
-
-  if (pdfFile) {
-    removeUploadedFile(existingBook.pdf);
-    existingBook.pdf = `uploads/books/${pdfFile.filename}`;
-  }
-
-  if (imageFile) {
-    removeUploadedFile(existingBook.image);
-    existingBook.image = `uploads/covers/${imageFile.filename}`;
-  } else if (!existingBook.image) {
-    existingBook.image = DEFAULT_BOOK_IMAGE;
-  }
-
-  existingBook.title = title;
-  existingBook.author = author;
-  existingBook.level = level;
-
-  return res.status(200).json({
-    message: "Book updated successfully!",
-    data: existingBook,
-  });
 }
 
-export function deleteBook(req, res) {
+export async function deleteBook(req, res) {
   const id = Number(req.params.id);
-  const bookIndex = books.findIndex((book) => Number(book.id) === id);
 
-  if (bookIndex === -1) {
-    return res.status(404).json({ message: "Book not found!" });
+  try {
+    const existingBook = await prisma.book.findUnique({ where: { id } });
+
+    if (!existingBook) {
+      return res.status(404).json({ message: "Book not found!" });
+    }
+
+    await prisma.book.delete({ where: { id } });
+    
+    removeUploadedFile(existingBook.pdf);
+    removeUploadedFile(existingBook.image);
+
+    return res.status(200).json({ message: "Book deleted successfully!" });
+  } catch (error) {
+    return res.status(500).json({ message: "Error deleting book", error: error.message });
   }
-
-  const [book] = books.splice(bookIndex, 1);
-  removeUploadedFile(book.pdf);
-  removeUploadedFile(book.image);
-
-  return res.status(200).json({ message: "Book deleted successfully!" });
 }

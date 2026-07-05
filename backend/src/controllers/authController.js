@@ -1,39 +1,46 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { randomUUID } from "crypto";
-import pool from "../config/db.js";
+import prisma from "../config/db.js";
 import { JWT_SECRET } from "../config/auth.js";
 
 export async function register(req, res) {
   const { username, password } = req.body;
   const email = req.body.email?.trim().toLowerCase();
+  
+  // Optional: receive role from request if provided, defaults to STUDENT
+  let role = req.body.role?.trim().toUpperCase();
+  if (!["ADMIN", "TEACHER", "STUDENT"].includes(role)) {
+    role = "STUDENT";
+  }
 
   if (!username?.trim() || !email || !password) {
     return res.status(400).json({ message: "All fields are required!" });
   }
 
-  const existingUserResult = await pool.query(
-    "SELECT id FROM users WHERE email = $1",
-    [email]
-  );
+  const existingUser = await prisma.user.findUnique({
+    where: { email },
+    select: { id: true },
+  });
 
-  if (existingUserResult.rows.length > 0) {
+  if (existingUser) {
     return res.status(409).json({ message: "User email already exist!" });
   }
 
   const passwordHash = await bcrypt.hash(password, 10);
-  const id = randomUUID();
 
-  const newUserResult = await pool.query(
-    `INSERT INTO users (id, username, email, password, role)
-     VALUES ($1, $2, $3, $4, $5)
-     RETURNING id, username, email, role`,
-    [id, username.trim(), email, passwordHash, "student"]
-  );
+  const newUser = await prisma.user.create({
+    data: {
+      username: username.trim(),
+      email,
+      password: passwordHash,
+      role: role,
+    },
+    select: { id: true, username: true, email: true, role: true },
+  });
 
   return res.status(201).json({
     message: "Registered successfully!",
-    user: newUserResult.rows[0],
+    user: newUser,
   });
 }
 
@@ -45,16 +52,14 @@ export async function login(req, res) {
     return res.status(400).json({ message: "All fields are required!" });
   }
 
-  const userResult = await pool.query(
-    "SELECT * FROM users WHERE email = $1",
-    [email]
-  );
+  const existingUser = await prisma.user.findUnique({
+    where: { email },
+  });
 
-  if (userResult.rows.length === 0) {
+  if (!existingUser) {
     return res.status(404).json({ message: "User email does not exist!" });
   }
 
-  const existingUser = userResult.rows[0];
   const isPasswordMatch = await bcrypt.compare(password, existingUser.password);
 
   if (!isPasswordMatch) {
