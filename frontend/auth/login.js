@@ -1,144 +1,75 @@
-const textSwitcherBtn = document.getElementById("text-switcher-btn");
 const heading = document.querySelector("h2");
 const loginBtn = document.getElementById("loginBtn");
-const usernameInput = document.getElementById("username");
 const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
-const usernameField = document.getElementById("usernameField");
 const form = document.getElementById("form");
 const formDescription = document.getElementById("formDescription");
 
-textSwitcherBtn.addEventListener("click", function () {
-  if (heading.textContent === "Login") {
-    switcher(
-      "Sign up",
-      "Already have an account? Login",
-      true,
-      "Create your profile and start using the platform."
-    );
-  } else {
-    switcher(
-      "Login",
-      "Don't have an account? Sign up",
-      false,
-      "Access your account and continue your workflow."
-    );
-  }
+// API Config - using your actual local backend port
+const BACKEND_URL = "http://localhost:5500"; 
+
+// Form Submission handling
+form.addEventListener("submit", async function (e) {
+  e.preventDefault();
+  await login();
 });
 
-function switcher(title, switchText, showUsername, description) {
-  form.classList.remove("form-switching");
-  void form.offsetWidth;
-  form.classList.add("form-switching");
-
-  loginBtn.value = title;
-  heading.textContent = title;
-  textSwitcherBtn.value = switchText;
-  formDescription.textContent = description;
-
-  if (showUsername) {
-    usernameField.classList.remove("is-collapsed");
-  } else {
-    usernameField.classList.add("is-collapsed");
-  }
-}
-
-form.addEventListener("animationend", function () {
-  form.classList.remove("form-switching");
+// Also trigger login on loginBtn click (since it's input type="button" in login.html)
+loginBtn.addEventListener("click", async function () {
+  await login();
 });
 
-loginBtn.addEventListener("click", function () {
-  if (loginBtn.value === "Sign up") {
-    register();
-  } else {
-    login();
-  }
-});
-
-async function register() {
-  try {
-    if (!usernameInput.value || !emailInput.value || !passwordInput.value) {
-      alert("All fields are required");
-      return;
-    }
-
-    const response = await fetch("http://localhost:5500/api/auth/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        username: usernameInput.value.trim(),
-        email: emailInput.value.trim(),
-        password: passwordInput.value.trim()
-      })
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      passwordInput.value = "";
-      emailInput.value = "";
-      usernameInput.value = "";
-      alert(data.message);
-    }
-  } catch (error) {
-    console.error("Network error:", error);
-    alert("Server bilan bog'lanib bo'lmadi");
-  }
-}
-
+// Login Logic
 async function login() {
-  try {
-    if (!emailInput.value || !passwordInput.value) {
-      alert("All fields are required");
-      return;
-    }
+  const email = emailInput.value.trim();
+  const password = passwordInput.value.trim();
 
-    const response = await fetch("http://localhost:5500/api/auth/login", {
+  if (!email || !password) {
+    alert("All fields are required");
+    return;
+  }
+
+  try {
+    const response = await fetch(`${BACKEND_URL}/api/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email: emailInput.value.trim(),
-        password: passwordInput.value.trim()
-      })
+      body: JSON.stringify({ email, password })
     });
 
     const data = await response.json();
 
-    if (response.ok) {
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("role", data.role);
-      localStorage.setItem("userId", data.id);
-      passwordInput.value = "";
-      emailInput.value = "";
-      alert(data.message);
-
-      const role = data.role.toLowerCase();
-
-      if (role === "admin") {
-        window.location.href = "../admin/index.html";
-        return;
-      }
-
-      if (role === "student") {
-        window.location.href = "../student/student.html";
-        return;
-      }
-
-      if (role === "teacher") {
-        window.location.href = "../teacher-dashboard.html";
-        return;
-      }
-
-      alert("Unknown user role");
+    if (!response.ok) {
+      alert(data.message || "Incorrect email or password");
       return;
     }
 
-    alert(data.message || "Login failed");
+    // Save token and role to localStorage
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("role", data.role); // e.g., 'ADMIN', 'TEACHER', 'STUDENT'
+    localStorage.setItem("userId", data.id);
+
+    alert("Login successful!");
+
+    // Role-based routing (case-insensitive conversion to match exact roles)
+    const role = data.role.toUpperCase();
+
+    switch (role) {
+      case "ADMIN":
+        window.location.href = "../admin/index.html";
+        break;
+      case "TEACHER":
+        window.location.href = "../teacher/index.html"; // Adjust to teacher dashboard if created
+        break;
+      case "STUDENT":
+        window.location.href = "../student/student.html"; // Points to your actual student page
+        break;
+      default:
+        alert("Unknown user role");
+        break;
+    }
+
   } catch (error) {
     console.error("Network error:", error);
-    alert("Server bilan bog'lanib bo'lmadi");
+    alert("Could not connect to the server.");
   }
-}
-
-function statusAlerts(code) {
-  alert(code);
 }
