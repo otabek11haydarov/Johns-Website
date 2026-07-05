@@ -1,9 +1,13 @@
 import app from "./app.js";
 import "dotenv/config";
-import pool from "./config/db.js";
+import prisma from "./config/db.js";
 
-const result = await pool.query("SELECT NOW()");
-console.log(result.rows);
+try {
+  const result = await prisma.$queryRaw`SELECT NOW()`;
+  console.log("Database connection successful:", result);
+} catch (error) {
+  console.error("Database connection failed:", error);
+}
 
 
 const PORT = process.env.PORT || 5500;

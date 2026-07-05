@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import pool from "../config/db.js";
+import prisma from "../config/db.js";
 import { JWT_SECRET } from "../config/auth.js";
 
 export async function verifyToken(req, res, next) {
@@ -14,16 +14,19 @@ export async function verifyToken(req, res, next) {
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
 
-    const userResult = await pool.query(
-      "SELECT id, email, role FROM users WHERE id = $1",
-      [decoded.id]
-    );
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.id },
+      select: { id: true, email: true, role: true },
+    });
 
-    if (userResult.rows.length === 0) {
+    if (!user) {
       return res.status(401).json({ message: "User not found or no longer active!" });
     }
 
-    req.user = userResult.rows[0];
+    req.user = {
+      ...user,
+      role: user.role.toLowerCase()
+    };
     next();
   } catch (error) {
     return res.status(401).json({ message: "Invalid or expired token!" });
