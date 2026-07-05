@@ -417,6 +417,10 @@ button {
 }
 
 .logout-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   border: 0;
   padding: 10px 16px;
   border-radius: 999px;
@@ -429,6 +433,16 @@ button {
 .logout-btn:hover {
   transform: translateY(-1px);
   box-shadow: 0 16px 28px rgba(255, 136, 76, 0.28);
+}
+
+.logout-btn svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .live-pill {
@@ -1360,13 +1374,48 @@ button {
   }
 
   .topbar {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 4px;
+  }
+
+  .topbar-actions {
+    width: 100%;
+    gap: 8px;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  .admin-chip {
     display: none;
+  }
+
+  .logout-btn {
+    width: 36px;
+    min-width: 36px;
+    height: 36px;
+    min-height: 36px;
+    padding: 0;
+    border-radius: 50%;
+  }
+
+  .logout-label {
+    display: none;
+  }
+
+  .icon-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
   }
 
   .overview-panel {
     min-height: auto;
     margin-top: 0;
-    padding: 62px 14px 18px;
+    padding: 24px 14px 18px;
   }
 
   .overview-header h1 {
@@ -1401,6 +1450,21 @@ button {
   .sidebar {
     width: 100%;
     padding: 8px 10px;
+  }
+
+  .topbar-actions {
+    gap: 6px;
+  }
+
+  .logout-btn {
+    width: 34px;
+    min-width: 34px;
+    height: 34px;
+  }
+
+  .icon-btn {
+    width: 34px;
+    height: 34px;
   }
 
   .nav-link,
