@@ -48,8 +48,6 @@ async function login() {
     localStorage.setItem("role", data.role); // e.g., 'ADMIN', 'TEACHER', 'STUDENT'
     localStorage.setItem("userId", data.id);
 
-    alert("Login successful!");
-
     // Role-based routing (case-insensitive conversion to match exact roles)
     const role = data.role.toUpperCase();
 
