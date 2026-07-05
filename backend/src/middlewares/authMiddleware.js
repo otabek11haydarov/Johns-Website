@@ -1,8 +1,8 @@
 import jwt from "jsonwebtoken";
-import { users } from "../data/db.js";
+import pool from "../config/db.js";
 import { JWT_SECRET } from "../config/auth.js";
 
-export function verifyToken(req, res, next) {
+export async function verifyToken(req, res, next) {
   const authHeader = req.headers.authorization;
 
   if (!authHeader?.startsWith("Bearer ")) {
@@ -13,28 +13,41 @@ export function verifyToken(req, res, next) {
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
-    const currentUser = users.find((user) => user.id === decoded.id);
 
-    if (!currentUser) {
+    const userResult = await pool.query(
+      "SELECT id, email, role FROM users WHERE id = $1",
+      [decoded.id]
+    );
+
+    if (userResult.rows.length === 0) {
       return res.status(401).json({ message: "User not found or no longer active!" });
     }
 
-    req.user = {
-      id: currentUser.id,
-      email: currentUser.email,
-      role: currentUser.role,
-    };
-
+    req.user = userResult.rows[0];
     next();
   } catch (error) {
     return res.status(401).json({ message: "Invalid or expired token!" });
   }
 }
 
-export function adminOnly(req, res, next) {
-  if (req.user?.role !== "admin") {
-    return res.status(403).json({ message: "Admin access only!" });
-  }
+export function allowRoles(...roles) {
+  return function roleMiddleware(req, res, next) {
+    if (!req.user) {
+      return res.status(401).json({ message: "Unauthorized!" });
+    }
 
-  next();
+    if (!roles.includes(req.user.role)) {
+      return res.status(403).json({ message: "You do not have permission to access this resource!" });
+    }
+
+    next();
+  };
+}
+
+export function adminOnly(req, res, next) {
+  return allowRoles("admin")(req, res, next);
+}
+
+export function studentOnly(req, res, next) {
+  return allowRoles("student")(req, res, next);
 }

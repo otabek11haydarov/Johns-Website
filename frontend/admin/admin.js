@@ -17,6 +17,23 @@ const sidebarToggle = document.getElementById("sidebarToggle");
 const sidebarClose = document.getElementById("sidebarClose");
 const themeToggle = document.getElementById("themeToggle");
 const THEME_KEY = "edu-dashboard-theme";
+const LOGIN_PAGE = "../auth/login.html";
+
+function redirectToLogin() {
+  window.location.href = LOGIN_PAGE;
+}
+
+function ensureAdminAccess() {
+  const token = localStorage.getItem("token");
+  const role = localStorage.getItem("role");
+
+  if (!token || role !== "admin") {
+    redirectToLogin();
+    return false;
+  }
+
+  return true;
+}
 
 function applyTheme(theme) {
   const isDark = theme === "dark";
@@ -622,23 +639,42 @@ if (themeToggle) {
 }
 
 if (document.getElementById("section-dashboard")) {
-  loadData();
-  renderStudents();
-  showSection("dashboard");
+  if (ensureAdminAccess()) {
+    loadData();
+    renderStudents();
+    showSection("dashboard");
+  }
 }
 
 async function loadData() {
   const tbody = document.getElementById("dashboard-activity-tbody");
   tbody.innerHTML = `<tr><td colspan="6" class="empty-row">Loading...</td></tr>`;
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    tbody.innerHTML = `<tr><td colspan="6" class="empty-row">Token topilmadi. Qayta login qiling.</td></tr>`;
+    redirectToLogin();
+    return;
+  }
 
   const response = await fetch(BASE_URL + "/api/admin/dashboard", {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
     },
   });
 
   const data = await response.json();
+
+  if (!response.ok) {
+    if (response.status === 401 || response.status === 403) {
+      redirectToLogin();
+    }
+
+    tbody.innerHTML = `<tr><td colspan="6" class="empty-row">${data.message || "Dashboard yuklanmadi."}</td></tr>`;
+    return;
+  }
 
   renderDashboardActivity(data.data.activity);
   renderStudents(data.data.students);

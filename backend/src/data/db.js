@@ -3,8 +3,8 @@ export const users =[
   {
     id: "admin-1",
     username: "Admin",
-    email: "admin@johns.com",
-    password: "$2b$10$Spi5yutewnwuh.9cAl/SF.oKL9pdJIXBdBGgNjMLQMdOmeQNS1jKm",
+    email: "gubernatr007@gmail.com",
+    password: "$2b$10$pcueUQOOZVm1y06/gjWPOeTRCUg3FGF.7nkeZx6tj0mhFLsQ72142",
     role: "admin",
   },
 ];

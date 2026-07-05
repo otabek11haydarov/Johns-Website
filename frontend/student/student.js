@@ -147,6 +147,7 @@ const libraryGrid = document.getElementById("library-grid");
 const librarySearch = document.getElementById("library-search");
 const libraryFilters = document.querySelectorAll("[data-library-filter]");
 const THEME_KEY = "edu-dashboard-theme";
+const LOGIN_PAGE = "../auth/login.html";
 
 const DEFAULT_BOOK_IMAGE = "default-book.png";
 const DEFAULT_BOOK_PREVIEW = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
@@ -167,6 +168,22 @@ const DEFAULT_BOOK_PREVIEW = `data:image/svg+xml;charset=UTF-8,${encodeURICompon
 
 let backlogExpanded = false;
 let activeLibraryCategory = "All";
+
+function redirectToLogin() {
+  window.location.href = LOGIN_PAGE;
+}
+
+function ensureStudentAccess() {
+  const token = localStorage.getItem("token");
+  const role = localStorage.getItem("role");
+
+  if (!token || role !== "student") {
+    redirectToLogin();
+    return false;
+  }
+
+  return true;
+}
 
 function applyTheme(theme) {
   const isDark = theme === "dark";
@@ -481,18 +498,20 @@ libraryGrid?.addEventListener("click", (event) => {
   window.open(`${BASE_URL}/${pdfPath}`, "_blank", "noopener");
 });
 
-renderVideoLessons();
-renderAssignments();
-renderBacklog();
-setBacklogExpanded(false);
-applyTheme(localStorage.getItem(THEME_KEY) || "light");
+if (ensureStudentAccess()) {
+  renderVideoLessons();
+  renderAssignments();
+  renderBacklog();
+  setBacklogExpanded(false);
+  applyTheme(localStorage.getItem(THEME_KEY) || "light");
 
-renderRows("results-tbody", resultRows, [
-  (row) => row.subject,
-  (row) => row.assessment,
-  (row) => row.score,
-  (row) => row.feedback,
-  (row) => createStatusBadge(row.status),
-]);
+  renderRows("results-tbody", resultRows, [
+    (row) => row.subject,
+    (row) => row.assessment,
+    (row) => row.score,
+    (row) => row.feedback,
+    (row) => createStatusBadge(row.status),
+  ]);
 
-showSection("dashboard");
+  showSection("dashboard");
+}

@@ -78,7 +78,6 @@ async function register() {
       emailInput.value = "";
       usernameInput.value = "";
       alert(data.message);
-      window.location.href = "../admin/index.html";
     }
   } catch (error) {
     console.error("Network error:", error);
@@ -102,12 +101,31 @@ async function login() {
       })
     });
 
+    const data = await response.json();
+
     if (response.ok) {
-      const data = await response.json();
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("role", data.role);
+      localStorage.setItem("userId", data.id);
       passwordInput.value = "";
       emailInput.value = "";
       alert(data.message);
+
+      if (data.role === "admin") {
+        window.location.href = "../admin/index.html";
+        return;
+      }
+
+      if (data.role === "student") {
+        window.location.href = "../student/student.html";
+        return;
+      }
+
+      alert("Unknown user role");
+      return;
     }
+
+    alert(data.message || "Login failed");
   } catch (error) {
     console.error("Network error:", error);
     alert("Server bilan bog'lanib bo'lmadi");
