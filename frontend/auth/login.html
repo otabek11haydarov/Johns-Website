@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Auth Page</title>
+    <link rel="stylesheet" href="login.css" />
+  </head>
+  <body>
+    <main class="auth-shell">
+      <section class="auth-hero">
+        <p class="hero-tag">Welcome back</p>
+        <h1>Modern account access for your workspace</h1>
+        <p class="hero-text">
+          Qovoqrang va qizg'ish palitradagi yangi ko'rinish bilan tizimga kirish
+          yoki ro'yxatdan o'tish jarayoni yanada yoqimli bo'ladi.
+        </p>
+        <div class="hero-glow hero-glow-one"></div>
+        <div class="hero-glow hero-glow-two"></div>
+      </section>
+
+      <form id="form" class="auth-card">
+        <div class="form-copy">
+          <p class="eyebrow">Account portal</p>
+          <h2>Sign Up</h2>
+          <p id="formDescription" class="form-description">
+            Create your profile and start using the platform.
+          </p>
+        </div>
+
+        <div class="field-grid">
+          <div class="field" id="usernameField">
+            <label id="usernameLabel" for="username">Username</label>
+            <input id="username" type="text" placeholder="Your username" />
+          </div>
+
+          <div class="field">
+            <label for="email">Email</label>
+            <input id="email" type="email" placeholder="example@mail.com" />
+          </div>
+
+          <div class="field">
+            <label for="password">Password</label>
+            <input id="password" type="password" placeholder="Enter password" />
+          </div>
+        </div>
+
+        <input type="button" id="loginBtn" value="Sign up" />
+        <input
+          type="button"
+          id="text-switcher-btn"
+          value="Already have an account? Login"
+        />
+      </form>
+    </main>
+    <script src="login.js"></script>
+  </body>
+</html>

@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Profile</title>
+    <link rel="stylesheet" href="profile.css" />
+</head>
+
+<body>
+    <div class="page-shell">
+        <div class="page-frame">
+            <aside class="sidebar" id="sidebar">
+                <div class="sidebar-top">
+                    <div class="sidebar-title">My Account</div>
+                    <button class="sidebar-close" id="sidebarClose" type="button" aria-label="Close menu">
+                        x
+                    </button>
+                </div>
+                <!-- // -- User profile card --------- -->
+                <div class="user-profile-card">
+                    <div class="profile-avatar">
+                        <span>JD</span>
+                        <i class="profile-status"></i>
+                    </div>
+                    <div class="profile-copy">
+                        <strong>John Developer</strong>
+                        <span>Student</span>
+                    </div>
+                </div>
+                <!-- // -- Sidebar Navigation --------- -->
+                <nav class="sidebar-nav">
+                    <a href="#" class="nav-link active" data-section="overview">
+                        <span class="nav-icon">&#8962;</span>
+                        <span class="nav-label">Overview</span>
+                    </a>
+                    <a href="#" class="nav-link" data-section="courses">
+                        <span class="nav-icon">&#128218;</span>
+                        <span class="nav-label">My Courses</span>
+                    </a>
+                    <a href="#" class="nav-link" data-section="settings">
+                        <span class="nav-icon">&#9881;</span>
+                        <span class="nav-label">Settings</span>
+                    </a>
+                    <a href="#" class="nav-link" data-section="certificates">
+                        <span class="nav-icon">&#127881;</span>
+                        <span class="nav-label">Certificates</span>
+                    </a>
+                </nav>
+                <!-- // -- Log out --------- -->
+                <div class="sidebar-bottom">
+                    <a href="../auth/login.html" class="logout-link">
+                        <span class="nav-icon">&#8617;</span>
+                        <span class="nav-label">Logout</span>
+                    </a>
+                </div>
+            </aside>
+
+            <div class="sidebar-overlay" id="sidebarOverlay"></div>
+            <!-- // -- Top bar --------- -->
+            <div class="main-wrapper">
+                <header class="topbar">
+                    <div class="topbar-left">
+                        <button class="sidebar-toggle" id="sidebarToggle" type="button" aria-label="Open menu">
+                            &#8801;
+                        </button>
+                        <div class="search-box">
+                            <span class="search-icon">&#8981;</span>
+                            <input type="text" placeholder="Search courses, certificates..." />
+                        </div>
+                    </div>
+
+                    <div class="topbar-right">
+                        <button class="topbar-icon" type="button" aria-label="Messages">
+                            &#9993;
+                        </button>
+                        <button class="topbar-icon" type="button" aria-label="Notifications">
+                            &#9873;
+                        </button>
+                        <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode"
+                            title="Toggle dark mode">
+                            <span class="theme-toggle-ring">
+                                <span class="theme-toggle-core"></span>
+                            </span>
+                        </button>
+
+                        <div class="topbar-user">
+                            <div class="mini-avatar">JD</div>
+                            <div class="topbar-user-copy">
+                                <strong>John Developer</strong>
+                                <span>Student</span>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+
+                <main class="main-content">
+                    <!-- // -- Overview Section --------- -->
+                    <section class="section active" id="section-overview">
+                        <div class="section-intro">
+                            <div>
+                                <p class="eyebrow">Welcome back</p>
+                                <h1 class="page-title" id="headerTitle">My Profile</h1>
+                            </div>
+                            <p class="section-note">
+                                View your learning progress, achievements, and profile
+                                information.
+                            </p>
+                        </div>
+
+                        <div class="stats-grid">
+                            <article class="metric-card purple">
+                                <div class="metric-icon">&#127881;</div>
+                                <div class="metric-copy">
+                                    <strong class="metric-value">8</strong>
+                                    <span class="metric-label">Courses Completed</span>
+                                </div>
+                            </article>
+
+                            <article class="metric-card green">
+                                <div class="metric-icon">&#9733;</div>
+                                <div class="metric-copy">
+                                    <strong class="metric-value">4.8</strong>
+                                    <span class="metric-label">Average Rating</span>
+                                </div>
+                            </article>
+
+                            <article class="metric-card warning">
+                                <div class="metric-icon">&#128214;</div>
+                                <div class="metric-copy">
+                                    <strong class="metric-value">12</strong>
+                                    <span class="metric-label">Active Courses</span>
+                                </div>
+                            </article>
+
+                            <article class="metric-card danger">
+                                <div class="metric-icon">&#8987;</div>
+                                <div class="metric-copy">
+                                    <strong class="metric-value">158</strong>
+                                    <span class="metric-label">Learning Hours</span>
+                                </div>
+                            </article>
+                        </div>
+
+                        <div class="profile-section">
+                            <h2 class="section-title">Profile Information</h2>
+                            <div class="profile-info-grid">
+                                <div class="info-item">
+                                    <label>Full Name</label>
+                                    <p>John Developer</p>
+                                </div>
+                                <div class="info-item">
+                                    <label>Email</label>
+                                    <p>john.developer@gmail.com</p>
+                                </div>
+                                <div class="info-item">
+                                    <label>Phone</label>
+                                    <p>+998 99 123 45 67</p>
+                                </div>
+                                <div class="info-item">
+                                    <label>Joined Date</label>
+                                    <p>15 Mar 2026</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- // -- My Courses Section --------- -->
+                    <section class="section" id="section-courses">
+                        <div class="section-intro">
+                            <div>
+                                <p class="eyebrow">Your learning journey</p>
+                                <h1 class="page-title" id="headerTitle">My Courses</h1>
+                            </div>
+                            <p class="section-note">
+                                Track your progress in all enrolled courses.
+                            </p>
+                        </div>
+
+                        <div class="courses-grid">
+                            <article class="course-card">
+                                <div class="course-header">Frontend Bootcamp</div>
+                                <div class="course-body">
+                                    <p class="course-description">
+                                        Master modern web development with React and JavaScript
+                                    </p>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 75%"></div>
+                                    </div>
+                                    <span class="progress-text">75% Complete</span>
+                                </div>
+                            </article>
+
+                            <article class="course-card">
+                                <div class="course-header">UI/UX Essentials</div>
+                                <div class="course-body">
+                                    <p class="course-description">
+                                        Learn design principles and tools
+                                    </p>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 50%"></div>
+                                    </div>
+                                    <span class="progress-text">50% Complete</span>
+                                </div>
+                            </article>
+
+                            <article class="course-card">
+                                <div class="course-header">English Foundation</div>
+                                <div class="course-body">
+                                    <p class="course-description">
+                                        Improve your English communication skills
+                                    </p>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 90%"></div>
+                                    </div>
+                                    <span class="progress-text">90% Complete</span>
+                                </div>
+                            </article>
+                        </div>
+                    </section>
+
+                    <!-- // -- Settings Section --------- -->
+                    <section class="section" id="section-settings">
+                        <div class="section-intro">
+                            <div>
+                                <p class="eyebrow">Manage your account</p>
+                                <h1 class="page-title" id="headerTitle">Settings</h1>
+                            </div>
+                            <p class="section-note">Update your profile and preferences.</p>
+                        </div>
+
+                        <div class="settings-container">
+                            <div class="settings-group">
+                                <h3>Account Settings</h3>
+                                <div class="setting-item">
+                                    <label>Change Password</label>
+                                    <button class="btn btn-secondary">Update</button>
+                                </div>
+                                <div class="setting-item">
+                                    <label>Email Notifications</label>
+                                    <input type="checkbox" checked />
+                                </div>
+                                <div class="setting-item">
+                                    <label>Two-Factor Authentication</label>
+                                    <button class="btn btn-secondary">Enable</button>
+                                </div>
+                            </div>
+
+                            <div class="settings-group">
+                                <h3>Preferences</h3>
+                                <div class="setting-item">
+                                    <label>Language</label>
+                                    <select>
+                                        <option>English</option>
+                                        <option>Uzbek</option>
+                                        <option>Russian</option>
+                                    </select>
+                                </div>
+                                <div class="setting-item">
+                                    <label>Theme</label>
+                                    <select>
+                                        <option>Light</option>
+                                        <option>Dark</option>
+                                        <option>Auto</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- // -- Certificates Section --------- -->
+                    <section class="section" id="section-certificates">
+                        <div class="section-intro">
+                            <div>
+                                <p class="eyebrow">Your achievements</p>
+                                <h1 class="page-title" id="headerTitle">Certificates</h1>
+                            </div>
+                            <p class="section-note">
+                                Display your earned certificates and accomplishments.
+                            </p>
+                        </div>
+
+                        <div class="certificates-grid">
+                            <article class="certificate-card">
+                                <div class="cert-icon">&#127881;</div>
+                                <h3>Frontend Development</h3>
+                                <p>Completed on 20 Apr 2026</p>
+                                <button class="btn btn-secondary">Download</button>
+                            </article>
+
+                            <article class="certificate-card">
+                                <div class="cert-icon">&#127881;</div>
+                                <h3>JavaScript Mastery</h3>
+                                <p>Completed on 15 Apr 2026</p>
+                                <button class="btn btn-secondary">Download</button>
+                            </article>
+
+                            <article class="certificate-card">
+                                <div class="cert-icon">&#127881;</div>
+                                <h3>Responsive Design</h3>
+                                <p>Completed on 10 Apr 2026</p>
+                                <button class="btn btn-secondary">Download</button>
+                            </article>
+                        </div>
+                    </section>
+                </main>
+            </div>
+        </div>
+    </div>
+
+    <script src="profile.js"></script>
+</body>
+
+</html>
