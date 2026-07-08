@@ -16,7 +16,7 @@
     "url": "git+https://github.com/otabek11haydarov/Johns-Website.git"
   },
   "license": "ISC",
-  "author": "Golden Fire",
+  "author": "Otabek Haydarov",
   "type": "module",
   "main": "index.js",
   "scripts": {

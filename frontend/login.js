@@ -1,6 +1,6 @@
 const heading = document.getElementById("formTitle");
 const loginBtn = document.getElementById("loginBtn");
-const emailInput = document.getElementById("email");
+const usernameInput = document.getElementById("username");
 const passwordInput = document.getElementById("password");
 const form = document.getElementById("form");
 const formDescription = document.getElementById("formDescription");
@@ -18,20 +18,20 @@ form.addEventListener("submit", async function (e) {
 
 // Login Logic
 async function login() {
-  const email = emailInput.value.trim();
+  const username = usernameInput.value.trim();
   const password = passwordInput.value.trim();
 
   try {
     const response = await fetch(`${BACKEND_URL}/api/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password })
+      body: JSON.stringify({ username, password })
     });
 
     const data = await response.json();
 
     if (!response.ok) {
-      showError(data.message || "Incorrect email or password");
+      showError(data.message || "Incorrect username or password");
       return;
     }
 
