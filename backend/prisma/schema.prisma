@@ -31,15 +31,6 @@ model User {
   mentoredGroups Group[]  @relation("GroupMentor")
 }
 
-model Book {
-  id        Int      @id @default(autoincrement())
-  title     String
-  author    String
-  level     String
-  pdf       String
-  image     String   @default("default-book.png")
-  createdAt DateTime @default(now())
-}
 
 model Group {
   id             String   @id @default(uuid())

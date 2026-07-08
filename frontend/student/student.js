@@ -3,7 +3,6 @@ const BASE_URL = "http://localhost:5500";
 const sectionLabels = {
   dashboard: "Dashboard",
   results: "Results",
-  library: "Library",
 };
 
 const videoLessons = [
@@ -143,31 +142,10 @@ const metricCards = document.querySelectorAll(".metric-action");
 const backlogList = document.getElementById("backlog-list");
 const toggleBacklogBtn = document.getElementById("toggleBacklogBtn");
 const themeToggle = document.getElementById("themeToggle");
-const libraryGrid = document.getElementById("library-grid");
-const librarySearch = document.getElementById("library-search");
-const libraryFilters = document.querySelectorAll("[data-library-filter]");
 const THEME_KEY = "edu-dashboard-theme";
 const LOGIN_PAGE = "../auth/login.html";
 
-const DEFAULT_BOOK_IMAGE = "default-book.png";
-const DEFAULT_BOOK_PREVIEW = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 600">
-    <defs>
-      <linearGradient id="coverGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#d97b41" />
-        <stop offset="100%" stop-color="#c95a52" />
-      </linearGradient>
-    </defs>
-    <rect width="480" height="600" rx="36" fill="url(#coverGradient)" />
-    <rect x="34" y="34" width="412" height="532" rx="28" fill="rgba(255,255,255,0.12)" />
-    <text x="52" y="118" fill="#fff7f1" font-family="Segoe UI, Arial, sans-serif" font-size="34" font-weight="700">Library</text>
-    <text x="52" y="210" fill="#ffffff" font-family="Segoe UI, Arial, sans-serif" font-size="46" font-weight="700">Digital Book</text>
-    <text x="52" y="520" fill="#fff7f1" font-family="Segoe UI, Arial, sans-serif" font-size="24">Student Access</text>
-  </svg>
-`)}`;
-
 let backlogExpanded = false;
-let activeLibraryCategory = "All";
 
 function redirectToLogin() {
   window.location.href = LOGIN_PAGE;
@@ -209,34 +187,6 @@ function escapeHtml(value) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
-}
-
-function normalizeBookLevel(level) {
-  return (level || "").toUpperCase().startsWith("CEFR") ? "CEFR" : level || "IELTS";
-}
-
-function resolveBookImage(image) {
-  if (!image || image === DEFAULT_BOOK_IMAGE) {
-    return DEFAULT_BOOK_PREVIEW;
-  }
-
-  if (image.startsWith("http") || image.startsWith("data:")) {
-    return image;
-  }
-
-  return `${BASE_URL}/${image.replace(/^\/+/, "")}`;
-}
-
-function resolveBookPdf(pdf) {
-  if (!pdf) {
-    return "#";
-  }
-
-  if (pdf.startsWith("http")) {
-    return pdf;
-  }
-
-  return `${BASE_URL}/${pdf.replace(/^\/+/, "")}`;
 }
 
 function renderRows(targetId, rows, columns) {
@@ -306,101 +256,6 @@ function renderBacklog() {
     .join("");
 }
 
-function renderBooks(payload) {
-  if (!libraryGrid) {
-    return;
-  }
-
-  const books = Array.isArray(payload?.data) ? payload.data : [];
-  const searchValue = (librarySearch?.value || "").trim().toLowerCase();
-
-  const filteredBooks = books.filter((book) => {
-    const matchesCategory =
-      activeLibraryCategory === "All" ? true : normalizeBookLevel(book.level) === activeLibraryCategory;
-    const matchesSearch = (book.title || "").toLowerCase().includes(searchValue);
-
-    return matchesCategory && matchesSearch;
-  });
-
-  if (!filteredBooks.length) {
-    libraryGrid.innerHTML = `
-      <div class="library-empty">
-        Hech qanday kitob topilmadi. Boshqa nom yoki kategoriya bilan qayta urinib ko'ring.
-      </div>
-    `;
-    return;
-  }
-
-  libraryGrid.innerHTML = filteredBooks
-    .map(
-      (book) => `
-        <article class="panel library-card">
-          <img class="library-card-cover" src="${escapeHtml(resolveBookImage(book.image))}" alt="${escapeHtml(book.title)} cover" />
-          <div class="library-card-body">
-            <div class="library-card-copy">
-              <h3>${escapeHtml(book.title)}</h3>
-              <p>${escapeHtml(book.author)}</p>
-            </div>
-
-            <div class="library-card-meta">
-              <span class="library-badge">${escapeHtml(book.level)}</span>
-              <span class="library-badge">PDF</span>
-            </div>
-
-            <div class="library-card-actions">
-              <button class="lesson-link library-action" type="button" data-library-read="${escapeHtml(book.pdf)}">
-                Read
-              </button>
-              <a class="task-link library-action" href="${escapeHtml(resolveBookPdf(book.pdf))}" download>
-                Download
-              </a>
-            </div>
-          </div>
-        </article>
-      `,
-    )
-    .join("");
-}
-
-async function loadBooks() {
-  if (!libraryGrid) {
-    return;
-  }
-
-  libraryGrid.innerHTML = `
-    <div class="library-empty">
-      Kitoblar yuklanmoqda...
-    </div>
-  `;
-
-  try {
-    const res = await fetch(`${BASE_URL}/api/books`);
-    const data = await res.json();
-
-    if (!res.ok) {
-      throw new Error(data.message || "Failed to load books.");
-    }
-
-    renderBooks(data);
-  } catch (error) {
-    libraryGrid.innerHTML = `
-      <div class="library-empty">
-        Kutubxona backend bilan ulanmagan.
-      </div>
-    `;
-  }
-}
-
-function setLibraryCategory(category) {
-  activeLibraryCategory = category;
-
-  libraryFilters.forEach((button) => {
-    button.classList.toggle("is-active", button.dataset.libraryFilter === category);
-  });
-
-  loadBooks();
-}
-
 function setBacklogExpanded(expanded) {
   backlogExpanded = expanded;
   backlogList.classList.toggle("collapsed", !expanded);
@@ -444,10 +299,6 @@ function showSection(name) {
     headerTitle.textContent = sectionLabels[name];
   }
 
-  if (name === "library") {
-    loadBooks();
-  }
-
   closeSidebar();
 }
 
@@ -473,30 +324,6 @@ sidebarToggle.addEventListener("click", openSidebar);
 sidebarClose.addEventListener("click", closeSidebar);
 sidebarOverlay.addEventListener("click", closeSidebar);
 themeToggle.addEventListener("click", toggleTheme);
-
-if (librarySearch) {
-  librarySearch.addEventListener("input", loadBooks);
-}
-
-libraryFilters.forEach((button) => {
-  button.addEventListener("click", () => {
-    setLibraryCategory(button.dataset.libraryFilter || "All");
-  });
-});
-
-libraryGrid?.addEventListener("click", (event) => {
-  const readButton = event.target.closest("[data-library-read]");
-  if (!readButton) {
-    return;
-  }
-
-  const pdfPath = readButton.dataset.libraryRead;
-  if (!pdfPath) {
-    return;
-  }
-
-  window.open(`${BASE_URL}/${pdfPath}`, "_blank", "noopener");
-});
 
 if (ensureStudentAccess()) {
   renderVideoLessons();
