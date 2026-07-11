@@ -1,0 +1,131 @@
+{
+	"info": {
+		"_postman_id": "c1f83c18-9366-4a6c-947f-85662bb381a5",
+		"name": "Lesson Module Test Suite",
+		"description": "Complete Postman testing collection for the Enterprise LMS Lesson Module.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Lessons",
+			"item": [
+				{
+					"name": "Create Lesson (Valid)",
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Content-Type", "value": "application/json" } ],
+						"url": { "raw": "http://localhost:5500/api/lessons", "protocol": "http", "host": [ "localhost" ], "port": "5500", "path": [ "api", "lessons" ] },
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Unit 1 - Greetings\",\n  \"groupLevel\": \"A1\",\n  \"description\": \"Introduction lesson\"\n}"
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Publish Lesson (Valid)",
+					"request": {
+						"method": "PATCH",
+						"header": [ { "key": "Content-Type", "value": "application/json" } ],
+						"url": { "raw": "http://localhost:5500/api/lessons/{{lessonId}}/publish", "protocol": "http", "host": [ "localhost" ], "port": "5500", "path": [ "api", "lessons", "{{lessonId}}", "publish" ] }
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Lesson (Valid)",
+					"request": {
+						"method": "DELETE",
+						"header": [ { "key": "Content-Type", "value": "application/json" } ],
+						"url": { "raw": "http://localhost:5500/api/lessons/{{lessonId}}", "protocol": "http", "host": [ "localhost" ], "port": "5500", "path": [ "api", "lessons", "{{lessonId}}" ] }
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Lesson Cards (Base)",
+			"item": [
+				{
+					"name": "Create Base Card (VIDEO)",
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Content-Type", "value": "application/json" } ],
+						"url": { "raw": "http://localhost:5500/api/lesson-cards", "protocol": "http", "host": [ "localhost" ], "port": "5500", "path": [ "api", "lesson-cards" ] },
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"lessonId\": \"{{lessonId}}\",\n  \"type\": \"VIDEO\",\n  \"description\": \"Intro Video Card\"\n}"
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Base Card (TEST)",
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Content-Type", "value": "application/json" } ],
+						"url": { "raw": "http://localhost:5500/api/lesson-cards", "protocol": "http", "host": [ "localhost" ], "port": "5500", "path": [ "api", "lesson-cards" ] },
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"lessonId\": \"{{lessonId}}\",\n  \"type\": \"TEST\",\n  \"description\": \"Quick Quiz\"\n}"
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Specific Tasks",
+			"item": [
+				{
+					"name": "Create Video Task (Valid)",
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Content-Type", "value": "application/json" } ],
+						"url": { "raw": "http://localhost:5500/api/video-tasks", "protocol": "http", "host": [ "localhost" ], "port": "5500", "path": [ "api", "video-tasks" ] },
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"taskId\": \"{{taskId}}\",\n  \"videoUrl\": \"https://youtube.com/watch?v=123\",\n  \"duration\": 120\n}"
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Flashcard Task (Valid)",
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Content-Type", "value": "application/json" } ],
+						"url": { "raw": "http://localhost:5500/api/flashcard-tasks", "protocol": "http", "host": [ "localhost" ], "port": "5500", "path": [ "api", "flashcard-tasks" ] },
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"taskId\": \"{{taskId}}\",\n  \"deckName\": \"Fruit Vocab\",\n  \"cards\": [\n    {\n      \"word\": \"Apple\",\n      \"description\": \"A red fruit\",\n      \"example\": \"I eat an apple\"\n    }\n  ]\n}"
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Test Task (Multiple Choice - Valid)",
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Content-Type", "value": "application/json" } ],
+						"url": { "raw": "http://localhost:5500/api/test-tasks", "protocol": "http", "host": [ "localhost" ], "port": "5500", "path": [ "api", "test-tasks" ] },
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"taskId\": \"{{taskId}}\",\n  \"timeLimit\": 20,\n  \"passingScore\": 70,\n  \"questions\": [\n    {\n      \"questionText\": \"What is 2 + 2?\",\n      \"options\": [\n        {\n          \"optionText\": \"3\",\n          \"isCorrect\": false\n        },\n        {\n          \"optionText\": \"4\",\n          \"isCorrect\": true\n        }\n      ]\n    }\n  ]\n}"
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "lessonId",
+			"value": ""
+		},
+		{
+			"key": "taskId",
+			"value": ""
+		}
+	]
+}

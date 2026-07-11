@@ -17,51 +17,173 @@ enum Role {
 }
 
 model User {
-  id             String   @id @default(uuid())
-  username       String   @unique
-  email          String   @unique
-  password       String
-  role           Role     @default(STUDENT)
-  status         String   @default("Active")
-  createdAt      DateTime @default(now())
+  id        String   @id @default(uuid())
+  username  String   @unique
+  email     String   @unique
+  password  String
+  role      Role     @default(STUDENT)
+  status    String   @default("Active")
+  createdAt DateTime @default(now())
 
   // Relations
   groupId        String?
-  group          Group?   @relation("GroupStudents", fields: [groupId], references: [id])
-  mentoredGroups Group[]  @relation("GroupMentor")
+  group          Group?  @relation("GroupStudents", fields: [groupId], references: [id])
+  mentoredGroups Group[] @relation("GroupMentor")
 }
 
-
 model Group {
-  id             String   @id @default(uuid())
+  id             String  @id @default(uuid())
   level          String
   label          String
   title          String
   description    String?
-  studentsCount  Int      @default(0)
+  studentsCount  Int     @default(0)
   mentorId       String?
-  mentor         User?    @relation("GroupMentor", fields: [mentorId], references: [id])
-  lessonsPerWeek Int      @default(3)
+  mentor         User?   @relation("GroupMentor", fields: [mentorId], references: [id])
+  lessonsPerWeek Int     @default(3)
   room           String?
-  status         String   @default("Active")
+  status         String  @default("Active")
 
   // Relations
-  students       User[]   @relation("GroupStudents")
+  students User[] @relation("GroupStudents")
 }
 
 model Lesson {
-  id          String   @id @default(uuid())
+  id          String  @id @default(uuid())
   title       String
   groupLevel  String
   description String?
-  tasks       Task[]
+  status      String  @default("DRAFT")
+  tasks       Task[]  // Barcha turdagi vazifalar ro'yxati
 }
 
+// ASOSIY JADVAL
 model Task {
-  id          String  @id @default(uuid())
+  id       String @id @default(uuid())
+  lessonId String
+  lesson   Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  type        String // 'VIDEO', 'TEST', 'FLASHCARD' va hkz.
+  order       Int // Darsdagi tartib raqami (1, 2, 3...)
+  description String?
+
+  // Yordamchi jadvallarga 1-to-1 bog'lanish (Optional)
+  videoTask     VideoTask?
+  testTask      TestTask?
+  flashcardTask FlashcardTask?
+  speakingTask  SpeakingTask?
+  readingTask   ReadingTask?
+  listeningTask ListeningTask?
+  writingTask   WritingTask?
+}
+
+// 1. VIDEO UCHUN ALOHIDA JADVAL
+model VideoTask {
+  id     String @id @default(uuid())
+  taskId String @unique
+  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  videoUrl String
+  duration Int? // Video davomiyligi (minutda)
+}
+
+// 2. TEST UCHUN ALOHIDA JADVAL
+model TestTask {
+  id           String @id @default(uuid())
+  taskId       String @unique
+  task         Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  timeLimit    Int? // Test ishlash uchun berilgan vaqt
+  passingScore Int  @default(60) // O'tish bali
+  questions    TestQuestion[]
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model TestQuestion {
+  id            String   @id @default(uuid())
+  testTaskId    String
+  testTask      TestTask @relation(fields: [testTaskId], references: [id], onDelete: Cascade)
+  
+  questionText  String   
+  order         Int
+  options       TestOption[]
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model TestOption {
+  id            String   @id @default(uuid())
+  questionId    String
+  question      TestQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  
+  optionText    String
+  isCorrect     Boolean  @default(false)
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// 3. FLASHCARD UCHUN ALOHIDA JADVAL
+model FlashcardTask {
+  id     String @id @default(uuid())
+  taskId String @unique
+  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  deckName String // Qanday so'zlar to'plami ekanligi
+  cards    FlashcardItem[]
+}
+
+model FlashcardItem {
+  id              String        @id @default(uuid())
+  flashcardTaskId String
+  flashcardTask   FlashcardTask @relation(fields: [flashcardTaskId], references: [id], onDelete: Cascade)
+
+  word        String
   description String
-  lessonId    String?
-  lesson      Lesson? @relation(fields: [lessonId], references: [id])
+  example     String?
+}
+
+// 4. SPEAKING UCHUN ALOHIDA JADVAL
+model SpeakingTask {
+  id     String @id @default(uuid())
+  taskId String @unique
+  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  prompt        String // Gapirish uchun mavzu yoki savol
+  durationLimit Int? // Gapirish uchun berilgan vaqt limit (sekund yoki minut)
+}
+
+// 5. READING UCHUN ALOHIDA JADVAL
+model ReadingTask {
+  id     String @id @default(uuid())
+  taskId String @unique
+  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  text      String // O'qish uchun matn
+  wordCount Int? // So'zlar soni
+}
+
+// 6. LISTENING UCHUN ALOHIDA JADVAL
+model ListeningTask {
+  id     String @id @default(uuid())
+  taskId String @unique
+  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  audioUrl String // Eshitish uchun audio fayl silsilasi yoki link
+  duration Int? // Audio davomiyligi
+}
+
+// 7. WRITING UCHUN ALOHIDA JADVAL
+model WritingTask {
+  id     String @id @default(uuid())
+  taskId String @unique
+  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  prompt    String // Yozish uchun mavzu
+  wordLimit Int? // Yozilishi kerak bo'lgan so'zlar soni (limit)
 }
 
 model Activity {
