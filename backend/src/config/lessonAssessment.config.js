@@ -1,0 +1,7 @@
+export const LESSON_WEIGHTS = {
+  VIDEO: 10,
+  VOCABULARY: 25,
+  FLASHCARD: 15,
+  TEST: 40,
+  SPEAKING: 10,
+};

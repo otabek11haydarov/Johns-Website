@@ -1,5 +1,5 @@
 import express from "express";
-// Trigger restart
+// Trigger restart once again
 import cors from "cors";
 import authRoute from "./routes/authRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
@@ -9,6 +9,8 @@ import lessonCardRoutes from "./routes/lessonCardRoutes.js";
 import videoRoutes from "./routes/videoRoutes.js";
 import testRoutes from "./routes/testRoutes.js";
 import flashcardRoutes from "./routes/flashcardRoutes.js";
+import lessonAssessmentRoutes from "./routes/lessonAssessment.routes.js";
+import videoAssessmentRoutes from "./routes/videoAssessment.routes.js";
 
 
 const app = express();
@@ -30,6 +32,8 @@ app.use("/api/lesson-cards", lessonCardRoutes);
 app.use("/api/video-tasks", videoRoutes);
 app.use("/api/test-tasks", testRoutes);
 app.use("/api/flashcard-tasks", flashcardRoutes);
+app.use("/api/lesson-assessments", lessonAssessmentRoutes);
+app.use("/api/video-assessments", videoAssessmentRoutes);
 
 app.use((error, req, res, next) => {
   if (!error) {

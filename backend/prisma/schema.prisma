@@ -194,3 +194,31 @@ model Activity {
   group String
   score Int
 }
+
+model LessonAssessment {
+  id              String   @id @default(uuid())
+  lessonId        String
+  studentId       String
+  videoScore      Float
+  vocabularyScore Float
+  flashcardScore  Float
+  testScore       Float
+  speakingScore   Float
+  overallScore    Float
+  status          String   @default("FAILED") // "PASSED" or "FAILED"
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model VideoAssessment {
+  id              String   @id @default(uuid())
+  studentId       String
+  lessonCardId    String
+  videoDuration   Int
+  watchedSeconds  Int
+  completionRatio Float
+  score           Float
+  completed       Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
