@@ -26,3 +26,24 @@ export async function getDashboardData(req, res) {
     return res.status(500).json({ message: "Error fetching dashboard data", error: error.message });
   }
 }
+
+// export async function addStudent(req, res) {
+//     try {
+//         const {username, password, group_id} = req.body;
+
+//         if (!username || !password || !group_id) {
+//             return res.status(400).json({message: "All fields are required"})
+//         }
+
+//         const user = await prisma.user.findUnique({
+//             where: username,
+//         });
+
+//         if (user) {
+
+//         }
+
+//     } catch (error) {
+        
+//     }
+// }

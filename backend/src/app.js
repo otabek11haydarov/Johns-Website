@@ -11,6 +11,7 @@ import testRoutes from "./routes/testRoutes.js";
 import flashcardRoutes from "./routes/flashcardRoutes.js";
 import lessonAssessmentRoutes from "./routes/lessonAssessment.routes.js";
 import videoAssessmentRoutes from "./routes/videoAssessment.routes.js";
+import studentRoutes from "./routes/student.routes.js";
 
 
 const app = express();
@@ -34,6 +35,7 @@ app.use("/api/test-tasks", testRoutes);
 app.use("/api/flashcard-tasks", flashcardRoutes);
 app.use("/api/lesson-assessments", lessonAssessmentRoutes);
 app.use("/api/video-assessments", videoAssessmentRoutes);
+app.use("/api/students", studentRoutes);
 
 app.use((error, req, res, next) => {
   if (!error) {

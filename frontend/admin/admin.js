@@ -718,3 +718,118 @@ async function loadData() {
   renderStudents(data.data.students);
   renderGroups(data.data.groups);
 }
+
+// --- STUDENT MODAL LOGIC ---
+const openStudentModalBtn = document.getElementById("openStudentModalBtn");
+const studentModalOverlay = document.getElementById("studentModalOverlay");
+const studentModalClose = document.getElementById("studentModalClose");
+const studentModalCancel = document.getElementById("studentModalCancel");
+const studentForm = document.getElementById("studentForm");
+const studentModalSubmit = document.getElementById("studentModalSubmit");
+
+function closeStudentModal() {
+  if(studentModalOverlay) studentModalOverlay.classList.remove("open");
+  if(studentForm) studentForm.reset();
+  document.querySelectorAll("#studentForm .field-error").forEach(el => el.textContent = "");
+  document.querySelectorAll("#studentForm input, #studentForm select").forEach(el => el.classList.remove("invalid"));
+}
+
+async function populateStudentGroups() {
+  const groupSelect = document.getElementById("studentGroup");
+  if (!groupSelect) return;
+  groupSelect.innerHTML = '<option value="">Select a group</option>';
+  try {
+    const token = localStorage.getItem("token");
+    const response = await fetch(BASE_URL + "/api/admin/dashboard", {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (response.ok) {
+      const data = await response.json();
+      const groups = data.data?.groups || [];
+      groups.forEach(group => {
+        const option = document.createElement("option");
+        option.value = group.id;
+        option.textContent = group.label || group.level;
+        groupSelect.appendChild(option);
+      });
+    }
+  } catch (err) {
+    console.error("Failed to load groups for modal", err);
+  }
+}
+
+if (openStudentModalBtn) {
+  openStudentModalBtn.addEventListener("click", () => {
+    populateStudentGroups();
+    studentModalOverlay.classList.add("open");
+  });
+}
+
+if (studentModalClose) studentModalClose.addEventListener("click", closeStudentModal);
+if (studentModalCancel) studentModalCancel.addEventListener("click", closeStudentModal);
+if (studentModalOverlay) {
+  studentModalOverlay.addEventListener("click", (e) => {
+    if (e.target === studentModalOverlay) closeStudentModal();
+  });
+}
+
+function setStudentFieldError(fieldId, errId, msg) {
+  document.getElementById(fieldId).classList.add("invalid");
+  document.getElementById(errId).textContent = msg;
+}
+
+if (studentForm) {
+  studentForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    
+    // Clear errors
+    document.querySelectorAll("#studentForm .field-error").forEach(el => el.textContent = "");
+    document.querySelectorAll("#studentForm input, #studentForm select").forEach(el => el.classList.remove("invalid"));
+
+    const fullName = document.getElementById("studentFullName").value.trim();
+    const username = document.getElementById("studentUsername").value.trim();
+    const email = document.getElementById("studentEmail").value.trim();
+    const password = document.getElementById("studentPassword").value;
+    const phone = document.getElementById("studentPhone").value.trim();
+    const groupId = document.getElementById("studentGroup").value;
+    const status = document.getElementById("studentStatus").value;
+
+    let valid = true;
+    if (!fullName) { setStudentFieldError("studentFullName", "student-err-fullname", "Full Name is required."); valid = false; }
+    if (!username) { setStudentFieldError("studentUsername", "student-eld-username", "Username is required."); valid = false; }
+    if (!email) { setStudentFieldError("studentEmail", "student-err-email", "Email is required."); valid = false; }
+    if (!password || password.length < 6) { setStudentFieldError("studentPassword", "student-err-password", "Password must be at least 6 characters."); valid = false; }
+    if (!groupId) { setStudentFieldError("studentGroup", "student-err-group", "Group is required."); valid = false; }
+
+    if (!valid) return;
+
+    studentModalSubmit.disabled = true;
+    studentModalSubmit.textContent = "Creating...";
+
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(BASE_URL + "/api/students", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ fullName, username, email, password, phone, groupId, status })
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.message || "Failed to create student.");
+      }
+
+      alert("Student created successfully!");
+      closeStudentModal();
+      loadData(); // refresh the table
+    } catch (error) {
+      alert(error.message);
+    } finally {
+      studentModalSubmit.disabled = false;
+      studentModalSubmit.textContent = "Create Student";
+    }
+  });
+}

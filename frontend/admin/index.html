@@ -354,8 +354,9 @@
                 <p class="eyebrow">Student records</p>
                 <h2 class="page-title">Students</h2>
               </div>
-              <p class="section-note">Learner directory prepared for your backend data.</p>
+              <button id="openStudentModalBtn" class="btn btn-primary btn-shine add-student-btn" type="button">+ Add Student</button>
             </div>
+            <p class="section-note">Learner directory prepared for your backend data.</p>
 
             <div class="panel">
               <div class="panel-header">
@@ -503,6 +504,73 @@
         <button type="button" class="btn btn-ghost" id="deleteBookModalCancel">Cancel</button>
         <button type="button" class="btn btn-danger-solid btn-shine" id="deleteBookModalConfirm">Yes, Delete</button>
       </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="studentModalOverlay">
+    <div class="modal" id="studentModal">
+      <div class="modal-header">
+        <h3 class="modal-title">Add Student</h3>
+        <button class="modal-close" id="studentModalClose" type="button">&times;</button>
+      </div>
+      <form class="modal-form" id="studentForm" novalidate>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="studentFullName">Full Name <span class="required">*</span></label>
+            <input type="text" id="studentFullName" placeholder="e.g. John Doe" required />
+            <span class="field-error" id="student-err-fullname"></span>
+          </div>
+          <div class="form-group">
+            <label for="studentUsername">Username <span class="required">*</span></label>
+            <input type="text" id="studentUsername" placeholder="e.g. johndoe" required />
+            <span class="field-error" id="student-err-username"></span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="studentEmail">Email <span class="required">*</span></label>
+            <input type="email" id="studentEmail" placeholder="e.g. john@example.com" required />
+            <span class="field-error" id="student-err-email"></span>
+          </div>
+          <div class="form-group">
+            <label for="studentPassword">Password <span class="required">*</span></label>
+            <input type="password" id="studentPassword" placeholder="Minimum 6 characters" required />
+            <span class="field-error" id="student-err-password"></span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="studentPhone">Phone Number</label>
+            <input type="text" id="studentPhone" placeholder="e.g. +998901234567" />
+            <span class="field-error" id="student-err-phone"></span>
+          </div>
+          <div class="form-group">
+            <label for="studentGroup">Group <span class="required">*</span></label>
+            <select id="studentGroup" required>
+              <option value="">Select a group</option>
+            </select>
+            <span class="field-error" id="student-err-group"></span>
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="studentStatus">Status</label>
+            <select id="studentStatus">
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+            </select>
+            <span class="field-error" id="student-err-status"></span>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-ghost" id="studentModalCancel">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-shine" id="studentModalSubmit">Create Student</button>
+        </div>
+      </form>
     </div>
   </div>
 
