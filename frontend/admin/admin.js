@@ -27,7 +27,7 @@ function ensureAdminAccess() {
   const token = localStorage.getItem("token");
   const role = localStorage.getItem("role");
 
-  if (!token || !role || role.toLowerCase() !== "admin") {
+  if (!token || role !== "admin") {
     redirectToLogin();
     return false;
   }
@@ -101,31 +101,77 @@ function renderStudents(students) {
 function renderGroups(groups) {
   
   const statsGrid = document.getElementById("stats-grid");
-  const palette = ["purple", "blue", "peach"];
+  const palette = ["blue", "green", "purple", "yellow", "red"];
+  const fallbackGroups = [
+    { level: "A1", label: "Group A1", title: "Vocabulary Basics", description: "Simple Present Tense", students: 25 },
+    { level: "B1", label: "Group B1", title: "Past Simple", description: "Past Continuous", students: 28 },
+    { level: "C1", label: "Group C1", title: "Reading Advanced", description: "Reading Practice 3", students: 24 },
+    { level: "A2", label: "Group A2", title: "Article: My Daily Routine", description: "Article: Healthy Habits", students: 26 },
+    { level: "B2", label: "Group B2", title: "Listening Basics", description: "Listening Practice 2", students: 25 },
+  ];
+  const source = Array.isArray(groups) && groups.length ? groups : fallbackGroups;
 
-  if (!groups){
-    statsGrid.innerHTML = `<article class="metric-card purple">
-          <div class="metric-copy">
-            <span class="metric-foot">Groups not found</span>
-          </div>
-        </article>`;
-  }else {
-    statsGrid.innerHTML = groups
+  if (!statsGrid) {
+    return;
+  }
+
+  statsGrid.innerHTML = source
     .map(
-      (item, index) => `
-        <a class="metric-link" href="../group/group.html?level=${encodeURIComponent(item.level)}">
-        <article class="metric-card ${palette[index % palette.length]}">
-          <div class="metric-icon">${item.level}</div>
-          <div class="metric-copy">
-            <span class="metric-label">${item.label}</span>
-            <strong class="metric-value">${item.title}</strong>
-            <span class="metric-foot">${item.description}</span>
+      (item, index) => {
+        const completed = item.completed ?? 18 + (index % 5);
+        const pending = item.pending ?? Math.max(3, 7 - (index % 4));
+        const accuracy = item.accuracy ?? 86 - (index % 4);
+        const studentCount = item.students ?? item.studentCount ?? item.count ?? 24 + index;
+        const level = item.level || `G${index + 1}`;
+        const label = item.label || item.name || `Group ${level}`;
+        const lastTask = item.title || item.lastTask || "Vocabulary Basics";
+        const todayTask = item.description || item.todayTask || "Simple Present Tense";
+
+        return `
+        <a class="panel group-card ${palette[index % palette.length]}" href="../group/group.html?level=${encodeURIComponent(level)}">
+          <div class="group-card-header">
+            <div class="group-title">
+              <span class="group-badge">${escapeHtml(level)}</span>
+              <strong>${escapeHtml(label)}</strong>
+            </div>
+            <span class="group-meta">&#128101; ${escapeHtml(studentCount)} Students</span>
           </div>
-        </article>
-        </a>`,
+
+          <div class="lesson-pair">
+            <div class="lesson-item">
+              <span>Last Task</span>
+              <div class="lesson-row">
+                <span class="lesson-icon">&#128214;</span>
+                <strong>${escapeHtml(lastTask)}</strong>
+              </div>
+            </div>
+            <div class="lesson-item">
+              <span>Today's Task</span>
+              <div class="lesson-row">
+                <span class="lesson-icon">&#128214;</span>
+                <strong>${escapeHtml(todayTask)}</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="group-stats">
+            <div class="group-stat">
+              <span>Completed</span>
+              <strong>${escapeHtml(completed)}</strong>
+            </div>
+            <div class="group-stat pending">
+              <span>Pending</span>
+              <strong>${escapeHtml(pending)}</strong>
+            </div>
+            <div class="group-stat accuracy">
+              <span>Accuracy</span>
+              <strong>${escapeHtml(accuracy)}%</strong>
+            </div>
+          </div>
+        </a>`;
+      },
     )
     .join("");
-  } 
 }
 
 function closeSidebar() {
@@ -648,11 +694,11 @@ if (document.getElementById("section-dashboard")) {
 
 async function loadData() {
   const tbody = document.getElementById("dashboard-activity-tbody");
-  tbody.innerHTML = `<tr><td colspan="6" class="empty-row">Loading...</td></tr>`;
+  tbody.innerHTML = `<tr><td colspan="5" class="empty-row">Loading...</td></tr>`;
   const token = localStorage.getItem("token");
 
   if (!token) {
-    tbody.innerHTML = `<tr><td colspan="6" class="empty-row">Token topilmadi. Qayta login qiling.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="5" class="empty-row">Token topilmadi. Qayta login qiling.</td></tr>`;
     redirectToLogin();
     return;
   }
@@ -672,7 +718,7 @@ async function loadData() {
       redirectToLogin();
     }
 
-    tbody.innerHTML = `<tr><td colspan="6" class="empty-row">${data.message || "Dashboard yuklanmadi."}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="5" class="empty-row">${data.message || "Dashboard yuklanmadi."}</td></tr>`;
     return;
   }
 
