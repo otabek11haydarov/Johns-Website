@@ -1,5 +1,5 @@
 (function attachJohnsApi(global) {
-  const BASE_URL = "http://localhost:5500";
+  // BASE_URL is provided by shared/config.js loaded before this script
   const DEFAULT_VOICE = "en_GB-alan-medium";
 
   async function speakText(text, voice = DEFAULT_VOICE) {
