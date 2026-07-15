@@ -24,6 +24,12 @@ const DEFAULT_WINDOWS_TTS_SCRIPT = path.resolve(
   "scripts",
   "windows_tts.ps1",
 );
+const SUPPORTED_VOICES = new Set([
+  "en_GB-alan-low",
+  "en_GB-alan-medium",
+  "en_US-amy-medium",
+  "en_US-ryan-high",
+]);
 
 const inflightSyntheses = new Map();
 
@@ -162,6 +168,10 @@ async function synthesizeInternal(text, voice) {
     throw new Error("Text is required for speech synthesis.");
   }
 
+  if (!SUPPORTED_VOICES.has(voice)) {
+    throw new Error(`Unsupported voice: ${voice}.`);
+  }
+
   if (normalizedText.length > DEFAULT_TEXT_LIMIT) {
     throw new Error(`Text must be ${DEFAULT_TEXT_LIMIT} characters or fewer.`);
   }
@@ -253,6 +263,7 @@ export async function synthesizeSpeech(text, voice = DEFAULT_VOICE) {
 export function getTtsConfig() {
   return {
     defaultVoice: DEFAULT_VOICE,
+    supportedVoices: [...SUPPORTED_VOICES],
     voicePath: DEFAULT_VOICE_PATH,
     cachePath: DEFAULT_CACHE_PATH,
     textLimit: DEFAULT_TEXT_LIMIT,

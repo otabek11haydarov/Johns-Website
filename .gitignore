@@ -14,6 +14,9 @@ backend/.env
 *.onnx.json
 backend/voices/
 backend/uploads/tts-cache/
+!backend/voices/
+!backend/voices/en_GB-alan-low.onnx
+!backend/voices/en_GB-alan-low.onnx.json
 
 # Prisma generated client
 backend/src/generated/prisma/
