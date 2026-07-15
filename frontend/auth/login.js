@@ -26,19 +26,16 @@ async function login() {
 
     if (response.ok) {
       localStorage.setItem("token", data.token);
-      localStorage.setItem("role", data.role);
+      const resolvedRole = resolveUserRole(data.role);
+      localStorage.setItem("role", resolvedRole || data.role); // save normalized role
       localStorage.setItem("userId", data.id);
       passwordInput.value = "";
       usernameInput.value = "";
       alert(data.message);
 
-      if (data.role === "admin") {
-        window.location.href = "../admin/index.html";
-        return;
-      }
-
-      if (data.role === "student") {
-        window.location.href = "../student/student.html";
+      const route = getRoleRoute(data.role);
+      if (route) {
+        window.location.href = route;
         return;
       }
 

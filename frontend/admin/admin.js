@@ -24,15 +24,7 @@ function redirectToLogin() {
 }
 
 function ensureAdminAccess() {
-  const token = localStorage.getItem("token");
-  const role = localStorage.getItem("role");
-
-  if (!token || role !== "admin") {
-    redirectToLogin();
-    return false;
-  }
-
-  return true;
+  return enforceRole("ADMIN");
 }
 
 function applyTheme(theme) {
