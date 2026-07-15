@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Speaking Task</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../admin/admin.css" />
+    <link rel="stylesheet" href="speak.css" />
+</head>
+
+<body>
+    <div class="page-shell">
+        <div class="page-frame">
+            <aside class="sidebar" id="sidebar">
+                <div class="sidebar-top">
+                    <div class="brand-mark">J</div>
+                    <div class="brand-copy">
+                        <div class="sidebar-title">Johns LMS</div>
+                        <span>Admin Panel</span>
+                    </div>
+                    <button class="sidebar-close" id="sidebarClose" type="button" aria-label="Close menu">
+                        x
+                    </button>
+                </div>
+
+                <nav class="sidebar-nav">
+                    <a href="../admin/index.html" class="nav-link active">
+                        <span class="nav-icon">&#9638;</span>
+                        <span class="nav-label">Dashboard</span>
+                    </a>
+                    <span class="nav-section-label">User Management</span>
+                    <a href="../admin/index.html#users" class="nav-link">
+                        <span class="nav-icon">&#128101;</span>
+                        <span class="nav-label">Students</span>
+                    </a>
+                    <a href="#" class="nav-link muted-link">
+                        <span class="nav-icon">&#127891;</span>
+                        <span class="nav-label">Teachers</span>
+                    </a>
+                    <a href="../admin/index.html" class="nav-link muted-link">
+                        <span class="nav-icon">&#9634;</span>
+                        <span class="nav-label">Groups</span>
+                    </a>
+                    <span class="nav-section-label">Academic</span>
+                    <a href="../admin/index.html#library" class="nav-link">
+                        <span class="nav-icon">&#128218;</span>
+                        <span class="nav-label">Library</span>
+                    </a>
+                    <a href="#" class="nav-link muted-link">
+                        <span class="nav-icon">&#128221;</span>
+                        <span class="nav-label">Assignments</span>
+                    </a>
+                </nav>
+
+                <div class="sidebar-bottom">
+                    <a href="../auth/login.html" class="logout-link">
+                        <span class="nav-icon">&#8617;</span>
+                        <span class="nav-label">Logout</span>
+                    </a>
+                </div>
+            </aside>
+
+            <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+            <div class="main-wrapper speaking-wrapper">
+                <header class="topbar">
+                    <div class="topbar-left">
+                        <button class="sidebar-toggle" id="sidebarToggle" type="button" aria-label="Open menu">
+                            &#8801;
+                        </button>
+                        <div class="breadcrumb-line">
+                            <span>Admin</span>
+                            <strong>Speaking</strong>
+                        </div>
+                    </div>
+
+                    <div class="topbar-right">
+                        <a class="topbar-icon" href="../admin/index.html" aria-label="Back to dashboard">&#8249;</a>
+                        <button class="topbar-icon has-dot" type="button" aria-label="Notifications">&#128276;</button>
+                        <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode"
+                            title="Toggle dark mode">
+                            <span class="theme-toggle-ring">
+                                <span class="theme-toggle-core"></span>
+                            </span>
+                        </button>
+                        <div class="topbar-user">
+                            <div class="mini-avatar">JA</div>
+                        </div>
+                        <a class="topbar-icon" href="../auth/login.html" aria-label="Logout">&#8618;</a>
+                    </div>
+                </header>
+
+                <main class="speaking-main" aria-labelledby="speakingTitle">
+                    <section class="speaking-box">
+                        <p class="speaking-eyebrow">Speaking</p>
+                        <h1 class="speaking-title" id="speakingTitle">Listen and speak clearly</h1>
+                        <p class="speaking-text">
+                            Read the prompt, prepare your answer, then use the audio button below.
+                        </p>
+                        <button class="audio-button" id="audioButton" type="button">
+                            Audio
+                        </button>
+                    </section>
+                </main>
+            </div>
+        </div>
+    </div>
+
+    <script src="../admin/admin.js"></script>
+    <script src="speak.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,120 @@
+.speaking-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.speaking-main {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  padding: 32px;
+  background:
+    radial-gradient(circle at 50% 25%, rgba(98, 22, 15, 0.16), transparent 26%),
+    #090604;
+}
+
+.speaking-box {
+  width: min(100%, 520px);
+  display: grid;
+  justify-items: center;
+  gap: 16px;
+  padding: 34px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(26, 19, 16, 0.96), rgba(18, 13, 11, 0.98));
+  color: #efe7e0;
+  text-align: center;
+}
+
+.speaking-eyebrow {
+  margin: 0;
+  color: #f05a28;
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.speaking-title {
+  margin: 0;
+  color: #fff7ef;
+  font-size: clamp(1.55rem, 1.2rem + 1vw, 2.15rem);
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+.speaking-text {
+  max-width: 390px;
+  margin: 0;
+  color: #a29791;
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+
+.audio-button {
+  min-width: 150px;
+  min-height: 46px;
+  margin-top: 6px;
+  border: 0;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #ff6633 0%, #e6471c 100%);
+  color: #fff;
+  font-weight: 800;
+  box-shadow: 0 12px 28px rgba(230, 71, 28, 0.26);
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    filter 0.2s ease;
+}
+
+.audio-button:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.06);
+}
+
+.audio-button:focus-visible {
+  outline: 3px solid rgba(255, 122, 49, 0.45);
+  outline-offset: 3px;
+}
+
+@media (max-width: 900px) {
+  .speaking-wrapper {
+    min-height: 100vh;
+  }
+}
+
+@media (max-width: 560px) {
+  .speaking-main {
+    padding: 18px;
+  }
+
+  .speaking-box {
+    padding: 26px 20px;
+  }
+
+  .audio-button {
+    width: 100%;
+  }
+}
+
+body:not(.dark-mode) .speaking-main {
+  background:
+    radial-gradient(circle at 50% 25%, rgba(240, 90, 40, 0.08), transparent 26%),
+    #fffaf7;
+}
+
+body:not(.dark-mode) .speaking-box {
+  background: #ffffff;
+  border-color: #ead8cf;
+  color: #4b342d;
+}
+
+body:not(.dark-mode) .speaking-title {
+  color: #35211b;
+}
+
+body:not(.dark-mode) .speaking-text {
+  color: #8d6f65;
+}
