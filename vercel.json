@@ -1,5 +1,9 @@
 {
   "cleanUrls": true,
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/index.js" },
+    { "source": "/(.*)", "destination": "/frontend/$1" }
+  ],
   "redirects": [
     { "source": "/", "destination": "/auth/login", "permanent": false },
     { "source": "/login", "destination": "/auth/login", "permanent": false },
