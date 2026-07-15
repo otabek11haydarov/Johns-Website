@@ -53,6 +53,19 @@
   line-height: 1.7;
 }
 
+.speaking-prompt {
+  width: 100%;
+  margin: 0;
+  padding: 16px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  color: #fff3eb;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.7;
+}
+
 .audio-button {
   min-width: 150px;
   min-height: 46px;
@@ -66,12 +79,27 @@
   cursor: pointer;
   transition:
     transform 0.2s ease,
-    filter 0.2s ease;
+    filter 0.2s ease,
+    opacity 0.2s ease;
 }
 
 .audio-button:hover {
   transform: translateY(-1px);
   filter: brightness(1.06);
+}
+
+.audio-button:disabled {
+  cursor: wait;
+  opacity: 0.72;
+  transform: none;
+  filter: none;
+}
+
+.audio-status {
+  min-height: 24px;
+  margin: 0;
+  color: #f8c7b4;
+  font-size: 0.88rem;
 }
 
 .audio-button:focus-visible {
@@ -111,10 +139,20 @@ body:not(.dark-mode) .speaking-box {
   color: #4b342d;
 }
 
+body:not(.dark-mode) .speaking-prompt {
+  border-color: #ead8cf;
+  background: #fff6f1;
+  color: #442b22;
+}
+
 body:not(.dark-mode) .speaking-title {
   color: #35211b;
 }
 
 body:not(.dark-mode) .speaking-text {
   color: #8d6f65;
+}
+
+body:not(.dark-mode) .audio-status {
+  color: #9f5e46;
 }

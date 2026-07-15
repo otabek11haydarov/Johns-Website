@@ -1,6 +1,10 @@
 node_modules
 # Keep environment variables out of version control
 .env
+voices/
+*.onnx
+*.onnx.json
+uploads/tts-cache/
 
 /src/generated/prisma
 scratch/

@@ -10,6 +10,10 @@ backend/scripts
 # Local env files
 .env
 backend/.env
+*.onnx
+*.onnx.json
+backend/voices/
+backend/uploads/tts-cache/
 
 # Prisma generated client
 backend/src/generated/prisma/
