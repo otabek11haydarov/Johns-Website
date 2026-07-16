@@ -1,10 +1,9 @@
 {
-  "cleanUrls": true,
   "redirects": [
-    { "source": "/", "destination": "/auth/login", "permanent": false },
-    { "source": "/login", "destination": "/auth/login", "permanent": false },
-    { "source": "/dashboard", "destination": "/admin", "permanent": false },
-    { "source": "/student", "destination": "/student/student", "permanent": false },
-    { "source": "/teacher", "destination": "/Task Manager/task", "permanent": false }
+    { "source": "/", "destination": "/auth/login.html", "permanent": false },
+    { "source": "/login", "destination": "/auth/login.html", "permanent": false },
+    { "source": "/dashboard", "destination": "/admin/", "permanent": false },
+    { "source": "/student", "destination": "/student/student.html", "permanent": false },
+    { "source": "/teacher", "destination": "/Task Manager/task.html", "permanent": false }
   ]
 }
