@@ -16,7 +16,7 @@ function resolveUserRole(role) {
 function getRoleRoute(role) {
     const normalized = resolveUserRole(role);
     switch (normalized) {
-        case "ADMIN": return "../admin/index.html";
+        case "ADMIN": return "../admin/";
         case "TEACHER": return "../Task Manager/task.html"; // Teacher dashboard is under Task Manager in this app, or fallback
         case "STUDENT": return "../student/student.html";
         default: return null;
