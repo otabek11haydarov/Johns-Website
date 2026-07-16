@@ -49,3 +49,14 @@ async function login() {
     alert("Server bilan bog'lanib bo'lmadi");
   }
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  const token = localStorage.getItem("token");
+  const role = localStorage.getItem("role");
+  if (token && role) {
+    const route = getRoleRoute(role);
+    if (route && !window.location.pathname.includes(route.replace('../', '').replace('.html', ''))) {
+       window.location.replace(route);
+    }
+  }
+});

@@ -32,7 +32,9 @@ function enforceRole(expectedRole) {
     const token = localStorage.getItem("token");
     
     if (!token || resolveUserRole(role) !== resolveUserRole(expectedRole)) {
-        window.location.href = "../auth/login.html";
+        if (!window.location.pathname.includes('/auth/login')) {
+            window.location.replace("../auth/login.html");
+        }
         return false;
     }
     return true;

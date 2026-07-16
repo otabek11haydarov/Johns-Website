@@ -20,7 +20,9 @@ const THEME_KEY = "edu-dashboard-theme";
 const LOGIN_PAGE = "../auth/login.html";
 
 function redirectToLogin() {
-  window.location.href = LOGIN_PAGE;
+  if (!window.location.pathname.includes('/auth/login')) {
+    window.location.replace(LOGIN_PAGE);
+  }
 }
 
 function ensureAdminAccess() {
