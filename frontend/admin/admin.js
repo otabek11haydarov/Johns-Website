@@ -723,6 +723,7 @@ async function loadData() {
 
 // --- STUDENT MODAL LOGIC ---
 const openStudentModalBtn = document.getElementById("openStudentModalBtn");
+const dashboardAddStudentBtn = document.getElementById("dashboardAddStudentBtn");
 const studentModalOverlay = document.getElementById("studentModalOverlay");
 const studentModalClose = document.getElementById("studentModalClose");
 const studentModalCancel = document.getElementById("studentModalCancel");
@@ -760,11 +761,16 @@ async function populateStudentGroups() {
   }
 }
 
+function openStudentModal() {
+  populateStudentGroups();
+  studentModalOverlay.classList.add("open");
+}
+
 if (openStudentModalBtn) {
-  openStudentModalBtn.addEventListener("click", () => {
-    populateStudentGroups();
-    studentModalOverlay.classList.add("open");
-  });
+  openStudentModalBtn.addEventListener("click", openStudentModal);
+}
+if (dashboardAddStudentBtn) {
+  dashboardAddStudentBtn.addEventListener("click", openStudentModal);
 }
 
 if (studentModalClose) studentModalClose.addEventListener("click", closeStudentModal);
@@ -790,17 +796,20 @@ if (studentForm) {
 
     const fullName = document.getElementById("studentFullName").value.trim();
     const username = document.getElementById("studentUsername").value.trim();
-    const email = document.getElementById("studentEmail").value.trim();
     const password = document.getElementById("studentPassword").value;
+    const parentPassword = document.getElementById("studentParentPassword").value;
     const phone = document.getElementById("studentPhone").value.trim();
+    const parentPhone = document.getElementById("studentParentPhone").value.trim();
     const groupId = document.getElementById("studentGroup").value;
     const status = document.getElementById("studentStatus").value;
 
     let valid = true;
     if (!fullName) { setStudentFieldError("studentFullName", "student-err-fullname", "Full Name is required."); valid = false; }
-    if (!username) { setStudentFieldError("studentUsername", "student-eld-username", "Username is required."); valid = false; }
-    if (!email) { setStudentFieldError("studentEmail", "student-err-email", "Email is required."); valid = false; }
+    if (!username) { setStudentFieldError("studentUsername", "student-err-username", "Username is required."); valid = false; }
     if (!password || password.length < 6) { setStudentFieldError("studentPassword", "student-err-password", "Password must be at least 6 characters."); valid = false; }
+    if (!parentPassword || parentPassword.length < 6) { setStudentFieldError("studentParentPassword", "student-err-parent-password", "Parent's Password must be at least 6 characters."); valid = false; }
+    if (!phone) { setStudentFieldError("studentPhone", "student-err-phone", "Phone is required."); valid = false; }
+    if (!parentPhone) { setStudentFieldError("studentParentPhone", "student-err-parent-phone", "Parent Phone is required."); valid = false; }
     if (!groupId) { setStudentFieldError("studentGroup", "student-err-group", "Group is required."); valid = false; }
 
     if (!valid) return;
@@ -816,7 +825,7 @@ if (studentForm) {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({ fullName, username, email, password, phone, groupId, status })
+        body: JSON.stringify({ fullName, username, password, parentPassword, phone, parentPhone, groupId, status })
       });
 
       const data = await res.json();

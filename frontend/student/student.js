@@ -180,8 +180,8 @@ function ensureStudentAccess() {
 function applyTheme(theme) {
   const isDark = theme === "dark";
   document.body.classList.toggle("dark-mode", isDark);
-  themeToggle.setAttribute("aria-label", isDark ? "Switch to light mode" : "Switch to dark mode");
-  themeToggle.setAttribute("title", isDark ? "Light mode" : "Dark mode");
+  themeToggle?.setAttribute("aria-label", isDark ? "Switch to light mode" : "Switch to dark mode");
+  themeToggle?.setAttribute("title", isDark ? "Light mode" : "Dark mode");
 }
 
 function toggleTheme() {
@@ -409,13 +409,13 @@ function scrollToPanel(id) {
 }
 
 function closeSidebar() {
-  sidebar.classList.remove("open");
-  sidebarOverlay.classList.remove("open");
+  sidebar?.classList.remove("open");
+  sidebarOverlay?.classList.remove("open");
 }
 
 function openSidebar() {
-  sidebar.classList.add("open");
-  sidebarOverlay.classList.add("open");
+  sidebar?.classList.add("open");
+  sidebarOverlay?.classList.add("open");
 }
 
 function showSection(name) {
@@ -457,14 +457,14 @@ metricCards.forEach((card) => {
   });
 });
 
-toggleBacklogBtn.addEventListener("click", () => {
+toggleBacklogBtn?.addEventListener("click", () => {
   setBacklogExpanded(!backlogExpanded);
 });
 
-sidebarToggle.addEventListener("click", openSidebar);
-sidebarClose.addEventListener("click", closeSidebar);
-sidebarOverlay.addEventListener("click", closeSidebar);
-themeToggle.addEventListener("click", toggleTheme);
+sidebarToggle?.addEventListener("click", openSidebar);
+sidebarClose?.addEventListener("click", closeSidebar);
+sidebarOverlay?.addEventListener("click", closeSidebar);
+themeToggle?.addEventListener("click", toggleTheme);
 
 if (librarySearch) {
   librarySearch.addEventListener("input", loadBooks);

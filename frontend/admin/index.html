@@ -121,7 +121,7 @@
                                     Welcome back, Admin. Here's what's happening today.
                                 </p>
                             </div>
-                            <button class="btn btn-primary btn-shine add-student-btn" type="button">
+                            <button class="btn btn-primary btn-shine add-student-btn" id="dashboardAddStudentBtn" onclick="openStudentModal()" type="button">
                                 <span>+</span> Add New Student
                             </button>
                         </div>
@@ -200,8 +200,11 @@
                                 <p class="eyebrow">Student records</p>
                                 <h2 class="page-title">Students</h2>
                             </div>
-                            <p class="section-note">Learner directory prepared for your backend data.</p>
+                            <button class="btn btn-primary btn-shine add-student-btn" id="openStudentModalBtn" onclick="openStudentModal()" type="button">
+                                <span>+</span> Add Student
+                            </button>
                         </div>
+                        <p class="section-note">Learner directory prepared for your backend data.</p>
 
                         <div class="panel">
                             <div class="panel-header">
@@ -270,162 +273,6 @@
         </div>
     </div>
 
-    <div class="modal-overlay" id="bookModalOverlay">
-        <div class="modal" id="bookModal">
-            <div class="modal-header">
-                <h3 class="modal-title" id="bookModalTitle">Add Book</h3>
-                <button class="modal-close" id="bookModalClose" type="button">&times;</button>
-            </div>
-            <form class="modal-form" id="bookForm" novalidate>
-                <input type="hidden" id="bookId" />
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="bookTitle">Title <span class="required">*</span></label>
-                        <input type="text" id="bookTitle" placeholder="e.g. IELTS Cambridge 15" required />
-                        <span class="field-error" id="book-err-title"></span>
-                    </div>
-                    <div class="form-group">
-                        <label for="bookAuthor">Author <span class="required">*</span></label>
-                        <input type="text" id="bookAuthor" placeholder="e.g. Cambridge" required />
-                        <span class="field-error" id="book-err-author"></span>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="bookLevel">Level <span class="required">*</span></label>
-                        <select id="bookLevel" required>
-                            <option value="">Select level</option>
-                            <option value="IELTS">IELTS</option>
-                            <option value="CEFR A1">CEFR A1</option>
-                            <option value="CEFR A2">CEFR A2</option>
-                            <option value="CEFR B1">CEFR B1</option>
-                            <option value="CEFR B2">CEFR B2</option>
-                            <option value="CEFR C1">CEFR C1</option>
-                        </select>
-                        <span class="field-error" id="book-err-level"></span>
-                    </div>
-                    <div class="form-group">
-                        <label for="bookPdf">PDF upload <span class="required">*</span></label>
-                        <input type="file" id="bookPdf" accept="application/pdf" />
-                        <span class="field-error" id="book-err-pdf"></span>
-                    </div>
-                </div>
-
-                <p class="book-file-hint" id="bookPdfHint"></p>
-
-                <div class="form-group">
-                    <label for="bookImage">Image upload</label>
-                    <input type="file" id="bookImage" accept="image/*" />
-                    <span class="field-error" id="book-err-image"></span>
-                </div>
-
-                <div class="book-preview-wrap">
-                    <img id="bookImagePreview" class="book-image-preview" alt="Book preview" />
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-ghost" id="bookModalCancel">Cancel</button>
-                    <button type="submit" class="btn btn-primary btn-shine" id="bookModalSubmit">Save Book</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="deleteBookModalOverlay">
-        <div class="modal modal-sm" id="deleteBookModal">
-            <div class="modal-header">
-                <h3 class="modal-title">Delete Book</h3>
-                <button class="modal-close" id="deleteBookModalClose" type="button">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="delete-icon">&#8998;</div>
-                <p class="delete-message">
-                    Are you sure you want to delete
-                    <strong id="deleteBookName"></strong>?
-                </p>
-                <p class="delete-sub">This action cannot be undone.</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-ghost" id="deleteBookModalCancel">Cancel</button>
-
-                <section class="section" id="section-users">
-                    <div class="section-intro compact">
-                        <div>
-                            <p class="eyebrow">Student records</p>
-                            <h2 class="page-title">Students</h2>
-                        </div>
-                        <button id="openStudentModalBtn" class="btn btn-primary btn-shine add-student-btn"
-                            type="button">+ Add Student</button>
-                    </div>
-                    <p class="section-note">Learner directory prepared for your backend data.</p>
-
-                    <div class="panel">
-                        <div class="panel-header">
-                            <div>
-                                <h2 class="panel-title">Student Directory</h2>
-                                <p class="panel-subtitle">Current UI preview for education platform users</p>
-                            </div>
-                        </div>
-
-                        <div class="table-wrapper">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Name</th>
-                                        <th>Email</th>
-                                        <th>Program</th>
-                                        <th>Joined</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="users-tbody">
-
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </section>
-                <section class="section" id="section-library">
-                    <div class="section-intro compact">
-                        <div>
-                            <p class="eyebrow">Book catalog</p>
-                            <h2 class="page-title">Library</h2>
-                        </div>
-                        <button id="addBookBtn" class="btn btn-primary btn-shine" type="button">+ Add New Book</button>
-                    </div>
-
-                    <div class="panel">
-                        <div class="panel-header library-header">
-                            <div>
-                                <h2 class="panel-title">Manage IELTS &amp; CEFR books</h2>
-                                <p class="panel-subtitle">Search, filter, upload PDFs, update, and delete book entries.
-                                </p>
-                            </div>
-                        </div>
-
-                        <div class="library-toolbar">
-                            <label class="library-search" for="bookSearchInput">
-                                <span class="search-icon">&#8981;</span>
-                                <input id="bookSearchInput" type="text" placeholder="Search by book title..." />
-                            </label>
-
-                            <select id="bookLevelFilter" class="library-select form-select w-25">
-                                <option value="All">All Levels</option>
-                                <option value="IELTS">IELTS</option>
-                                <option value="CEFR">CEFR</option>
-                            </select>
-                        </div>
-
-                        <div id="book-grid" class="book-grid"></div>
-                    </div>
-                </section>
-                </main>
-            </div>
-        </div>
-    </div>
 
     <div class="modal-overlay" id="bookModalOverlay">
         <div class="modal" id="bookModal">
@@ -513,7 +360,7 @@
     </div>
 
     <div class="modal-overlay" id="studentModalOverlay">
-        <div class="modal" id="studentModal">
+        <div class="modal animated-modal" id="studentModal">
             <div class="modal-header">
                 <h3 class="modal-title">Add Student</h3>
                 <button class="modal-close" id="studentModalClose" type="button">&times;</button>
@@ -534,33 +381,38 @@
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="studentEmail">Email <span class="required">*</span></label>
-                        <input type="email" id="studentEmail" placeholder="e.g. john@example.com" required />
-                        <span class="field-error" id="student-err-email"></span>
-                    </div>
-                    <div class="form-group">
                         <label for="studentPassword">Password <span class="required">*</span></label>
                         <input type="password" id="studentPassword" placeholder="Minimum 6 characters" required />
                         <span class="field-error" id="student-err-password"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="studentParentPassword">Parent's Password <span class="required">*</span></label>
+                        <input type="password" id="studentParentPassword" placeholder="Minimum 6 characters" required />
+                        <span class="field-error" id="student-err-parent-password"></span>
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="studentPhone">Phone Number</label>
-                        <input type="text" id="studentPhone" placeholder="e.g. +998901234567" />
+                        <label for="studentPhone">Student Phone <span class="required">*</span></label>
+                        <input type="text" id="studentPhone" placeholder="+998 90 123 45 67" required />
                         <span class="field-error" id="student-err-phone"></span>
                     </div>
                     <div class="form-group">
-                        <label for="studentGroup">Group <span class="required">*</span></label>
+                        <label for="studentParentPhone">Parent Phone <span class="required">*</span></label>
+                        <input type="text" id="studentParentPhone" placeholder="+998 90 123 45 67" required />
+                        <span class="field-error" id="student-err-parent-phone"></span>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="studentGroup">Current Level / Group <span class="required">*</span></label>
                         <select id="studentGroup" required>
                             <option value="">Select a group</option>
                         </select>
                         <span class="field-error" id="student-err-group"></span>
                     </div>
-                </div>
-
-                <div class="form-row">
                     <div class="form-group">
                         <label for="studentStatus">Status</label>
                         <select id="studentStatus">

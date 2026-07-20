@@ -4,11 +4,11 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Group Task Planning</title>
+    <title>Group Lesson Planning</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <link rel="stylesheet" href="../admin/admin.css" />
-    <link rel="stylesheet" href="group.css" />
+    <link rel="stylesheet" href="lesson.css" />
 </head>
 
 <body>
@@ -94,7 +94,7 @@
                         </button>
                         <div class="breadcrumb-line">
                             <span>Admin</span>
-                            <strong>Groups</strong>
+                            <strong>Lessons</strong>
                         </div>
                     </div>
 
@@ -119,14 +119,14 @@
                         <div class="section-intro">
                             <div>
                                 <span class="panel-chip" id="heroChip">A1 Foundations</span>
-                                <h1 class="page-title" id="taskPageTitle">A1 Task Planning</h1>
-                                <h2 class="visually-hidden" id="heroTitle">Task planning for A1 learners</h2>
+                                <h1 class="page-title" id="taskPageTitle">A1 Lesson Planning</h1>
+                                <h2 class="visually-hidden" id="heroTitle">Lesson planning for A1 learners</h2>
                                 <p class="section-note" id="heroDescription">
-                                    Manage group tasks with the same clean dashboard layout used in the admin panel.
+                                    Build lessons for this group by choosing any task types you want to include.
                                 </p>
                             </div>
                             <button id="add-task-btn" class="btn btn-primary btn-shine add-student-btn" type="button">
-                                <span>+</span> Add Video Task
+                                <span>+</span> Add Lesson
                             </button>
                         </div>
 
@@ -134,7 +134,7 @@
                             <article class="metric-card kpi-card blue">
                                 <div class="metric-icon">&#128203;</div>
                                 <div class="metric-copy">
-                                    <span class="metric-label">Total Tasks</span>
+                                    <span class="metric-label">Total Lessons</span>
                                     <strong class="metric-value" id="metricTotal">0</strong>
                                     <span class="metric-foot">Selected group</span>
                                 </div>
@@ -142,7 +142,7 @@
                             <article class="metric-card kpi-card green">
                                 <div class="metric-icon">&#9679;</div>
                                 <div class="metric-copy">
-                                    <span class="metric-label">Active</span>
+                                    <span class="metric-label">Published</span>
                                     <strong class="metric-value" id="metricActive">0</strong>
                                     <span class="metric-foot">Ready for students</span>
                                 </div>
@@ -160,67 +160,23 @@
                                 <div class="metric-copy">
                                     <span class="metric-label">CEFR Group</span>
                                     <strong class="metric-value" id="groupBadge">A1</strong>
-                                    <span class="metric-foot">Current planning board</span>
+                                    <span class="metric-foot">Current lesson board</span>
                                 </div>
                             </article>
                         </div>
 
-                        <article class="panel task-category-panel" aria-labelledby="sidebarCategoriesTitle">
-                            <div class="panel-header">
-                                <div>
-                                    <h2 class="panel-title" id="sidebarCategoriesTitle">Task Categories</h2>
-                                    <p class="panel-subtitle">Choose the activity type to manage this group's tasks</p>
-                                </div>
-                                <span class="panel-chip" id="activeCategoryLabel">Video</span>
-                            </div>
-
-                            <nav class="sidebar-categories__tabs" id="categoryTabs" aria-label="Task categories"
-                                role="tablist">
-                                <button class="sidebar-categories__button is-active" type="button" role="tab"
-                                    aria-selected="true" data-category="video">
-                                    <span class="sidebar-categories__label">Video</span>
-                                    <span class="sidebar-categories__count" data-count-for="Video">0</span>
-                                </button>
-                                <button class="sidebar-categories__button" type="button" role="tab"
-                                    aria-selected="false" data-category="writing">
-                                    <span class="sidebar-categories__label">Writing</span>
-                                    <span class="sidebar-categories__count" data-count-for="Writing">0</span>
-                                </button>
-                                <button class="sidebar-categories__button" type="button" role="tab"
-                                    aria-selected="false" data-category="listening">
-                                    <span class="sidebar-categories__label">Listening</span>
-                                    <span class="sidebar-categories__count" data-count-for="Listening">0</span>
-                                </button>
-                                <button class="sidebar-categories__button" type="button" role="tab"
-                                    aria-selected="false" data-category="reading">
-                                    <span class="sidebar-categories__label">Reading</span>
-                                    <span class="sidebar-categories__count" data-count-for="Reading">0</span>
-                                </button>
-                                <button class="sidebar-categories__button" type="button" role="tab"
-                                    aria-selected="false" data-category="speaking">
-                                    <span class="sidebar-categories__label">Speaking</span>
-                                    <span class="sidebar-categories__count" data-count-for="Speaking">0</span>
-                                </button>
-                                <button class="sidebar-categories__button" type="button" role="tab"
-                                    aria-selected="false" data-category="vocabulary">
-                                    <span class="sidebar-categories__label">Vocabulary</span>
-                                    <span class="sidebar-categories__count" data-count-for="Vocabulary">0</span>
-                                </button>
-                            </nav>
-                        </article>
-
                         <section class="task-workspace panel" aria-labelledby="taskWorkspaceTitle">
                             <div class="task-workspace__header">
                                 <div>
-                                    <p class="task-workspace__eyebrow">Filtered Tasks</p>
-                                    <h2 class="task-workspace__title" id="taskWorkspaceTitle">Category preview</h2>
+                                    <p class="task-workspace__eyebrow">Group Lessons</p>
+                                    <h2 class="task-workspace__title" id="taskWorkspaceTitle">Lesson preview</h2>
                                 </div>
 
                                 <div class="task-workspace__actions">
                                     <div class="task-workspace__summary">
                                         <span class="task-workspace__summary-label">Currently showing</span>
                                         <strong class="task-workspace__summary-value" id="resultsSummary">0
-                                            tasks</strong>
+                                            lessons</strong>
                                     </div>
                                 </div>
                             </div>
@@ -228,9 +184,9 @@
                             <div class="task-grid" id="taskGrid" aria-live="polite"></div>
 
                             <div class="task-empty" id="taskEmpty" hidden>
-                                <h3 class="task-empty__title">No tasks in this category</h3>
+                                <h3 class="task-empty__title">No lessons match this filter</h3>
                                 <p class="task-empty__text">
-                                    Switch categories above to preview another task set for this group.
+                                    Add a lesson and choose one or more tasks to build this group's plan.
                                 </p>
                             </div>
                         </section>
@@ -244,7 +200,7 @@
         <article class="task-card">
             <div class="task-card__header">
                 <div class="task-card__title-wrap">
-                    <p class="task-card__eyebrow">Learning Task</p>
+                    <p class="task-card__eyebrow">Lesson</p>
                     <h3 class="task-card__title"></h3>
                 </div>
                 <span class="task-card__type"></span>
@@ -267,34 +223,50 @@
     </template>
 
     <div class="modal fade" id="task-modal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-dialog modal-dialog-centered modal-xl lesson-modal-dialog">
             <div class="modal-content admin-modal-panel">
                 <div class="modal-header">
-                    <h3 class="modal-title" id="taskModalTitle">Create Task</h3>
+                    <h3 class="modal-title" id="taskModalTitle">Create Lesson</h3>
                     <button type="button" class="modal-close" data-bs-dismiss="modal"
                         aria-label="Close">&times;</button>
                 </div>
                 <form class="modal-form" id="taskForm" novalidate>
                     <div class="form-group">
-                        <label for="taskTitleInput">Task title</label>
-                        <input type="text" id="taskTitleInput" placeholder="Enter task title" required />
+                        <label for="taskTitleInput">Lesson title</label>
+                        <input type="text" id="taskTitleInput" placeholder="Enter lesson title" required />
                     </div>
                     <div class="form-group">
                         <label for="taskDescriptionInput">Description</label>
-                        <textarea id="taskDescriptionInput" rows="4" placeholder="Short task description"></textarea>
+                        <textarea id="taskDescriptionInput" rows="4" placeholder="Short lesson description"></textarea>
                     </div>
-                    <div class="form-group" id="videoTaskSourceRow">
-                        <label for="video-link">Video link</label>
-                        <input type="url" id="video-link" placeholder="Paste video link" />
+                    <div class="form-row">
+                        <div class="form-group lesson-quick-filter-field">
+                            <label for="taskCategorySelect">Quick filter</label>
+                            <select id="taskCategorySelect">
+                                <option value="Video">Video</option>
+                                <option value="Writing">Writing</option>
+                                <option value="Listening">Listening</option>
+                                <option value="Reading">Reading</option>
+                                <option value="Speaking">Speaking</option>
+                                <option value="Vocabulary">Vocabulary</option>
+                            </select>
+                        </div>
+                        <div class="form-group lesson-selected-field">
+                            <label>Selected tasks</label>
+                            <div class="lesson-selected-summary lesson-selected-summary--top" id="lessonSelectedSummary">
+                                <span class="lesson-selected-empty">No tasks selected yet.</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group" id="speakingTaskTextRow" hidden>
-                        <label for="speaking-text">Text</label>
-                        <input type="text" id="speaking-text" placeholder="Enter speaking text" />
+                    <div class="form-group" id="lessonTaskPicker">
+                        <label>Tasks inside this lesson</label>
+                        <div class="lesson-task-picker" id="lessonTaskOptions"></div>
+                        <p class="lesson-form-hint">Open a filter, choose one task from that type, and skip the task types this lesson does not need.</p>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-ghost" data-bs-dismiss="modal">Cancel</button>
                         <button type="submit" class="btn btn-primary btn-shine" id="taskSubmitButton">Create
-                            Task</button>
+                            Lesson</button>
                     </div>
                 </form>
             </div>
@@ -305,13 +277,13 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content admin-modal-panel">
                 <div class="modal-header">
-                    <h3 class="modal-title">Delete Task</h3>
+                    <h3 class="modal-title">Delete Lesson</h3>
                     <button type="button" class="modal-close" data-bs-dismiss="modal"
                         aria-label="Close">&times;</button>
                 </div>
                 <div class="modal-body px-4 pt-3">
                     <div class="delete-icon">&#8998;</div>
-                    <p class="delete-message">Are you sure you want to delete this task?</p>
+                    <p class="delete-message">Are you sure you want to delete this lesson?</p>
                     <p class="delete-sub">This action cannot be undone.</p>
                 </div>
                 <div class="modal-footer px-4 pb-4">
@@ -325,7 +297,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../shared/task-manager-page.js"></script>
-    <script src="group.js"></script>
+    <script src="lesson.js"></script>
     <script src="../admin/admin.js"></script>
 </body>
 

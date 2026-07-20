@@ -191,6 +191,8 @@
       videoSourceType: document.getElementById("video-source-type"),
       videoUpload: document.getElementById("video-upload"),
       videoLink: document.getElementById("video-link"),
+      speakingTextRow: document.getElementById("speakingTaskTextRow"),
+      speakingTextInput: document.getElementById("speaking-text"),
       deleteTaskModal: document.getElementById("delete-task-modal"),
       confirmDeleteTaskButton: document.getElementById("confirmDeleteTaskBtn"),
     };
@@ -308,16 +310,30 @@
     }
 
     function syncVideoSourceInput() {
-      if (!elements.videoSourceRow || !elements.videoSourceType || !elements.videoUpload || !elements.videoLink) {
+      const selectedType = elements.taskCategorySelect?.value || capitalize(currentCategory);
+      const isVideoCategory = selectedType === "Video";
+      const isSpeakingCategory = selectedType === "Speaking";
+
+      if (elements.speakingTextRow) {
+        elements.speakingTextRow.hidden = !isSpeakingCategory;
+      }
+
+      if (!elements.videoSourceRow || !elements.videoLink) {
         return;
       }
 
-      const isVideoCategory = elements.taskCategorySelect.value === "Video";
       elements.videoSourceRow.hidden = !isVideoCategory;
 
       if (!isVideoCategory) {
-        elements.videoUpload.style.display = "none";
+        if (elements.videoUpload) {
+          elements.videoUpload.style.display = "none";
+        }
         elements.videoLink.style.display = "none";
+        return;
+      }
+
+      if (!elements.videoSourceType) {
+        elements.videoLink.style.display = "block";
         return;
       }
 
@@ -340,8 +356,14 @@
     function resetTaskForm() {
       editingTaskId = null;
       elements.taskForm.reset();
-      elements.taskCategorySelect.value = capitalize(currentCategory);
-      elements.taskStatusSelect.value = "Active";
+
+      if (elements.taskCategorySelect) {
+        elements.taskCategorySelect.value = capitalize(currentCategory);
+      }
+
+      if (elements.taskStatusSelect) {
+        elements.taskStatusSelect.value = "Active";
+      }
 
       if (elements.videoSourceType) {
         elements.videoSourceType.value = "upload";
@@ -372,8 +394,22 @@
       editingTaskId = taskId;
       elements.taskTitleInput.value = task.title;
       elements.taskDescriptionInput.value = task.description;
-      elements.taskCategorySelect.value = task.type;
-      elements.taskStatusSelect.value = task.status;
+
+      if (elements.taskCategorySelect) {
+        elements.taskCategorySelect.value = task.type;
+      }
+
+      if (elements.taskStatusSelect) {
+        elements.taskStatusSelect.value = task.status;
+      }
+
+      if (elements.videoLink) {
+        elements.videoLink.value = task.videoLink || "";
+      }
+
+      if (elements.speakingTextInput) {
+        elements.speakingTextInput.value = task.speakingText || "";
+      }
 
       if (elements.videoSourceType) {
         elements.videoSourceType.value = "upload";
@@ -439,8 +475,10 @@
 
       const title = elements.taskTitleInput.value.trim();
       const description = elements.taskDescriptionInput.value.trim() || "No description added yet.";
-      const type = elements.taskCategorySelect.value;
-      const status = elements.taskStatusSelect.value;
+      const type = elements.taskCategorySelect?.value || capitalize(currentCategory);
+      const status = elements.taskStatusSelect?.value || "Active";
+      const videoLink = elements.videoLink?.value.trim() || "";
+      const speakingText = elements.speakingTextInput?.value.trim() || "";
 
       if (!title) {
         elements.taskTitleInput.focus();
@@ -452,6 +490,8 @@
         description,
         type,
         status,
+        videoLink,
+        speakingText,
       };
 
       currentCategory = type.toLowerCase();
@@ -485,7 +525,7 @@
       refreshUI();
       elements.categoryTabs.addEventListener("click", handleCategoryClick);
       elements.addTaskButton.addEventListener("click", openCreateTaskModal);
-      elements.taskCategorySelect.addEventListener("change", syncVideoSourceInput);
+      elements.taskCategorySelect?.addEventListener("change", syncVideoSourceInput);
       elements.videoSourceType?.addEventListener("change", syncVideoSourceInput);
       elements.taskForm.addEventListener("submit", handleTaskSubmit);
       elements.confirmDeleteTaskButton.addEventListener("click", deleteTask);
