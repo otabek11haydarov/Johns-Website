@@ -22,6 +22,9 @@ const THEME_KEY = "edu-dashboard-theme";
 const LOGIN_PAGE = "../auth/login.html";
 
 function redirectToLogin() {
+  localStorage.removeItem("token");
+  localStorage.removeItem("role");
+  localStorage.removeItem("userId");
   if (!window.location.pathname.includes('/auth/login')) {
     window.location.replace(LOGIN_PAGE);
   }

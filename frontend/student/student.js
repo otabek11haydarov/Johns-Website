@@ -170,7 +170,10 @@ let backlogExpanded = false;
 let activeLibraryCategory = "All";
 
 function redirectToLogin() {
-  window.location.href = LOGIN_PAGE;
+  localStorage.removeItem("token");
+  localStorage.removeItem("role");
+  localStorage.removeItem("userId");
+  window.location.replace(LOGIN_PAGE);
 }
 
 function ensureStudentAccess() {
