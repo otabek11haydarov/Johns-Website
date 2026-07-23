@@ -23,3 +23,26 @@ export async function createStudent(req, res) {
     return res.status(500).json({ success: false, message: "Internal server error" });
   }
 }
+
+export async function updateStudent(req, res) {
+  try {
+    const student = await studentService.updateStudent(req.params.id, req.body);
+    return res.json({ success: true, message: "Student updated successfully", student });
+  } catch (error) {
+    if (error.message === "Username already exists") {
+      return res.status(400).json({ success: false, message: error.message });
+    }
+    console.error("Error updating student:", error);
+    return res.status(500).json({ success: false, message: "Internal server error" });
+  }
+}
+
+export async function deleteStudent(req, res) {
+  try {
+    await studentService.deleteStudent(req.params.id);
+    return res.json({ success: true, message: "Student deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting student:", error);
+    return res.status(500).json({ success: false, message: "Internal server error" });
+  }
+}

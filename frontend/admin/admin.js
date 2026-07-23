@@ -1,3 +1,5 @@
+let currentStudents = [];
+let editingStudentId = null;
 
 
 const sectionLabels = {
@@ -52,9 +54,10 @@ function createStatusBadge(status) {
 function renderDashboardActivity(activity) {
   const tbody = document.getElementById("dashboard-activity-tbody");
 
-  if (!activity){
-    tbody.innerHTML = `<tr><td colspan="5">No activity data available.</td></tr>`;
-  }else { tbody.innerHTML = activity
+  if (!activity || activity.length === 0){
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px; color: var(--text-secondary);">Hozircha baholangan o'quvchilar yo'q.</td></tr>`;
+  }else { 
+    tbody.innerHTML = activity
     .map(
       (item) => `
         <tr>
@@ -70,25 +73,32 @@ function renderDashboardActivity(activity) {
 }
 
 function renderStudents(students) {
-  
+  currentStudents = students || [];
   const tbody = document.getElementById("users-tbody");
 
-  if (!students){
-    tbody.innerHTML = `<tr><td colspan="6">No students found.</td></tr>`;
+  if (!students || students.length === 0){
+    tbody.innerHTML = `<tr><td colspan="7">No students found.</td></tr>`;
   }else {
-    tbody.innerHTML = students
-    .map(
-      (item) => `
+    tbody.innerHTML = students.map((item) => {
+      const joinedDate = new Date(item.createdAt).toLocaleDateString();
+      const program = item.group && item.group.label ? item.group.label : "-";
+      const name = item.fullName || "Ism ko'rsatilmagan";
+      return `
         <tr>
-          <td>${item.id}</td>
-          <td>${item.name}</td>
+          <td><strong>${item.username}</strong></td>
+          <td>${name}</td>
           <td>${item.email}</td>
-          <td>${item.program}</td>
-          <td>${item.joined}</td>
+          <td>${program}</td>
+          <td>${joinedDate}</td>
           <td>${createStatusBadge(item.status)}</td>
-        </tr>`,
-    )
-    .join("");
+          <td>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-primary" style="padding: 4px 10px; font-size: 12px; min-height: unset; height: 28px;" onclick="editStudent('${item.id}')">Edit</button>
+              <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 12px; min-height: unset; height: 28px; background-color: transparent; color: #fff; border: 1px solid rgba(255, 255, 255, 0.2);" onclick="deleteStudent('${item.id}')">Delete</button>
+            </div>
+          </td>
+        </tr>`;
+    }).join("");
   } 
 }
 
@@ -761,8 +771,44 @@ async function populateStudentGroups() {
   }
 }
 
-function openStudentModal() {
-  populateStudentGroups();
+function openStudentModal(student = null) {
+  populateStudentGroups().then(() => {
+    if (student && student.id) {
+      document.getElementById("studentGroup").value = student.groupId || "";
+    }
+  });
+  
+  const title = document.querySelector("#studentModal .modal-header h3");
+  const studentForm = document.getElementById("studentForm");
+  const studentModalSubmit = document.getElementById("studentModalSubmit");
+
+  if (student && student.id) {
+    editingStudentId = student.id;
+    document.getElementById("studentUsername").value = student.username || "";
+    document.getElementById("studentFullName").value = student.fullName || "";
+    
+    // Check if email field exists (it might not be in the form)
+    const emailField = document.getElementById("studentEmail");
+    if(emailField) emailField.value = student.email || "";
+    
+    document.getElementById("studentPhone").value = student.phone || "";
+    document.getElementById("studentParentPhone").value = student.parentPhone || "";
+    document.getElementById("studentStatus").value = student.status || "Active";
+    
+    document.getElementById("studentPassword").required = false;
+    document.getElementById("studentParentPassword").required = false;
+    
+    if (title) title.textContent = "Edit Student";
+    if (studentModalSubmit) studentModalSubmit.textContent = "Save Changes";
+  } else {
+    editingStudentId = null;
+    if (studentForm) studentForm.reset();
+    document.getElementById("studentPassword").required = true;
+    document.getElementById("studentParentPassword").required = true;
+    if (title) title.textContent = "Add Student";
+    if (studentModalSubmit) studentModalSubmit.textContent = "Create Student";
+  }
+  
   studentModalOverlay.classList.add("open");
 }
 
@@ -804,28 +850,63 @@ if (studentForm) {
     const status = document.getElementById("studentStatus").value;
 
     let valid = true;
-    if (!fullName) { setStudentFieldError("studentFullName", "student-err-fullname", "Full Name is required."); valid = false; }
-    if (!username) { setStudentFieldError("studentUsername", "student-err-username", "Username is required."); valid = false; }
-    if (!password || password.length < 6) { setStudentFieldError("studentPassword", "student-err-password", "Password must be at least 6 characters."); valid = false; }
-    if (!parentPassword || parentPassword.length < 6) { setStudentFieldError("studentParentPassword", "student-err-parent-password", "Parent's Password must be at least 6 characters."); valid = false; }
-    if (!phone) { setStudentFieldError("studentPhone", "student-err-phone", "Phone is required."); valid = false; }
-    if (!parentPhone) { setStudentFieldError("studentParentPhone", "student-err-parent-phone", "Parent Phone is required."); valid = false; }
-    if (!groupId) { setStudentFieldError("studentGroup", "student-err-group", "Group is required."); valid = false; }
+    const payload = {};
+    if (status) payload.status = status;
+    if (groupId) payload.groupId = groupId;
+
+    if (!editingStudentId) {
+      if (!fullName) { setStudentFieldError("studentFullName", "student-err-fullname", "Full Name is required."); valid = false; }
+      else payload.fullName = fullName;
+      
+      if (!username) { setStudentFieldError("studentUsername", "student-err-username", "Username is required."); valid = false; }
+      else payload.username = username;
+      
+      if (!password || password.length < 6) { setStudentFieldError("studentPassword", "student-err-password", "Password must be at least 6 characters."); valid = false; }
+      else payload.password = password;
+      
+      if (!parentPassword || parentPassword.length < 6) { setStudentFieldError("studentParentPassword", "student-err-parent-password", "Parent's Password must be at least 6 characters."); valid = false; }
+      else payload.parentPassword = parentPassword;
+      
+      if (!phone) { setStudentFieldError("studentPhone", "student-err-phone", "Phone is required."); valid = false; }
+      else payload.phone = phone;
+      
+      if (!parentPhone) { setStudentFieldError("studentParentPhone", "student-err-parent-phone", "Parent Phone is required."); valid = false; }
+      else payload.parentPhone = parentPhone;
+      
+      if (!groupId) { setStudentFieldError("studentGroup", "student-err-group", "Group is required."); valid = false; }
+    } else {
+      if (fullName) payload.fullName = fullName;
+      if (username) payload.username = username;
+      if (phone) payload.phone = phone;
+      if (parentPhone) payload.parentPhone = parentPhone;
+      
+      if (password) {
+        if (password.length < 6) { setStudentFieldError("studentPassword", "student-err-password", "Password must be at least 6 characters."); valid = false; }
+        else payload.password = password;
+      }
+      if (parentPassword) {
+        if (parentPassword.length < 6) { setStudentFieldError("studentParentPassword", "student-err-parent-password", "Parent's Password must be at least 6 characters."); valid = false; }
+        else payload.parentPassword = parentPassword;
+      }
+    }
 
     if (!valid) return;
 
     studentModalSubmit.disabled = true;
-    studentModalSubmit.textContent = "Creating...";
+    studentModalSubmit.textContent = editingStudentId ? "Saving..." : "Creating...";
 
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(BASE_URL + "/api/students", {
-        method: "POST",
+      const url = editingStudentId ? BASE_URL + "/api/students/" + editingStudentId : BASE_URL + "/api/students";
+      const method = editingStudentId ? "PUT" : "POST";
+
+      const res = await fetch(url, {
+        method,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({ fullName, username, password, parentPassword, phone, parentPhone, groupId, status })
+        body: JSON.stringify(payload)
       });
 
       const data = await res.json();
@@ -833,14 +914,109 @@ if (studentForm) {
         throw new Error(data.message || "Failed to create student.");
       }
 
-      alert("Student created successfully!");
+      if (typeof showToast !== 'undefined') {
+        showToast(editingStudentId ? "Student updated successfully!" : "Student created successfully!", "success");
+      } else {
+        alert(editingStudentId ? "Student updated successfully!" : "Student created successfully!");
+      }
       closeStudentModal();
-      loadData(); // refresh the table
+      loadData();
     } catch (error) {
-      alert(error.message);
+      if (typeof showToast !== 'undefined') {
+        showToast(error.message, "error");
+      } else {
+        alert(error.message);
+      }
     } finally {
       studentModalSubmit.disabled = false;
-      studentModalSubmit.textContent = "Create Student";
+      studentModalSubmit.textContent = editingStudentId ? "Save Changes" : "Create Student";
     }
   });
+}
+
+window.editStudent = function(id) {
+  const student = currentStudents.find(s => s.id === id);
+  if (student) openStudentModal(student);
+};
+
+let studentToDelete = null;
+window.deleteStudent = function(id) {
+  studentToDelete = id;
+  const modal = document.getElementById("deleteStudentModalOverlay");
+  if (modal) modal.classList.add("open");
+};
+
+const deleteStudentConfirmBtn = document.getElementById("deleteStudentModalConfirm");
+const deleteStudentCancelBtn = document.getElementById("deleteStudentModalCancel");
+const deleteStudentCloseBtn = document.getElementById("deleteStudentModalClose");
+
+function closeDeleteStudentModal() {
+  studentToDelete = null;
+  const modal = document.getElementById("deleteStudentModalOverlay");
+  if (modal) modal.classList.remove("open");
+}
+
+if (deleteStudentCancelBtn) deleteStudentCancelBtn.addEventListener("click", closeDeleteStudentModal);
+if (deleteStudentCloseBtn) deleteStudentCloseBtn.addEventListener("click", closeDeleteStudentModal);
+
+if (deleteStudentConfirmBtn) {
+  deleteStudentConfirmBtn.addEventListener("click", async () => {
+    if (!studentToDelete) return;
+    
+    // show loading state on button
+    const oldText = deleteStudentConfirmBtn.textContent;
+    deleteStudentConfirmBtn.textContent = "Deleting...";
+    deleteStudentConfirmBtn.disabled = true;
+
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(BASE_URL + "/api/students/" + studentToDelete, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (!res.ok) throw new Error("Failed to delete student");
+      
+      if (typeof showToast !== 'undefined') {
+        showToast("Student deleted successfully", "success");
+      } else {
+        alert("Student deleted successfully");
+      }
+      
+      closeDeleteStudentModal();
+      loadData();
+    } catch (e) {
+      if (typeof showToast !== 'undefined') {
+        showToast(e.message, "error");
+      } else {
+        alert(e.message);
+      }
+    } finally {
+      deleteStudentConfirmBtn.textContent = oldText;
+      deleteStudentConfirmBtn.disabled = false;
+    }
+  });
+}
+
+function showToast(message, type = 'success') {
+  const container = document.getElementById('toastContainer');
+  if (!container) {
+    alert(message);
+    return;
+  }
+  const toast = document.createElement('div');
+  toast.className = 'toast toast-' + type;
+  
+  let icon = '&#10004;';
+  if (type === 'error') icon = '&#10006;';
+  if (type === 'info') icon = '&#8505;';
+  
+  toast.innerHTML = `<div class="toast-icon">${icon}</div><div class="toast-message">${message}</div>`;
+  container.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.classList.add('toast-hiding');
+    toast.addEventListener('animationend', () => {
+      toast.remove();
+    });
+  }, 3000);
 }

@@ -131,7 +131,7 @@
                                 <div class="metric-icon">&#128101;</div>
                                 <div class="metric-copy">
                                     <span class="metric-label">Total Students</span>
-                                    <strong class="metric-value">128</strong>
+                                    <strong class="metric-value" id="kpiTotalStudents">128</strong>
                                     <span class="metric-foot">All groups</span>
                                 </div>
                             </article>
@@ -139,24 +139,24 @@
                                 <div class="metric-icon">&#128197;</div>
                                 <div class="metric-copy">
                                     <span class="metric-label">Today's Attendance</span>
-                                    <strong class="metric-value">94%</strong>
-                                    <span class="metric-foot">Present: 120 &bull; Absent: 8</span>
+                                    <strong class="metric-value" id="kpiAttendancePct">94%</strong>
+                                    <span class="metric-foot" id="kpiAttendanceFoot">Present: 120 &bull; Absent: 8</span>
                                 </div>
                             </article>
                             <article class="metric-card kpi-card orange">
                                 <div class="metric-icon">&#128203;</div>
                                 <div class="metric-copy">
                                     <span class="metric-label">Today's Tasks (All Groups)</span>
-                                    <span class="task-complete">Completed <strong>78%</strong></span>
-                                    <div class="progress-bar kpi-progress"><span style="width: 78%"></span></div>
-                                    <span class="metric-foot">Done: 100 &bull; Pending: 28</span>
+                                    <span class="task-complete">Completed <strong id="kpiTasksPct">78%</strong></span>
+                                    <div class="progress-bar kpi-progress"><span id="kpiTasksBar" style="width: 78%"></span></div>
+                                    <span class="metric-foot" id="kpiTasksFoot">Done: 100 &bull; Pending: 28</span>
                                 </div>
                             </article>
                             <article class="metric-card kpi-card purple">
                                 <div class="metric-icon">&#9673;</div>
                                 <div class="metric-copy">
                                     <span class="metric-label">Avg Accuracy</span>
-                                    <strong class="metric-value">82%</strong>
+                                    <strong class="metric-value" id="kpiAvgAccuracy">82%</strong>
                                     <span class="metric-foot">All groups</span>
                                 </div>
                             </article>
@@ -218,12 +218,13 @@
                                 <table class="data-table">
                                     <thead>
                                         <tr>
-                                            <th>ID</th>
+                                            <th>Username</th>
                                             <th>Name</th>
                                             <th>Email</th>
                                             <th>Program</th>
                                             <th>Joined</th>
                                             <th>Status</th>
+                                            <th>Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody id="users-tbody">
@@ -359,6 +360,27 @@
         </div>
     </div>
 
+    
+    <div class="modal-overlay" id="deleteStudentModalOverlay">
+        <div class="modal modal-sm animated-modal" id="deleteStudentModal">
+            <div class="modal-header" style="border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 16px;">
+                <h3 class="modal-title">Delete Student</h3>
+                <button class="modal-close" id="deleteStudentModalClose" type="button">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 32px 24px;">
+                <div class="delete-icon" style="font-size: 48px; color: #f87171; text-align: center; margin-bottom: 16px; background: rgba(248, 113, 113, 0.1); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">&#9888;</div>
+                <p class="delete-message" style="text-align: center; font-size: 1.1rem; font-weight: 500; margin-bottom: 8px;">
+                    Are you sure you want to delete this student?
+                </p>
+                <p class="delete-sub" style="text-align: center; color: #9ca3af; font-size: 0.9rem;">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 24px; display: flex; justify-content: center; gap: 16px;">
+                <button type="button" class="btn btn-ghost" id="deleteStudentModalCancel">Cancel</button>
+                <button type="button" class="btn btn-danger-solid btn-shine" id="deleteStudentModalConfirm" style="background: #e47553;">Yes, Delete</button>
+            </div>
+        </div>
+    </div>
+  
     <div class="modal-overlay" id="studentModalOverlay">
         <div class="modal animated-modal" id="studentModal">
             <div class="modal-header">
@@ -436,6 +458,7 @@
     <script src="../shared/config.js"></script>
     <script src="../shared/roleResolver.js"></script>
     <script src="./admin.js"></script>
+    <div class="toast-container" id="toastContainer"></div>
 </body>
 
 </html>

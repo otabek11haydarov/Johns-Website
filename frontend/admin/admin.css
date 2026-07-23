@@ -832,6 +832,10 @@ select {
 
 .modal-overlay > .modal,
 .modal-content.admin-modal-panel {
+    position: fixed !important;
+    inset: 0 !important;
+    margin: auto !important;
+    height: fit-content !important;
     width: min(100%, 620px);
     max-height: 90vh;
     overflow-y: auto;
@@ -842,7 +846,13 @@ select {
 }
 
 .modal-overlay > .modal.modal-sm {
-    width: min(100%, 420px);
+    position: fixed !important;
+    inset: 0 !important;
+    margin: auto !important;
+    width: 380px !important;
+    height: fit-content !important;
+    min-height: 0 !important;
+    padding: 0 !important;
 }
 
 .modal-header {
@@ -1840,12 +1850,57 @@ body.dark-mode .panel-subtitle {
     min-height: 204px;
     padding: 16px;
     color: inherit;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    animation: group-card-entrance 0.6s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+.group-card:nth-child(1) { animation-delay: 0.05s; }
+.group-card:nth-child(2) { animation-delay: 0.1s; }
+.group-card:nth-child(3) { animation-delay: 0.15s; }
+.group-card:nth-child(4) { animation-delay: 0.2s; }
+.group-card:nth-child(5) { animation-delay: 0.25s; }
+.group-card:nth-child(6) { animation-delay: 0.3s; }
+.group-card:nth-child(7) { animation-delay: 0.35s; }
+.group-card:nth-child(8) { animation-delay: 0.4s; }
+
+@keyframes group-card-entrance {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.group-card::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+    transform: scale(0.5);
 }
 
 .group-card:hover {
     color: inherit;
-    transform: translateY(-2px);
-    border-color: rgba(240, 90, 40, 0.26);
+    transform: translateY(-6px) scale(1.015);
+    border-color: rgba(240, 90, 40, 0.35);
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(240, 90, 40, 0.15);
+    z-index: 10;
+}
+
+.group-card:hover::after {
+    opacity: 1;
+    transform: scale(1);
 }
 
 .group-card-header,
@@ -1918,6 +1973,12 @@ body.dark-mode .panel-subtitle {
     border-radius: 8px;
     background: rgba(255, 255, 255, 0.025);
     border: 1px solid rgba(255, 255, 255, 0.04);
+    transition: transform 0.4s ease, background 0.4s ease;
+}
+
+.group-card:hover .lesson-pair {
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.045);
 }
 
 .lesson-item {
@@ -2261,4 +2322,77 @@ body:not(.dark-mode) .form-select {
 body:not(.dark-mode) .data-table th,
 body:not(.dark-mode) .data-table td {
     border-bottom-color: var(--border);
+}
+
+/* --- TOAST NOTIFICATIONS --- */
+.toast-container {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 9999999;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    pointer-events: none;
+}
+
+.toast {
+    background: var(--surface);
+    color: var(--title);
+    border: 1px solid var(--border);
+    padding: 16px 24px;
+    border-radius: 12px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    pointer-events: auto;
+    animation: toast-slide-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    transition: all 0.3s ease;
+    opacity: 0;
+    transform: translateX(100%);
+}
+
+.toast.toast-hiding {
+    animation: toast-slide-out 0.3s ease forwards;
+}
+
+.toast-icon {
+    font-size: 20px;
+}
+
+.toast-success .toast-icon {
+    color: #4ade80;
+}
+
+.toast-error .toast-icon {
+    color: #f87171;
+}
+
+.toast-info .toast-icon {
+    color: #60a5fa;
+}
+
+@keyframes toast-slide-in {
+    from {
+        opacity: 0;
+        transform: translateX(100%) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}
+
+@keyframes toast-slide-out {
+    from {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(100%) scale(0.9);
+    }
 }

@@ -36,9 +36,44 @@ export class StudentService {
       },
     });
 
-    // We don't want to return the password to the controller
     const { password: _, parentPassword: __, ...studentWithoutPassword } = student;
     return studentWithoutPassword;
+  }
+
+  async updateStudent(id, data) {
+    const updateData = { ...data };
+    
+    if (updateData.username) {
+      const existing = await prisma.user.findFirst({
+        where: { username: updateData.username, NOT: { id } }
+      });
+      if (existing) throw new Error("Username already exists");
+    }
+
+    if (updateData.password) {
+      updateData.password = await bcrypt.hash(updateData.password, 10);
+    } else {
+      delete updateData.password;
+    }
+    
+    if (updateData.parentPassword) {
+      updateData.parentPassword = await bcrypt.hash(updateData.parentPassword, 10);
+    } else {
+      delete updateData.parentPassword;
+    }
+
+    const student = await prisma.user.update({
+      where: { id },
+      data: updateData
+    });
+    
+    const { password: _, parentPassword: __, ...studentWithoutPassword } = student;
+    return studentWithoutPassword;
+  }
+
+  async deleteStudent(id) {
+    await prisma.user.delete({ where: { id } });
+    return true;
   }
 }
 
