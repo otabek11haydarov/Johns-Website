@@ -79,6 +79,7 @@ model Task {
   readingTask   ReadingTask?
   listeningTask ListeningTask?
   writingTask   WritingTask?
+  grammarTest   GrammarTest?
 }
 
 // 1. VIDEO UCHUN ALOHIDA JADVAL
@@ -225,4 +226,69 @@ model VideoAssessment {
   completed       Boolean  @default(false)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+}
+
+// 8. GRAMMAR UCHUN ALOHIDA JADVAL
+model GrammarTest {
+  id        String   @id @default(uuid())
+  taskId    String   @unique
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  
+  questions GrammarQuestion[]
+  attempts  StudentGrammarAttempt[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model GrammarQuestion {
+  id            String   @id @default(uuid())
+  grammarTestId String
+  grammarTest   GrammarTest @relation(fields: [grammarTestId], references: [id], onDelete: Cascade)
+  
+  type          String   @default("MULTIPLE_CHOICE")
+  questionText  String   
+  order         Int
+  explanation   String?
+  
+  options       GrammarOption[]
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model GrammarOption {
+  id            String   @id @default(uuid())
+  questionId    String
+  question      GrammarQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  
+  optionText    String
+  isCorrect     Boolean  @default(false)
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model StudentGrammarAttempt {
+  id             String   @id @default(uuid())
+  grammarTestId  String
+  grammarTest    GrammarTest @relation(fields: [grammarTestId], references: [id], onDelete: Cascade)
+  studentId      String
+  
+  score          Int
+  totalQuestions Int
+  percentage     Float
+  
+  answers        StudentGrammarAnswer[]
+  
+  createdAt      DateTime @default(now())
+}
+
+model StudentGrammarAnswer {
+  id             String   @id @default(uuid())
+  attemptId      String
+  attempt        StudentGrammarAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  questionId     String
+  selectedOptionId String?
+  isCorrect      Boolean
 }

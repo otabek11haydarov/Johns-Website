@@ -1,5 +1,27 @@
 import * as lessonService from '../service/lesson.service.js';
 
+export async function createLessonWizardController(req, res) {
+    try {
+        const { title, groupLevel, description, status, tasks } = req.body;
+
+        if (!title || !groupLevel) {
+            return res.status(400).json({ error: "title and groupLevel are required!" });
+        }
+
+        const newLesson = await lessonService.createLessonWithTasks({ title, groupLevel, description, status, tasks });
+
+        return res.status(201).json({
+            success: true,
+            message: "Lesson with tasks created successfully",
+            data: newLesson
+        });
+
+    } catch (error) {
+        console.error("Error creating lesson with wizard:", error);
+        return res.status(500).json({ error: "Internal server error" });
+    }
+}
+
 export async function createLessonController(req, res) {
     try {
         const { title, groupLevel, description } = req.body;
