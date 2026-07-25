@@ -546,6 +546,11 @@
     TASK_TEMPLATES,
     resolveGroup,
     createSeedTasks,
-    createPage: createTaskManagerPage,
+    currentGroup: null,
+    createPage: function (options) {
+      const resolvedGroup = resolveGroup(options.currentGroup);
+      window.TaskManagerPage.currentGroup = resolvedGroup;
+      return createTaskManagerPage(options);
+    },
   };
 })();

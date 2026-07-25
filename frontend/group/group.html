@@ -148,22 +148,6 @@
                                     <span class="metric-foot">Selected group</span>
                                 </div>
                             </article>
-                            <article class="metric-card kpi-card green">
-                                <div class="metric-icon">&#9679;</div>
-                                <div class="metric-copy">
-                                    <span class="metric-label">Active</span>
-                                    <strong class="metric-value" id="metricActive">0</strong>
-                                    <span class="metric-foot">Ready for students</span>
-                                </div>
-                            </article>
-                            <article class="metric-card kpi-card orange">
-                                <div class="metric-icon">&#128221;</div>
-                                <div class="metric-copy">
-                                    <span class="metric-label">Draft</span>
-                                    <strong class="metric-value" id="metricDraft">0</strong>
-                                    <span class="metric-foot">Still being prepared</span>
-                                </div>
-                            </article>
                             <article class="metric-card kpi-card purple">
                                 <div class="metric-icon">&#9634;</div>
                                 <div class="metric-copy">
@@ -173,6 +157,68 @@
                                 </div>
                             </article>
                         </div>
+
+                        <!-- ═══ LESSON LIBRARY ════════════════════════════════════ -->
+
+                        <!-- Lesson Statistics -->
+                        <div class="lesson-stats-grid" id="lessonStatsGrid">
+                            <article class="metric-card kpi-card blue">
+                                <div class="metric-icon">&#128218;</div>
+                                <div class="metric-copy">
+                                    <span class="metric-label">Total Lessons</span>
+                                    <strong class="metric-value" id="lessonStatTotal">0</strong>
+                                    <span class="metric-foot">This group</span>
+                                </div>
+                            </article>
+                            <article class="metric-card kpi-card purple">
+                                <div class="metric-icon">&#128202;</div>
+                                <div class="metric-copy">
+                                    <span class="metric-label">Avg Tasks</span>
+                                    <strong class="metric-value" id="lessonStatAvgTasks">0</strong>
+                                    <span class="metric-foot">Per lesson</span>
+                                </div>
+                            </article>
+                            <article class="metric-card kpi-card blue">
+                                <div class="metric-icon">&#9201;</div>
+                                <div class="metric-copy">
+                                    <span class="metric-label">Avg Duration</span>
+                                    <strong class="metric-value" id="lessonStatAvgDuration">—</strong>
+                                    <span class="metric-foot">Estimated</span>
+                                </div>
+                            </article>
+                        </div>
+
+                        <!-- Lesson Library Panel -->
+                        <article class="panel lesson-library-panel" aria-labelledby="lessonLibraryTitle">
+                            <div class="panel-header">
+                                <div>
+                                    <h2 class="panel-title" id="lessonLibraryTitle">Lessons</h2>
+                                    <p class="panel-subtitle">All lessons for the current CEFR group</p>
+                                </div>
+                                <span class="panel-chip" id="lessonGroupChip">A1</span>
+                            </div>
+
+                            <!-- Toolbar: search + filter + sort -->
+                            <div class="lesson-library-toolbar">
+                                <label class="lesson-search-wrap" for="lessonSearchInput">
+                                    <span class="search-icon">&#8981;</span>
+                                    <input id="lessonSearchInput" type="text" placeholder="Search lessons..." autocomplete="off" />
+                                </label>
+                                <button type="button" class="btn btn-secondary btn-shine ms-auto" id="btnOpenReorderModal">
+                                    &#8693; Darslar Ketma-ketligi
+                                </button>
+                            </div>
+
+                            <!-- Lesson Cards Grid -->
+                            <div class="lesson-cards-grid" id="lessonCardsGrid" aria-live="polite">
+                                <!-- Cards injected by lessonLibrary.js -->
+                            </div>
+
+                            <!-- Pagination -->
+                            <div class="lesson-pagination" id="lessonPagination"></div>
+                        </article>
+
+                        <!-- ═══ END LESSON LIBRARY ════════════════════════════════ -->
 
                         <article class="panel task-category-panel" aria-labelledby="sidebarCategoriesTitle">
                             <div class="panel-header">
@@ -249,6 +295,133 @@
         </div>
     </div>
 
+    <!-- ═══ Lesson Preview Modal ════════════════════════════════════════ -->
+    <div class="modal fade" id="lessonPreviewModal" tabindex="-1" aria-labelledby="lessonPreviewModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
+            <div class="modal-content admin-modal-panel">
+                <div class="modal-header border-bottom border-secondary">
+                    <h3 class="modal-title" id="lessonPreviewModalLabel">Lesson Preview</h3>
+                    <button type="button" class="modal-close" data-bs-dismiss="modal" aria-label="Close">&#x2715;</button>
+                </div>
+                <div class="modal-body p-4">
+
+                    <!-- Header: title + status -->
+                    <div class="lesson-preview-header">
+                        <div>
+                            <p class="task-workspace__eyebrow" id="previewLessonNumber">Lesson 1</p>
+                            <h4 class="page-title mb-1" id="previewModalTitle">—</h4>
+                            <p class="section-note mb-0" id="previewModalDescription">—</p>
+                        </div>
+                        <span class="lesson-card__status is-draft" id="previewModalStatus">Draft</span>
+                    </div>
+
+                    <!-- Meta grid -->
+                    <div class="lesson-preview-meta-grid">
+                        <div class="lesson-preview-meta-item">
+                            <span class="meta-label">CEFR Group</span>
+                            <span class="meta-value" id="previewModalGroup">—</span>
+                        </div>
+                        <div class="lesson-preview-meta-item">
+                            <span class="meta-label">Task Count</span>
+                            <span class="meta-value" id="previewModalTaskCount">—</span>
+                        </div>
+                        <div class="lesson-preview-meta-item">
+                            <span class="meta-label">Created</span>
+                            <span class="meta-value" id="previewModalCreated">—</span>
+                        </div>
+                        <div class="lesson-preview-meta-item">
+                            <span class="meta-label">Est. Duration</span>
+                            <span class="meta-value" id="previewModalDuration">—</span>
+                        </div>
+                    </div>
+
+                    <!-- Student Statistics -->
+                    <h5 class="mb-3" style="color: var(--title);">Student Statistics</h5>
+                    <div class="lesson-preview-student-stats">
+                        <div class="lesson-preview-stat-box">
+                            <span class="stat-num" id="previewStatCompleted">0</span>
+                            <span class="stat-label">Completed</span>
+                        </div>
+                        <div class="lesson-preview-stat-box">
+                            <span class="stat-num" id="previewStatAvg" style="color: #ff8a38;">0%</span>
+                            <span class="stat-label">Avg Score</span>
+                        </div>
+                        <div class="lesson-preview-stat-box">
+                            <span class="stat-num" id="previewStatHigh" style="color: #5ccc8a;">0%</span>
+                            <span class="stat-label">Highest</span>
+                        </div>
+                        <div class="lesson-preview-stat-box">
+                            <span class="stat-num" id="previewStatLow" style="color: #f07a60;">0%</span>
+                            <span class="stat-label">Lowest</span>
+                        </div>
+                    </div>
+
+                    <!-- Task Flow -->
+                    <h5 class="mb-3" style="color: var(--title);">Lesson Flow</h5>
+                    <div class="lesson-preview-flow" id="previewModalTaskFlow">
+                        <!-- Injected by lessonLibrary.js -->
+                    </div>
+
+                </div>
+                <div class="modal-footer px-4 py-3 border-top border-secondary">
+                    <button type="button" class="btn btn-ghost" data-bs-dismiss="modal">Close</button>
+                    <div class="ms-auto d-flex gap-2">
+                        <button type="button" class="btn btn-danger btn-shine" id="previewDeleteLessonBtn">&#128465; Delete Lesson</button>
+                        <button type="button" class="btn btn-primary btn-shine" id="previewEditLessonBtn">&#9998; Edit Lesson</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ Delete Lesson Modal ════════════════════════════════════════ -->
+    <div class="modal fade" id="deleteLessonModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content admin-modal-panel">
+                <div class="modal-header border-bottom border-secondary">
+                    <h3 class="modal-title">Delete Lesson</h3>
+                    <button type="button" class="modal-close" data-bs-dismiss="modal" aria-label="Close">&#x2715;</button>
+                </div>
+                <div class="modal-body px-4 pt-4 pb-2 text-center">
+                    <div class="delete-icon" style="font-size:2.5rem; color:#f07a60; margin-bottom:12px;">&#9888;</div>
+                    <p class="delete-message" style="font-size:1.05rem; font-weight:500;">Delete Lesson?</p>
+                    <p class="delete-sub" style="color:var(--muted);">This action cannot be undone. All tasks inside this lesson will be permanently removed.</p>
+                </div>
+                <div class="modal-footer px-4 pb-4 border-top border-secondary" style="justify-content:center; gap:12px;">
+                    <button type="button" class="btn btn-ghost" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger-solid btn-shine" id="confirmDeleteLessonBtn">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ Reorder Lessons Modal ════════════════════════════════════════ -->
+    <div class="modal fade" id="reorderLessonsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content admin-modal-panel">
+                <div class="modal-header border-bottom border-secondary">
+                    <h3 class="modal-title">Set Lesson Sequence</h3>
+                    <button type="button" class="modal-close" data-bs-dismiss="modal" aria-label="Close">&#x2715;</button>
+                </div>
+                <div class="modal-body px-4 pt-4 pb-4">
+                    <p class="mb-3" style="color: var(--muted);">Reorder lessons using the Up/Down buttons.</p>
+                    <div class="selected-tasks-list mb-3" id="reorderLessonsList">
+                        <!-- Items injected by lessonLibrary.js -->
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center" id="reorderPagination" style="display: none !important;">
+                        <button type="button" class="btn btn-sm btn-warning btn-shine" id="btnReorderPrev">Previous</button>
+                        <span id="reorderPageInfo" class="small" style="color: var(--muted);">Page 1 of 1</span>
+                        <button type="button" class="btn btn-sm btn-warning btn-shine" id="btnReorderNext">Next</button>
+                    </div>
+                </div>
+                <div class="modal-footer px-4 py-3 border-top border-secondary">
+                    <button type="button" class="btn btn-ghost" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary btn-shine ms-auto" id="btnSaveLessonSequence">Save Sequence</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Enterprise Lesson Creation Wizard Modal -->
     <div class="modal fade" id="lessonWizardModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
         <div class="modal-dialog modal-dialog-centered" style="max-width: 85%;">
@@ -283,16 +456,22 @@
 
                         <!-- Step 2: Select Tasks -->
                         <div class="wizard-step d-none" id="wizardStep-selectTasks">
-                            <h4 class="mb-4">Select Lesson Tasks</h4>
-                            <p class="text-muted mb-4">Choose the tasks you want to include in this lesson. You can reorder them below.</p>
-                            
-                            <div class="wizard-task-cards-grid mb-5" id="wizardTaskSelectionGrid">
-                                <!-- Task cards generated by JS -->
+                            <div class="d-flex justify-content-between align-items-start mb-4">
+                                <div>
+                                    <h4 class="mb-1">Lesson Tasks</h4>
+                                    <p class="text-muted mb-0">Choose the tasks you want to include in this lesson. You can reorder them below.</p>
+                                </div>
+                                <button type="button" class="btn btn-primary btn-shine" id="btnOpenTaskPicker">+ Add New Task</button>
                             </div>
 
-                            <h5 class="mt-4 mb-3 border-top border-secondary pt-4">Selected Tasks (Order Defines Flow)</h5>
                             <div class="selected-tasks-list" id="wizardSelectedTasksList">
                                 <!-- Selected tasks with drag/reorder will appear here -->
+                            </div>
+                            
+                            <div id="wizardNoTasksEmptyState" class="text-center p-5 rounded" style="border: 2px dashed var(--secondary); display: none;">
+                                <div style="font-size: 2rem; color: var(--muted); margin-bottom: 10px;">📋</div>
+                                <p class="text-muted mb-0" style="font-size: 1.05rem;">No tasks added yet.</p>
+                                <p class="text-muted" style="font-size: 0.9rem;">Click "+ Add New Task" to begin.</p>
                             </div>
                         </div>
 
@@ -488,8 +667,31 @@
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
     <script src="../shared/task-manager-page.js"></script>
     <script src="group.js"></script>
+    <!-- Task Picker Modal -->
+    <div class="modal fade" id="taskPickerModal" tabindex="-1" aria-hidden="true" style="z-index: 1060;">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content admin-modal-panel">
+                <div class="modal-header border-bottom border-secondary">
+                    <h4 class="modal-title">Select Tasks to Add</h4>
+                    <button type="button" class="modal-close" data-bs-dismiss="modal" aria-label="Close">&times;</button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="wizard-task-cards-grid" id="wizardTaskSelectionGrid">
+                        <!-- Task cards generated by JS -->
+                    </div>
+                </div>
+                <div class="modal-footer px-4 py-3 border-top border-secondary">
+                    <button type="button" class="btn btn-primary btn-shine" data-bs-dismiss="modal">Done</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="../admin/admin.js"></script>
     <script src="lessonWizard.js"></script>
+    <script src="lessonLibrary.js"></script>
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" id="toastContainer" style="z-index:9999;"></div>
 </body>
 
 </html>
+

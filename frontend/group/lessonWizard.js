@@ -176,6 +176,7 @@ class GrammarBuilder {
                         if(window.grammarBuilder.questions.length >= 50) {
                             alert('Maximum 50 questions reached.');
                         } else {
+                            window.grammarBuilder.addQuestion();
                             window.grammarBuilder.render();
                         }
                     ">+ Add Question</button>
@@ -575,27 +576,48 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!modalElement) return;
 
     // --- State Management ---
+    const _initUrlParams = new URLSearchParams(window.location.search);
+    const _initUrlLevel = _initUrlParams.get('level');
+    let wizardEditingLessonId = null; // null = creating, string = editing
     let wizardState = {
         lessonInfo: {
             title: '',
             description: '',
-            groupLevel: window.TaskManagerPage ? window.TaskManagerPage.currentGroup : 'Unknown'
+            groupLevel: (window.TaskManagerPage && window.TaskManagerPage.currentGroup)
+                || (window.TaskManagerPage && window.TaskManagerPage.resolveGroup && window.TaskManagerPage.resolveGroup(_initUrlLevel))
+                || _initUrlLevel
+                || 'A1'
         },
         selectedTasks: [], // Array of task types e.g. ['VIDEO', 'VOCABULARY']
         taskConfigs: {}    // e.g. { VIDEO: { videoUrl: '', duration: 0 } }
     };
 
-    // Configuration for available task types
-    const AVAILABLE_TASKS = [
-        { id: 'VIDEO', label: 'Video', icon: 'bi-play-circle', desc: 'Video lesson content' },
-        { id: 'VOCABULARY', label: 'Vocabulary', icon: 'bi-translate', desc: 'Word lists and flashcards' },
-        { id: 'FLASHCARD', label: 'Flashcard', icon: 'bi-card-text', desc: 'Interactive flip cards' },
-        { id: 'READING', label: 'Reading', icon: 'bi-book', desc: 'Reading comprehension text' },
-        { id: 'LISTENING', label: 'Listening', icon: 'bi-earbuds', desc: 'Audio listening tasks' },
-        { id: 'WRITING', label: 'Writing', icon: 'bi-pencil-square', desc: 'Writing prompt' },
-        { id: 'SPEAKING', label: 'Speaking', icon: 'bi-mic', desc: 'Voice recording prompt' },
-        { id: 'GRAMMAR', label: 'Grammar', icon: 'bi-spellcheck', desc: 'Grammar rules and tests' }
-    ];
+    let AVAILABLE_TASKS = [];
+
+    const API_BASE = window.API_BASE_URL || 'http://localhost:5000/api';
+
+    async function loadTaskTypes() {
+        try {
+            const res = await fetch(`${API_BASE}/task-types`);
+            if (!res.ok) throw new Error('Failed to load task types');
+            const data = await res.json();
+            
+            AVAILABLE_TASKS = data.map(t => ({
+                id: t.code,
+                label: t.name,
+                icon: t.icon,
+                desc: t.description || '',
+                color: t.color || '#6b7280'
+            }));
+        } catch (err) {
+            console.error('[LessonWizard] Error loading task types:', err);
+            if (window.showToast) {
+                window.showToast('Could not connect to server. Please reload the page.', 'danger');
+            } else {
+                alert('Could not load task types from server. Please check if the backend is running and reload the page.');
+            }
+        }
+    }
 
     // Wizard Flow Steps
     let currentStepIndex = 0;
@@ -615,9 +637,24 @@ document.addEventListener('DOMContentLoaded', () => {
     // Step 2 Elements
     const taskSelectionGrid = document.getElementById('wizardTaskSelectionGrid');
     const selectedTasksList = document.getElementById('wizardSelectedTasksList');
+    const noTasksEmptyState = document.getElementById('wizardNoTasksEmptyState');
+    const btnOpenTaskPicker = document.getElementById('btnOpenTaskPicker');
+    const taskPickerModalEl = document.getElementById('taskPickerModal');
+    let taskPickerModal = null;
+    
+    if (taskPickerModalEl) {
+        taskPickerModal = new bootstrap.Modal(taskPickerModalEl);
+    }
+    
+    if (btnOpenTaskPicker) {
+        btnOpenTaskPicker.addEventListener('click', () => {
+            if (taskPickerModal) taskPickerModal.show();
+        });
+    }
 
     // Init function
-    function initWizard() {
+    async function initWizard() {
+        await loadTaskTypes();
         renderTaskSelectionGrid();
         updateWizardFlow();
         renderStepper();
@@ -628,12 +665,49 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Trigger initialization when modal opens
     modalElement.addEventListener('show.bs.modal', () => {
-        // Reset state on open if it was previously closed (optional, here we just keep it or reset it)
-        wizardState.lessonInfo.groupLevel = window.TaskManagerPage ? window.TaskManagerPage.currentGroup : 'A1';
+        // Get group level from URL params first, then from TaskManagerPage
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlLevel = urlParams.get('level');
+        const resolvedGroup = (window.TaskManagerPage && window.TaskManagerPage.currentGroup)
+            || (window.TaskManagerPage && window.TaskManagerPage.resolveGroup && window.TaskManagerPage.resolveGroup(urlLevel))
+            || urlLevel
+            || 'A1';
+        if (!wizardEditingLessonId) {
+            wizardState.lessonInfo.groupLevel = resolvedGroup;
+        }
+        // Update modal title
+        const modalTitleEl = modalElement.querySelector('.modal-title');
+        if (modalTitleEl) {
+            modalTitleEl.textContent = wizardEditingLessonId ? 'Edit Lesson' : 'Create New Lesson';
+        }
         currentStepIndex = 0;
         updateWizardFlow();
         renderStepper();
         showCurrentStep();
+
+        // Pre-populate form inputs if editing
+        if (wizardEditingLessonId) {
+            // Use a short delay so the DOM is ready after showCurrentStep
+            setTimeout(() => {
+                if (inputLessonTitle) inputLessonTitle.value = wizardState.lessonInfo.title;
+                if (inputLessonDesc)  inputLessonDesc.value  = wizardState.lessonInfo.description;
+                renderTaskSelectionGrid();
+            }, 200);
+        } else {
+            // Reset form inputs for new lesson
+            if (inputLessonTitle) inputLessonTitle.value = '';
+            if (inputLessonDesc)  inputLessonDesc.value  = '';
+            wizardState.selectedTasks = [];
+            wizardState.taskConfigs   = {};
+            updateWizardFlow();
+            renderTaskSelectionGrid();
+        }
+    });
+
+
+    modalElement.addEventListener('hidden.bs.modal', () => {
+        // Reset editing state when wizard is closed
+        wizardEditingLessonId = null;
     });
 
     btnNext.addEventListener('click', () => {
@@ -660,53 +734,101 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     btnFinish.addEventListener('click', async () => {
-        // Submit to API
+        // Submit to API — create or update
         btnFinish.disabled = true;
         btnFinish.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...';
 
         try {
-            const payload = {
-                title: wizardState.lessonInfo.title,
-                description: wizardState.lessonInfo.description,
-                groupLevel: wizardState.lessonInfo.groupLevel,
-                tasks: wizardState.selectedTasks.map((taskId, index) => {
-                    return {
-                        type: taskId,
-                        order: index + 1,
-                        config: wizardState.taskConfigs[taskId] || {}
-                    };
-                })
-            };
+            let response, data;
 
-            const response = await fetch('http://localhost:5000/api/lessons/wizard', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(payload)
-            });
+            if (wizardEditingLessonId) {
+                // ── UPDATE existing lesson (title, description, status, task order) ──
+                const payload = {
+                    title: wizardState.lessonInfo.title,
+                    description: wizardState.lessonInfo.description,
+                    tasks: wizardState.selectedTasks.map((taskId, index) => {
+                        return {
+                            type: taskId,
+                            order: index + 1,
+                            config: wizardState.taskConfigs[taskId] || {}
+                        };
+                    })
+                };
+                response = await fetch(`${API_BASE}/lessons/${wizardEditingLessonId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                data = await response.json();
 
-            const data = await response.json();
-            
-            if (response.ok) {
-                // Success
-                const bsModal = bootstrap.Modal.getInstance(modalElement);
-                bsModal.hide();
-                // Optionally reload data on page
-                if (window.TaskManagerPage && window.TaskManagerPage.loadTasks) {
-                    window.TaskManagerPage.loadTasks();
+                if (response.ok) {
+                    const bsModal = bootstrap.Modal.getInstance(modalElement);
+                    bsModal.hide();
+                    if (window.LessonLibrary && typeof window.LessonLibrary.refresh === 'function') {
+                        window.LessonLibrary.refresh();
+                    }
+                    // Show success toast if available
+                    const container = document.getElementById('toastContainer');
+                    if (container) {
+                        const el = document.createElement('div');
+                        el.className = 'toast align-items-center text-bg-success border-0 show';
+                        el.setAttribute('role', 'alert');
+                        el.innerHTML = '<div class="d-flex"><div class="toast-body">Lesson updated successfully!</div><button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button></div>';
+                        container.appendChild(el);
+                        setTimeout(() => el.remove(), 3500);
+                    }
+                } else {
+                    alert('Error updating lesson: ' + (data.error || data.message));
                 }
-                // Show toast or alert
-                alert('Lesson successfully created!');
             } else {
-                alert('Error creating lesson: ' + (data.error || data.message));
+                // ── CREATE new lesson via wizard ──
+                const payload = {
+                    title: wizardState.lessonInfo.title,
+                    description: wizardState.lessonInfo.description,
+                    groupLevel: wizardState.lessonInfo.groupLevel,
+                    tasks: wizardState.selectedTasks.map((taskId, index) => {
+                        return {
+                            type: taskId,
+                            order: index + 1,
+                            config: wizardState.taskConfigs[taskId] || {}
+                        };
+                    })
+                };
+
+                response = await fetch(`${API_BASE}/lessons/wizard`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                data = await response.json();
+
+                if (response.ok) {
+                    const bsModal = bootstrap.Modal.getInstance(modalElement);
+                    bsModal.hide();
+                    if (window.LessonLibrary && typeof window.LessonLibrary.refresh === 'function') {
+                        window.LessonLibrary.refresh();
+                    } else if (window.TaskManagerPage && window.TaskManagerPage.loadTasks) {
+                        window.TaskManagerPage.loadTasks();
+                    }
+                    const container = document.getElementById('toastContainer');
+                    if (container) {
+                        const el = document.createElement('div');
+                        el.className = 'toast align-items-center text-bg-success border-0 show';
+                        el.setAttribute('role', 'alert');
+                        el.innerHTML = '<div class="d-flex"><div class="toast-body">Lesson created successfully!</div><button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button></div>';
+                        container.appendChild(el);
+                        setTimeout(() => el.remove(), 3500);
+                    }
+                } else {
+                    alert('Error creating lesson: ' + (data.error || data.message));
+                }
             }
         } catch (error) {
             console.error(error);
             alert('Failed to connect to the server.');
         } finally {
             btnFinish.disabled = false;
-            btnFinish.innerHTML = 'Finish & Save Lesson';
+            btnFinish.innerHTML = wizardEditingLessonId ? 'Save Changes' : 'Finish & Save Lesson';
         }
     });
 
@@ -924,11 +1046,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderSelectedTasksList() {
+        if (!selectedTasksList) return;
         selectedTasksList.innerHTML = '';
         
         if (wizardState.selectedTasks.length === 0) {
-            selectedTasksList.innerHTML = '<p class="text-muted small">No tasks selected yet.</p>';
+            if (noTasksEmptyState) noTasksEmptyState.style.display = 'block';
             return;
+        } else {
+            if (noTasksEmptyState) noTasksEmptyState.style.display = 'none';
         }
         
         wizardState.selectedTasks.forEach((taskId, index) => {
@@ -1038,6 +1163,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 `;
                 break;
             case 'SPEAKING':
+                html += `
+                    <div class="form-group mb-3">
+                        <label>Speaking Text / Prompt</label>
+                        <p class="text-muted small mb-2">Paste the text the student needs to read, or the speaking topic.</p>
+                        <textarea class="form-control" name="prompt" rows="8" placeholder="Paste text here..." required></textarea>
+                    </div>
+                `;
+                break;
             case 'WRITING':
                 html += `
                     <div class="form-group mb-3">
@@ -1045,8 +1178,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         <textarea class="form-control" name="prompt" rows="3" required></textarea>
                     </div>
                     <div class="form-group mb-3">
-                        <label>Limit (words or seconds)</label>
-                        <input type="number" class="form-control" name="limit">
+                        <label>Word Limit</label>
+                        <input type="number" class="form-control" name="limit" placeholder="e.g. 250">
                     </div>
                 `;
                 break;
@@ -1179,6 +1312,30 @@ document.addEventListener('DOMContentLoaded', () => {
             currentStepIndex = index;
             showCurrentStep();
             renderStepper();
+        }
+    };
+
+    // Expose openForEdit to window so LessonLibrary can call it
+    window.LessonWizard = {
+        openForEdit: function(lesson) {
+            // Pre-fill wizard state with existing lesson data
+            wizardEditingLessonId = lesson.id;
+            wizardState.lessonInfo.title       = lesson.title       || '';
+            wizardState.lessonInfo.description = lesson.description || '';
+            wizardState.lessonInfo.groupLevel  = lesson.groupLevel  || currentGroup;
+            wizardState.lessonInfo.status      = lesson.status      || 'DRAFT';
+
+            // Map task types from existing lesson tasks
+            if (Array.isArray(lesson.tasks) && lesson.tasks.length > 0) {
+                const sorted = [...lesson.tasks].sort((a, b) => a.order - b.order);
+                wizardState.selectedTasks = sorted.map(t => t.type);
+            } else {
+                wizardState.selectedTasks = [];
+            }
+            wizardState.taskConfigs = {};
+
+            // Open the wizard modal
+            bootstrap.Modal.getOrCreateInstance(modalElement).show();
         }
     };
 

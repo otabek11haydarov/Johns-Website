@@ -14,6 +14,8 @@ import videoAssessmentRoutes from "./routes/videoAssessment.routes.js";
 import studentRoutes from "./routes/student.routes.js";
 import ttsRoutes from "./routes/ttsRoutes.js";
 import grammarTestRoutes from "./routes/grammarTestRoutes.js";
+import taskTypeRoutes from "./routes/taskTypeRoutes.js";
+
 
 
 const app = express();
@@ -49,6 +51,7 @@ app.use("/api/video-assessments", videoAssessmentRoutes);
 app.use("/api/students", studentRoutes);
 app.use("/api/tts", ttsRoutes);
 app.use("/api/grammar-tests", grammarTestRoutes);
+app.use("/api/task-types", taskTypeRoutes);
 
 app.use((error, req, res, next) => {
   if (!error) {
