@@ -1066,141 +1066,141 @@ input {
   }
 }
 
-body.dark-mode {
+{
   background:
     radial-gradient(circle at top left, rgba(58, 42, 37, 0.96), transparent 28%),
     linear-gradient(180deg, #231915 0%, #1a1210 100%);
   color: #eadfd9;
 }
 
-body.dark-mode .page-frame {
+{
   background: #221814;
   border-color: #4a352f;
 }
 
-body.dark-mode .sidebar {
+{
   background: linear-gradient(180deg, #261c18 0%, #1f1714 100%);
   border-right-color: #3b2b25;
 }
 
-body.dark-mode .topbar,
-body.dark-mode .panel,
-body.dark-mode .search-box,
-body.dark-mode .library-search,
-body.dark-mode .theme-toggle,
-body.dark-mode .sidebar-close,
-body.dark-mode .sidebar-toggle,
-body.dark-mode .topbar-icon,
-body.dark-mode .lesson-item,
-body.dark-mode .task-item,
-body.dark-mode .panel-link,
-body.dark-mode .insight-card {
+
+
+
+
+
+
+
+
+
+
+
+{
   background: #2a1f1b;
   border-color: #4a352f;
   color: #f4e4dc;
 }
 
-body.dark-mode .page-title,
-body.dark-mode .panel-title,
-body.dark-mode .profile-copy strong,
-body.dark-mode .topbar-user-copy strong,
-body.dark-mode .data-table td,
-body.dark-mode .lesson-item-copy strong,
-body.dark-mode .task-item-copy strong,
-body.dark-mode .library-card-copy h3 {
+
+
+
+
+
+
+
+{
   color: #f4e4dc;
 }
 
-body.dark-mode .profile-copy span,
-body.dark-mode .topbar-user-copy span,
-body.dark-mode .eyebrow,
-body.dark-mode .panel-subtitle,
-body.dark-mode .section-note,
-body.dark-mode .data-table th,
-body.dark-mode .lesson-item-copy span,
-body.dark-mode .task-item-copy span,
-body.dark-mode .library-card-copy p,
-body.dark-mode .library-empty {
+
+
+
+
+
+
+
+
+
+{
   color: #c9afa4;
 }
 
-body.dark-mode .nav-link,
-body.dark-mode .logout-link,
-body.dark-mode .nav-label,
-body.dark-mode .nav-icon,
-body.dark-mode .search-icon,
-body.dark-mode .topbar-icon,
-body.dark-mode .sidebar-close,
-body.dark-mode .sidebar-toggle {
+
+
+
+
+
+
+
+{
   color: #d9bdb1;
 }
 
-body.dark-mode .nav-link:hover,
-body.dark-mode .logout-link:hover,
-body.dark-mode .data-table tbody tr:hover {
+
+
+{
   background: #352621;
 }
 
-body.dark-mode .nav-link.active {
+{
   background: linear-gradient(90deg, rgba(201, 111, 74, 0.25), rgba(201, 111, 74, 0.08));
 }
 
-body.dark-mode .data-table th,
-body.dark-mode .data-table td {
+
+{
   border-bottom-color: #3a2a24;
 }
 
-body.dark-mode .task-tag,
-body.dark-mode .panel-chip,
-body.dark-mode .panel-chip-button,
-body.dark-mode .insight-badge,
-body.dark-mode .library-badge,
-body.dark-mode .library-filter {
+
+
+
+
+
+{
   background: #3a2a24;
   color: #f2bb94;
 }
 
-body.dark-mode .lesson-list::-webkit-scrollbar-thumb,
-body.dark-mode .task-list::-webkit-scrollbar-thumb {
+
+{
   background: rgba(242, 187, 148, 0.45);
 }
 
-body.dark-mode .lesson-list::-webkit-scrollbar-track,
-body.dark-mode .task-list::-webkit-scrollbar-track {
+
+{
   background: rgba(74, 53, 47, 0.65);
 }
 
-body.dark-mode .library-filter {
+{
   border-color: #4a352f;
 }
 
-body.dark-mode .library-filter.is-active,
-body.dark-mode .library-price {
+
+{
   color: #fff;
 }
 
-body.dark-mode .library-empty,
-body.dark-mode .library-card-cover {
+
+{
   background: #2a1f1b;
   border-color: #4a352f;
 }
 
-body.dark-mode .progress-bar {
+{
   background: #3a2a24;
 }
 
-body.dark-mode .theme-toggle {
+{
   box-shadow: inset 0 0 0 1px #5b4037;
 }
 
-body.dark-mode .theme-toggle-ring {
+{
   border-color: #f0b28a;
 }
 
-body.dark-mode .theme-toggle-core {
+{
   border-color: #ffd4a6;
 }
 
-body.dark-mode .sidebar-overlay {
+{
   background: rgba(8, 5, 4, 0.58);
 }

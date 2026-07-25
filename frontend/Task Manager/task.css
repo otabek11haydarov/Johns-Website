@@ -623,7 +623,7 @@ a {
   line-height: 1.6;
 }
 
-body.dark-mode {
+{
   --bg: #1e1e1e;
   --frame: #222222;
   --surface: #2a2a2a;
@@ -633,52 +633,52 @@ body.dark-mode {
   --muted: #b6a7a1;
 }
 
-body.dark-mode .task-page__frame,
-body.dark-mode .task-page__topbar,
-body.dark-mode .task-page__active-category,
-body.dark-mode .task-page__group-badge,
-body.dark-mode .task-workspace,
-body.dark-mode .task-card,
-body.dark-mode .task-empty,
-body.dark-mode .task-page__menu-toggle {
+
+
+
+
+
+
+
+{
   background: var(--surface);
   border-color: var(--border);
   color: var(--text);
 }
 
-body.dark-mode .task-card {
+{
   background: linear-gradient(180deg, #313131 0%, var(--surface) 100%);
 }
 
-body.dark-mode .task-page__title,
-body.dark-mode .task-workspace__title,
-body.dark-mode .task-card__title {
+
+
+{
   color: var(--title);
 }
 
-body.dark-mode .task-page__eyebrow,
-body.dark-mode .task-page__active-label,
-body.dark-mode .task-page__group-label,
-body.dark-mode .task-workspace__eyebrow,
-body.dark-mode .task-workspace__summary-label,
-body.dark-mode .task-card__eyebrow,
-body.dark-mode .task-card__description,
-body.dark-mode .task-empty__text {
+
+
+
+
+
+
+
+{
   color: var(--muted);
 }
 
-body.dark-mode .task-card__group {
+{
   background: #353535;
   color: var(--text);
 }
 
-body.dark-mode .task-page__active-value,
-body.dark-mode .task-page__group-value,
-body.dark-mode .task-workspace__summary-value {
+
+
+{
   color: #f0b28a;
 }
 
-body.dark-mode .task-empty {
+{
   background: #303030;
 }
 

@@ -156,6 +156,15 @@
     flex-direction: column;
   }
 
+  .group-dashboard .section-intro > .d-flex {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .group-dashboard .section-intro > .d-flex > .btn {
+    width: 100%;
+  }
+
   .task-category-panel .sidebar-categories__tabs,
   .task-grid {
     grid-template-columns: 1fr;
