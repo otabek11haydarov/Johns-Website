@@ -10,7 +10,7 @@ const sectionLabels = {
 
 
 
-const navLinks = document.querySelectorAll(".nav-link[data-section]");
+const navLinks = document.querySelectorAll(".nav-link[data-section], .bottom-nav-item[data-section]");
 const sections = document.querySelectorAll(".section");
 const headerTitle = document.getElementById("headerTitle");
 const sidebar = document.getElementById("sidebar");
@@ -59,17 +59,66 @@ function renderDashboardActivity(activity) {
 
   if (!activity || activity.length === 0){
     tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px; color: var(--text-secondary);">Hozircha baholangan o'quvchilar yo'q.</td></tr>`;
-  }else { 
+  } else { 
     tbody.innerHTML = activity
     .map(
-      (item) => `
-        <tr>
-          <td>${item.rank}</td>
-          <td>${item.name}</td>
-          <td>${item.email}</td>
-          <td>${item.group}</td>
-          <td>${item.score}</td>
-        </tr>`,
+      (item, index) => {
+        // Formatter for large numbers (e.g. 9842 -> 9,842)
+        const formattedScore = new Intl.NumberFormat('en-US').format(item.score || 0);
+        
+        // Mock avatar and course name based on index for the UI
+        const mockAvatars = [
+          "https://i.pravatar.cc/150?u=a042581f4e29026024d",
+          "https://i.pravatar.cc/150?u=a042581f4e29026704d",
+          "https://i.pravatar.cc/150?u=a04258114e29026702d",
+          "https://i.pravatar.cc/150?u=a048581f4e29026701d",
+          ""
+        ];
+        const mockCourses = [
+          "Advanced Mastery",
+          "Data Structures",
+          "UI/UX Fundamentals",
+          "Machine Learning",
+          "Marketing Strategy"
+        ];
+        
+        const avatarSrc = mockAvatars[index % 5];
+        const avatarHtml = avatarSrc 
+          ? `<div class="avatar-wrapper"><img src="${avatarSrc}" alt="${item.name}" class="student-avatar" />${index === 0 ? '<span class="star-icon">★</span>' : ''}</div>`
+          : `<div class="avatar-wrapper"><div class="student-avatar-placeholder">${item.name.substring(0, 2).toUpperCase()}</div></div>`;
+          
+        const courseName = mockCourses[index % 5];
+        const rankClass = index === 0 ? 'rank-1' : (index % 2 === 0 ? 'rank-even' : 'rank-odd');
+        const levelClass = item.group ? item.group.toLowerCase().replace(/[^a-z0-9]/g, '') : 'default';
+
+        return `
+        <tr class="standings-row">
+          <td>
+            <div class="rank-badge ${rankClass}">${index + 1}</div>
+          </td>
+          <td>
+            <div class="student-info-cell">
+              ${avatarHtml}
+              <div class="student-details">
+                <strong class="student-name">${item.name}</strong>
+                <span class="student-course">${courseName}</span>
+              </div>
+            </div>
+          </td>
+          <td>
+            <span class="contact-email">${item.email}</span>
+          </td>
+          <td>
+            <span class="level-pill level-${levelClass}">${item.group}</span>
+          </td>
+          <td class="text-right">
+            <div class="score-cell">
+              <strong>${formattedScore}</strong>
+              <span class="score-unit">pt</span>
+            </div>
+          </td>
+        </tr>`;
+      }
     )
     .join("");
   }
@@ -200,10 +249,12 @@ function showSection(name) {
     target.classList.add("active");
   }
 
-  const activeLink = document.querySelector(`.nav-link[data-section="${name}"]`);
-  if (activeLink) {
-    activeLink.classList.add("active");
-  }
+  const activeLinks = document.querySelectorAll(`[data-section="${name}"]`);
+  activeLinks.forEach(link => {
+    if (link.classList.contains("nav-link") || link.classList.contains("bottom-nav-item")) {
+      link.classList.add("active");
+    }
+  });
 
   if (headerTitle) {
     headerTitle.textContent = sectionLabels[name] || "Dashboard";

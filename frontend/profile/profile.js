@@ -7,7 +7,7 @@ const sectionLabels = {
   certificates: "Certificates",
 };
 
-const navLinks = document.querySelectorAll(".nav-link[data-section]");
+const navLinks = document.querySelectorAll(".nav-link[data-section], .bottom-nav-item[data-section]");
 const sections = document.querySelectorAll(".section");
 const headerTitle = document.getElementById("headerTitle");
 const sidebar = document.getElementById("sidebar");
@@ -44,15 +44,17 @@ function switchSection(sectionName) {
 
   // Add active class to selected section and nav link
   const targetSection = document.getElementById(`section-${sectionName}`);
-  const targetLink = document.querySelector(`[data-section="${sectionName}"]`);
+  const targetLinks = document.querySelectorAll(`[data-section="${sectionName}"]`);
 
   if (targetSection) {
     targetSection.classList.add("active");
   }
 
-  if (targetLink) {
-    targetLink.classList.add("active");
-  }
+  targetLinks.forEach(link => {
+    if (link.classList.contains("nav-link") || link.classList.contains("bottom-nav-item")) {
+      link.classList.add("active");
+    }
+  });
 
   // Update header title
   if (headerTitle) {

@@ -132,7 +132,7 @@ const resultRows = [
   },
 ];
 
-const navLinks = document.querySelectorAll(".nav-link[data-section]");
+const navLinks = document.querySelectorAll(".nav-link[data-section], .bottom-nav-item[data-section]");
 const sections = document.querySelectorAll(".section");
 const headerTitle = document.getElementById("headerTitle");
 const sidebar = document.getElementById("sidebar");
@@ -430,10 +430,12 @@ function showSection(name) {
     target.classList.add("active");
   }
 
-  const activeLink = document.querySelector(`.nav-link[data-section="${name}"]`);
-  if (activeLink) {
-    activeLink.classList.add("active");
-  }
+  const activeLinks = document.querySelectorAll(`[data-section="${name}"]`);
+  activeLinks.forEach(link => {
+    if (link.classList.contains("nav-link") || link.classList.contains("bottom-nav-item")) {
+      link.classList.add("active");
+    }
+  });
 
   if (headerTitle && sectionLabels[name]) {
     headerTitle.textContent = sectionLabels[name];
