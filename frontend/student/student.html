@@ -4,264 +4,259 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Student Dashboard</title>
+    <title>Student Portal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="student.css" />
 </head>
 
 <body>
-    <div class="page-shell">
-        <div class="page-frame">
-            <aside class="sidebar" id="sidebar">
-                <div class="sidebar-top">
-                    <div class="sidebar-title">Student Panel</div>
-                    <button class="sidebar-close" id="sidebarClose" type="button" aria-label="Close menu">
-                        x
-                    </button>
+    <div class="student-app">
+        <aside class="sidebar" id="sidebar">
+            <div class="brand">
+                <div class="brand-mark">J</div>
+                <div>
+                    <strong>Student Portal</strong>
+                    <span>Johns LMS</span>
                 </div>
+            </div>
 
-                <div class="student-profile-card">
-                    <div class="profile-avatar">
-                        <span>ST</span>
-                        <i class="profile-status"></i>
-                    </div>
-                    <div class="profile-copy">
-                        <strong>Sarah Talibova</strong>
-                        <span>Frontend Bootcamp Student</span>
-                    </div>
-                </div>
-
-                <nav class="sidebar-nav">
-                    <a href="#" class="nav-link active" data-section="dashboard">
-                        <span class="nav-icon">⌂</span>
-                        <span class="nav-label">Dashboard</span>
-                    </a>
-                    <a href="#" class="nav-link" data-section="results">
-                        <span class="nav-icon">◔</span>
-                        <span class="nav-label">Results</span>
-                    </a>
-                    <a href="#" class="nav-link" data-section="library">
-                        <span class="nav-icon">📚</span>
-                        <span class="nav-label">Library</span>
-                    </a>
-                </nav>
-
-                <div class="sidebar-bottom">
-                    <a href="../auth/login.html" class="logout-link">
-                        <span class="nav-icon">↩</span>
-                        <span class="nav-label">Logout</span>
-                    </a>
-                </div>
-            </aside>
-
-            <div class="sidebar-overlay" id="sidebarOverlay"></div>
-
-            <!-- // -- Mobile Bottom Navigation --------- -->
-            <nav class="bottom-nav">
-                <a href="#" class="bottom-nav-item active" data-section="dashboard">
-                    <span class="nav-icon">⌂</span>
+            <nav class="nav-block" aria-label="Main navigation">
+                <a class="nav-item active" href="#" data-section="dashboard">
+                    <span class="icon grid-icon"></span>
                     <span>Dashboard</span>
-                </a>
-                <a href="#" class="bottom-nav-item" data-section="results">
-                    <span class="nav-icon">◔</span>
-                    <span>Results</span>
-                </a>
-                <a href="#" class="bottom-nav-item" data-section="library">
-                    <span class="nav-icon">📚</span>
-                    <span>Library</span>
-                </a>
-                <a href="#" class="bottom-nav-item">
-                    <span class="nav-icon">👤</span>
-                    <span>Profile</span>
                 </a>
             </nav>
 
+            <div class="nav-heading">Academics</div>
+            <nav class="nav-block" aria-label="Academics">
+                <a class="nav-item" href="#" data-section="attendance">
+                    <span class="icon user-icon"></span>
+                    <span>Attendance</span>
+                </a>
+            </nav>
 
-            <div class="main-wrapper">
-                <header class="topbar">
-                    <div class="topbar-left">
-                        <button class="sidebar-toggle" id="sidebarToggle" type="button" aria-label="Open menu">
-                            ≡
-                        </button>
-                        <div class="search-box">
-                            <span class="search-icon">⌕</span>
-                            <input type="text" placeholder="Search lessons, homework, mentors..." />
-                        </div>
-                    </div>
+            <div class="nav-heading">My Learning</div>
+            <nav class="nav-block" aria-label="Learning">
+                <a class="nav-item" href="#" data-section="assignments">
+                    <span class="icon clipboard-icon"></span>
+                    <span>My Assignments</span>
+                </a>
+            </nav>
 
-                    <div class="topbar-right">
-                        <button class="topbar-icon" type="button" aria-label="Messages">✉</button>
-                        <button class="topbar-icon" type="button" aria-label="Notifications">⚑</button>
-                        <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode"
-                            title="Toggle dark mode">
-                            <span class="theme-toggle-ring">
-                                <span class="theme-toggle-core"></span>
-                            </span>
-                        </button>
-
-                        <div class="topbar-user">
-                            <div class="mini-avatar">ST</div>
-                            <div class="topbar-user-copy">
-                                <strong>Sarah Talibova</strong>
-                                <span>Student account</span>
-                            </div>
-                        </div>
-                    </div>
-                </header>
-
-                <main class="main-content">
-                    <section class="section active" id="section-dashboard">
-                        <div class="section-intro">
-                            <div>
-                                <p class="eyebrow">Student overview</p>
-                                <h1 class="page-title" id="headerTitle">Dashboard</h1>
-                            </div>
-                            <p class="section-note">
-                                Video darslar, ustoz bergan vazifalar va qolib ketgan topshiriqlarni bir joyda kuzatib
-                                boring.
-                            </p>
-                        </div>
-
-                        <div class="stats-grid">
-                            <article class="metric-card pumpkin metric-action" data-target="video-lessons-panel">
-                                <div class="metric-icon">▶</div>
-                                <div class="metric-copy">
-                                    <span class="metric-label">Video Darslar</span>
-                                    <strong class="metric-value" id="stat-video-count">6</strong>
-                                    <span class="metric-foot">Bosilganda video darslar ro‘yxatiga o‘tadi</span>
-                                </div>
-                            </article>
-
-                            <article class="metric-card terracotta metric-action" data-target="assignments-panel">
-                                <div class="metric-icon">✓</div>
-                                <div class="metric-copy">
-                                    <span class="metric-label">Yangi Vazifalar</span>
-                                    <strong class="metric-value" id="stat-assignment-count">5</strong>
-                                    <span class="metric-foot">Essay draft, React page, vocabulary va boshqalar</span>
-                                </div>
-                            </article>
-
-                            <article class="metric-card coral metric-action" data-target="backlog-panel"
-                                data-expand-backlog="true">
-                                <div class="metric-icon">!</div>
-                                <div class="metric-copy">
-                                    <span class="metric-label">Qolib Ketgan Vazifalar</span>
-                                    <strong class="metric-value" id="stat-backlog-count">4</strong>
-                                    <span class="metric-foot">Chala yoki xato bajarilgan ishlarni ko‘rsatadi</span>
-                                </div>
-                            </article>
-                        </div>
-
-                        <div class="dashboard-grid">
-                            <article class="panel panel-wide" id="video-lessons-panel">
-                                <div class="panel-header">
-                                    <div>
-                                        <h2 class="panel-title">Ustoz Tomonidan Berilgan Video Darslar</h2>
-                                        <p class="panel-subtitle">Har bir link ustiga bosib video darsni ochishingiz
-                                            mumkin</p>
-                                    </div>
-                                    <span class="panel-chip">6 lessons</span>
-                                </div>
-
-                                <div class="lesson-list" id="video-lessons-list"></div>
-                            </article>
-
-                            <aside class="panel panel-side" id="assignments-panel">
-                                <div class="panel-header">
-                                    <div>
-                                        <h2 class="panel-title">Yangi Vazifalar</h2>
-                                        <p class="panel-subtitle">Ustoz yuklagan topshiriqlar va ularning soni</p>
-                                    </div>
-                                </div>
-
-                                <div class="task-list" id="assignment-list"></div>
-
-                                <a class="panel-link" href="#assignment-list">Barcha vazifalarni ko‘rish</a>
-                            </aside>
-                        </div>
-
-                        <div class="panel panel-backlog" id="backlog-panel">
-                            <div class="panel-header">
-                                <div>
-                                    <h2 class="panel-title">Oldingi Darslardan Qolgan Vazifalar</h2>
-                                    <p class="panel-subtitle">Chala yoki xato bajarilgan topshiriqlarning qisqa ro‘yxati
-                                    </p>
-                                </div>
-                                <button class="panel-chip panel-chip-button" id="toggleBacklogBtn" type="button">
-                                    Hammasini ko‘rish
-                                </button>
-                            </div>
-
-                            <div class="task-list backlog-list collapsed" id="backlog-list"></div>
-                        </div>
-                    </section>
-
-                    <section class="section" id="section-results">
-                        <div class="section-intro compact">
-                            <div>
-                                <p class="eyebrow">Assessment</p>
-                                <h2 class="page-title">Results</h2>
-                            </div>
-                            <p class="section-note">Review your exam scores, assignments, and mentor feedback.</p>
-                        </div>
-
-                        <div class="panel">
-                            <div class="panel-header">
-                                <div>
-                                    <h2 class="panel-title">Recent Results</h2>
-                                    <p class="panel-subtitle">Latest academic performance summary</p>
-                                </div>
-                            </div>
-
-                            <div class="table-wrapper">
-                                <table class="data-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Subject</th>
-                                            <th>Assessment</th>
-                                            <th>Score</th>
-                                            <th>Feedback</th>
-                                            <th>Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="results-tbody"></tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </section>
-                    <section class="section" id="section-library">
-                        <div class="section-intro compact">
-                            <div>
-                                <p class="eyebrow">Study resources</p>
-                                <h2 class="page-title">Library</h2>
-                            </div>
-                            <p class="section-note">IELTS va CEFR tayyorlanish kitoblari</p>
-                        </div>
-
-                        <div class="panel">
-                            <div class="library-toolbar">
-                                <label class="library-search" for="library-search">
-                                    <span class="search-icon">⌕</span>
-                                    <input id="library-search" type="text" placeholder="Kitob nomi bo'yicha qidirish" />
-                                </label>
-
-                                <div class="library-filters" id="library-filters">
-                                    <button class="library-filter is-active" type="button" data-library-filter="All">
-                                        All
-                                    </button>
-                                    <button class="library-filter" type="button" data-library-filter="IELTS">
-                                        IELTS
-                                    </button>
-                                    <button class="library-filter" type="button" data-library-filter="CEFR">
-                                        CEFR
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div id="library-grid" class="library-grid"></div>
-                        </div>
-                    </section>
-                </main>
+            <div class="sidebar-footer">
+                <a class="nav-item" href="../auth/login.html">
+                    <span class="icon logout-icon"></span>
+                    <span>Logout</span>
+                </a>
+                <button class="nav-item button-nav" id="collapseBtn" type="button">
+                    <span class="icon chevron-icon"></span>
+                    <span>Collapse</span>
+                </button>
             </div>
+        </aside>
+
+        <div class="sidebar-scrim" id="sidebarScrim"></div>
+
+        <div class="content">
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button class="menu-btn" id="menuBtn" type="button" aria-label="Open menu">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
+                    <div class="breadcrumb">
+                        <a href="student.html" style="color: inherit; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='inherit'">Student Portal</a>
+                        <span class="separator">></span>
+                        <strong id="breadcrumbCurrent">Dashboard</strong>
+                    </div>
+                </div>
+
+                <div class="topbar-actions">
+                    <button class="round-btn" id="themeToggle" type="button" aria-label="Switch to light mode"
+                        title="Switch to light mode">
+                        <span class="theme-icon sun-icon" id="themeIcon"></span>
+                    </button>
+                    <div class="avatar" id="header-avatar">OH</div>
+                    <a class="round-btn" href="../auth/login.html" aria-label="Logout" onclick="localStorage.removeItem('token')">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                            <polyline points="16 17 21 12 16 7"></polyline>
+                            <line x1="21" y1="12" x2="9" y2="12"></line>
+                        </svg>
+                    </a>
+                </div>
+            </header>
+
+            <main class="dashboard">
+                <section class="welcome">
+                    <div>
+                        <h1>Good Morning, Otabek! <span class="wave">!</span></h1>
+                        <p>Here's what's happening with your learning journey today.</p>
+                    </div>
+                    <div class="welcome-stats">
+                        <div class="stat-pill">
+                            <span class="flame-icon"></span>
+                            <strong id="stat-streak">0</strong>
+                            <small>Day Streak</small>
+                        </div>
+                        <div class="stat-pill">
+                            <span class="star-icon"></span>
+                            <strong id="stat-xp">0</strong>
+                            <small>XP Points</small>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="kpi-grid" aria-label="Student summary">
+                    <article class="kpi-card">
+                        <div class="kpi-icon blue"><span class="cap-icon"></span></div>
+                        <strong id="stat-level">A1</strong>
+                        <span>Current Level</span>
+                    </article>
+                    <article class="kpi-card">
+                        <div class="kpi-icon red"><span class="open-book-icon"></span></div>
+                        <strong id="stat-group">Computer Science</strong>
+                        <span>My Group</span>
+                    </article>
+                    <article class="kpi-card">
+                        <div class="kpi-icon green"><span class="target-icon"></span></div>
+                        <strong id="stat-attendance">0%</strong>
+                        <span>Attendance Rate</span>
+                    </article>
+                    <article class="kpi-card">
+                        <div class="kpi-icon gold"><span class="award-icon"></span></div>
+                        <strong id="stat-pending">0</strong>
+                        <span>Pending Tasks</span>
+                    </article>
+                </section>
+
+                <section class="layout-grid">
+                    <article class="panel schedule-card">
+                        <div class="panel-title">
+                            <div>
+                                <h2>Bugungi Topshiriq</h2>
+                                <p>Siz ishlashingiz kerak bo'lgan navbatdagi dars.</p>
+                            </div>
+                        </div>
+
+                        <div class="timeline-row" id="current-lesson-container">
+                            <div class="time-line">
+                                <span></span>
+                            </div>
+                            <div class="lesson-time">--:--<br />--:--</div>
+                            <div class="lesson-box">
+                                <div class="lesson-icon"><span class="calendar-icon"></span></div>
+                                <div class="lesson-copy">
+                                    <strong id="current-lesson-title">Barcha darslar tugatildi</strong>
+                                    <span id="current-lesson-teacher">Ustoz: ---</span>
+                                    <div class="lesson-tags">
+                                        <small id="current-lesson-type">Guruh: ---</small>
+                                    </div>
+                                </div>
+                                <a href="#" class="status-chip" id="current-lesson-status">Boshlash</a>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="panel quick-card">
+                        <div class="panel-title">
+                            <h2>Quick Actions</h2>
+                        </div>
+                        <button class="action-row" type="button">
+                            <span class="action-icon orange"><span class="play-icon"></span></span>
+                            <span>
+                                <strong>Start Assignment</strong>
+                                <small id="quick-action-pending">0 pending tasks</small>
+                            </span>
+                            <b>></b>
+                        </button>
+                        <button class="action-row" type="button">
+                            <span class="action-icon red"><span class="flame-icon"></span></span>
+                            <span>
+                                <strong>Daily Vocabulary</strong>
+                                <small>+50 XP Reward</small>
+                            </span>
+                            <b>></b>
+                        </button>
+                    </article>
+
+                    <article class="panel analytics-card">
+                        <div class="analytics-head">
+                            <div class="panel-title">
+                                <h2>Performance Analytics</h2>
+                                <p>Daily and overall learning performance</p>
+                            </div>
+                            <div class="segmented">
+                                <button class="active" type="button">Daily</button>
+                                <button type="button">Average</button>
+                            </div>
+                        </div>
+
+                        <div class="chart-row">
+                            <div class="chart-wrap">
+                                <canvas id="performanceChart" width="560" height="200"
+                                    aria-label="Performance chart"></canvas>
+                                <div class="chart-legend">
+                                    <span><i class="orange-dot"></i>Assignment Accuracy</span>
+                                    <span><i class="red-dot"></i>Homework Accuracy</span>
+                                </div>
+                            </div>
+                            <div class="score-grid">
+                                <div class="score-card">
+                                    <small>Today's Accuracy</small>
+                                    <strong id="perf-today">--%</strong>
+                                </div>
+                                <div class="score-card">
+                                    <small>Average Accuracy</small>
+                                    <strong id="perf-avg">--%</strong>
+                                </div>
+                                <div class="score-card">
+                                    <small>Best Day</small>
+                                    <strong class="green-text" id="perf-best">--</strong>
+                                </div>
+                                <div class="score-card">
+                                    <small>Weakest Day</small>
+                                    <strong class="red-text" id="perf-weakest">--</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="subject-row">
+                            <div><small>Mon<br />Grammar</small><strong>94%</strong><span class="rise">~</span></div>
+                            <div><small>Tue<br />Reading</small><strong>86%</strong><span class="rise">~</span></div>
+                            <div><small>Wed<br />Vocabulary</small><strong>98%</strong><span class="good">~</span></div>
+                            <div><small>Thu<br />Listening</small><strong>72%</strong><span class="bad">~</span></div>
+                            <div><small>Fri<br />Writing</small><strong>81%</strong><span class="rise">~</span></div>
+                            <button type="button">View More <span>-></span></button>
+                        </div>
+                    </article>
+
+                    <article class="panel students-card">
+                        <div class="panel-title">
+                            <h2>Top Students</h2>
+                            <p>Students with the same CEFR Level</p>
+                        </div>
+
+                        <ol class="student-list" id="top-students-list">
+                            <li>Yuklanmoqda...</li>
+                        </ol>
+
+                        <div class="you-row" id="top-students-you">
+                            <div class="avatar">--</div>
+                            <span>
+                                <strong>Yuklanmoqda...</strong>
+                                <small>Rank #--</small>
+                            </span>
+                            <b>--%</b>
+                        </div>
+                        <a href="leaderboard.html" class="wide-btn" style="display:block; text-align:center; text-decoration:none;">View More <span>-></span></a>
+                    </article>
+                </section>
+            </main>
         </div>
     </div>
 

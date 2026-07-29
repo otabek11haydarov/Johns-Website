@@ -23,24 +23,12 @@ const lessonPageGroup = window.TaskManagerPage.resolveGroup(lessonPageParams.get
     lessonGrid: document.getElementById("taskGrid"),
     lessonEmpty: document.getElementById("taskEmpty"),
     lessonCardTemplate: document.getElementById("taskCardTemplate"),
-    lessonModal: document.getElementById("task-modal"),
-    lessonModalTitle: document.getElementById("taskModalTitle"),
-    lessonForm: document.getElementById("taskForm"),
-    lessonTitleInput: document.getElementById("taskTitleInput"),
-    lessonDescriptionInput: document.getElementById("taskDescriptionInput"),
-    quickFilterSelect: document.getElementById("taskCategorySelect"),
-    selectedSummary: document.getElementById("lessonSelectedSummary"),
-    lessonSubmitButton: document.getElementById("taskSubmitButton"),
-    lessonTaskOptions: document.getElementById("lessonTaskOptions"),
     deleteLessonModal: document.getElementById("delete-task-modal"),
     confirmDeleteLessonButton: document.getElementById("confirmDeleteTaskBtn"),
   };
 
   let lessons = loadLessons();
   let currentCategory = "video";
-  let pickerCategory = currentCategory;
-  let selectedTaskIds = new Set();
-  let editingLessonId = null;
   let pendingDeleteLessonId = null;
 
   function capitalize(value) {
@@ -107,108 +95,7 @@ const lessonPageGroup = window.TaskManagerPage.resolveGroup(lessonPageParams.get
 
     pickerCategory = nextPickerCategory || currentCategory;
 
-    const activeCategoryName = capitalize(pickerCategory);
-    const activeTasks = TASK_TEMPLATES.filter((task) => task.type === activeCategoryName);
-    const tabMarkup = CATEGORY_ORDER.map((category) => {
-      const selectedTask = TASK_TEMPLATES.find((task) => task.type === category && selectedTaskIds.has(task.id));
-      const categoryTaskCount = TASK_TEMPLATES.filter((task) => task.type === category).length;
-      const isActive = category.toLowerCase() === pickerCategory;
 
-      return `
-        <button
-          class="lesson-picker-tab ${isActive ? "is-active" : ""} ${selectedTask ? "has-selected" : ""}"
-          type="button"
-          data-picker-category="${category.toLowerCase()}"
-          aria-pressed="${isActive}"
-        >
-          <span>${category}</span>
-          <strong>${categoryTaskCount}</strong>
-        </button>
-      `;
-    }).join("");
-
-    const taskRows = activeTasks
-      .map((task) => {
-        const isSelected = selectedTaskIds.has(task.id);
-
-        return `
-          <button
-            class="lesson-task-option ${isSelected ? "is-selected" : ""}"
-            type="button"
-            data-select-task="${task.id}"
-            aria-pressed="${isSelected}"
-          >
-            <span class="lesson-task-option__radio"></span>
-            <span class="lesson-task-option__copy">
-              <strong>${task.title}</strong>
-              <small>${lessonPageGroup} group &middot; ${task.type}</small>
-              <em>${task.description}</em>
-            </span>
-          </button>
-        `;
-      })
-      .join("");
-
-    const selectedSummary = getSelectedTasks()
-      .map((task) => `<span class="lesson-selected-chip">${task.type}: ${task.title}</span>`)
-      .join("");
-
-    if (elements.selectedSummary) {
-      elements.selectedSummary.innerHTML =
-        selectedSummary || `<span class="lesson-selected-empty">No tasks selected yet.</span>`;
-    }
-
-    elements.lessonTaskOptions.innerHTML = `
-      <div class="lesson-picker-tabs" role="tablist" aria-label="Lesson task filters">
-        ${tabMarkup}
-      </div>
-      <div class="lesson-task-group">
-        <div class="lesson-task-group__header">
-          <h4>${activeCategoryName} tasks for ${lessonPageGroup}</h4>
-          <button class="lesson-picker-clear" type="button" data-clear-category="${pickerCategory}">Clear ${activeCategoryName}</button>
-        </div>
-        <div class="lesson-task-options">
-          ${taskRows || `<div class="lesson-task-empty">No ${activeCategoryName.toLowerCase()} tasks for this group.</div>`}
-        </div>
-      </div>
-    `;
-  }
-
-  function getSelectedTaskIds() {
-    return Array.from(selectedTaskIds);
-  }
-
-  function getSelectedTasks() {
-    return getSelectedTaskIds().map(getTaskById).filter(Boolean);
-  }
-
-  function selectTaskForCategory(taskId) {
-    const task = getTaskById(taskId);
-
-    if (!task) {
-      return;
-    }
-
-    const isAlreadySelected = selectedTaskIds.has(taskId);
-    TASK_TEMPLATES.filter((item) => item.type === task.type).forEach((item) => {
-      selectedTaskIds.delete(item.id);
-    });
-
-    if (!isAlreadySelected) {
-      selectedTaskIds.add(taskId);
-    }
-
-    renderTaskPicker();
-  }
-
-  function clearTaskCategory(category) {
-    const normalizedCategory = capitalize(category);
-
-    TASK_TEMPLATES.filter((task) => task.type === normalizedCategory).forEach((task) => {
-      selectedTaskIds.delete(task.id);
-    });
-
-    renderTaskPicker();
   }
 
   function updatePageCopy() {
@@ -321,136 +208,12 @@ const lessonPageGroup = window.TaskManagerPage.resolveGroup(lessonPageParams.get
     renderLessons();
   }
 
-  function resetLessonForm() {
-    editingLessonId = null;
-    elements.lessonForm.reset();
-    elements.quickFilterSelect.value = capitalize(currentCategory);
-    renderTaskPicker([], currentCategory);
-    elements.lessonModalTitle.textContent = "Create Lesson";
-    elements.lessonSubmitButton.textContent = "Create Lesson";
-  }
-
-  function openLessonModal() {
-    bootstrap.Modal.getOrCreateInstance(elements.lessonModal).show();
-  }
-
   function openCreateLessonModal() {
-    resetLessonForm();
-    openLessonModal();
+    window.location.href = `lesson-wizard.html?level=${lessonPageGroup}`;
   }
 
   function openEditLessonModal(lessonId) {
-    const lesson = lessons.find((item) => item.id === lessonId);
-
-    if (!lesson) {
-      return;
-    }
-
-    editingLessonId = lessonId;
-    elements.lessonTitleInput.value = lesson.title;
-    elements.lessonDescriptionInput.value = lesson.description;
-    const firstTask = (lesson.taskIds || []).map(getTaskById).find(Boolean);
-    pickerCategory = firstTask ? firstTask.type.toLowerCase() : currentCategory;
-    elements.quickFilterSelect.value = capitalize(pickerCategory);
-    renderTaskPicker(lesson.taskIds || [], pickerCategory);
-    elements.lessonModalTitle.textContent = "Edit Lesson";
-    elements.lessonSubmitButton.textContent = "Save Changes";
-    openLessonModal();
-  }
-
-  function createLesson(payload) {
-    lessons = [
-      {
-        id: `${lessonPageGroup.toLowerCase()}-lesson-${Date.now()}`,
-        group: lessonPageGroup,
-        ...payload,
-      },
-      ...lessons,
-    ];
-  }
-
-  function updateLesson(payload) {
-    lessons = lessons.map((lesson) =>
-      lesson.id === editingLessonId
-        ? {
-            ...lesson,
-            ...payload,
-          }
-        : lesson,
-    );
-  }
-
-  function handleLessonSubmit(event) {
-    event.preventDefault();
-
-    const title = elements.lessonTitleInput.value.trim();
-    const description = elements.lessonDescriptionInput.value.trim() || "No lesson description added yet.";
-    const taskIds = getSelectedTaskIds();
-
-    if (!title) {
-      elements.lessonTitleInput.focus();
-      return;
-    }
-
-    if (!taskIds.length) {
-      elements.lessonTaskOptions.querySelector("input")?.focus();
-      return;
-    }
-
-    const payload = { title, description, status: "Active", taskIds };
-    const firstTask = getTaskById(taskIds[0]);
-
-    if (firstTask) {
-      currentCategory = firstTask.type.toLowerCase();
-    }
-
-    if (editingLessonId) {
-      updateLesson(payload);
-    } else {
-      createLesson(payload);
-    }
-
-    saveLessons();
-    bootstrap.Modal.getOrCreateInstance(elements.lessonModal).hide();
-    refreshUI();
-  }
-
-  function handleCategoryClick(event) {
-    const button = event.target.closest("[data-category]");
-
-    if (!button) {
-      return;
-    }
-
-    currentCategory = button.dataset.category;
-    renderLessons();
-  }
-
-  function handleQuickFilterChange() {
-    pickerCategory = elements.quickFilterSelect.value.toLowerCase();
-    renderTaskPicker();
-  }
-
-  function handleTaskPickerClick(event) {
-    const categoryButton = event.target.closest("[data-picker-category]");
-    const taskButton = event.target.closest("[data-select-task]");
-    const clearButton = event.target.closest("[data-clear-category]");
-
-    if (categoryButton) {
-      pickerCategory = categoryButton.dataset.pickerCategory;
-      elements.quickFilterSelect.value = capitalize(pickerCategory);
-      renderTaskPicker();
-      return;
-    }
-
-    if (taskButton) {
-      selectTaskForCategory(taskButton.dataset.selectTask);
-      return;
-    }
-
-    if (clearButton) {
-      clearTaskCategory(clearButton.dataset.clearCategory);
-    }
+    window.location.href = `lesson-wizard.html?level=${lessonPageGroup}&editId=${lessonId}`;
   }
 
   function openDeleteLessonModal(lessonId) {
@@ -486,14 +249,9 @@ const lessonPageGroup = window.TaskManagerPage.resolveGroup(lessonPageParams.get
 
   function init() {
     refreshUI();
-    renderTaskPicker();
     elements.categoryTabs?.addEventListener("click", handleCategoryClick);
     elements.addLessonButton.addEventListener("click", openCreateLessonModal);
-    elements.quickFilterSelect.addEventListener("change", handleQuickFilterChange);
-    elements.lessonTaskOptions.addEventListener("click", handleTaskPickerClick);
-    elements.lessonForm.addEventListener("submit", handleLessonSubmit);
     elements.confirmDeleteLessonButton.addEventListener("click", deleteLesson);
-    elements.lessonModal.addEventListener("hidden.bs.modal", resetLessonForm);
     elements.deleteLessonModal.addEventListener("hidden.bs.modal", () => {
       pendingDeleteLessonId = null;
     });

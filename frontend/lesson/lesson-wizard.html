@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson Creator Wizard - Johns LMS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="lesson-wizard.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+</head>
+<body class="">
+
+<div class="wizard-layout">
+    <!-- Left Sidebar -->
+    <aside class="wizard-sidebar">
+        <div class="wizard-brand">
+            <a href="lesson.html" class="wizard-back" aria-label="Go back">
+                <i class="bi bi-arrow-left"></i>
+            </a>
+            <h1 class="wizard-title">Lesson Creator</h1>
+        </div>
+
+        <div class="wizard-stepper" id="wizardStepper">
+            <!-- Dynamically injected by JS -->
+        </div>
+
+        <div class="wizard-actions">
+            <button class="btn-wizard btn-wizard-outline" id="saveDraftBtn">Save Draft & Exit</button>
+            <a href="#" class="btn-wizard btn-wizard-outline" style="text-decoration: none; border:none;">Help Center</a>
+        </div>
+    </aside>
+
+    <!-- Right Workspace -->
+    <main class="wizard-workspace" id="wizardWorkspace">
+        
+        <!-- STEP: Lesson Information -->
+        <section class="workspace-content active" id="step-info">
+            <div class="workspace-header">
+                <h2 class="workspace-title">Lesson Information</h2>
+                <p class="workspace-desc">Start by giving your lesson a clear, descriptive title.</p>
+            </div>
+            
+            <div class="wiz-card">
+                <div class="wiz-form-group">
+                    <label for="lessonTitle">Lesson Title *</label>
+                    <input type="text" id="lessonTitle" class="wiz-input" placeholder="e.g. Unit 1: Introductions">
+                </div>
+                <div class="wiz-form-group">
+                    <label for="lessonDesc">Description</label>
+                    <textarea id="lessonDesc" class="wiz-textarea" placeholder="What will the students learn?"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP: Video -->
+        <section class="workspace-content" id="step-video">
+            <div class="workspace-header">
+                <h2 class="workspace-title">Video Lesson</h2>
+                <p class="workspace-desc">Embed a video lecture for this lesson.</p>
+            </div>
+            
+            <div class="wiz-card">
+                <div class="wiz-form-group">
+                    <label>Video URL (YouTube, Vimeo, etc.)</label>
+                    <input type="url" id="videoUrl" class="wiz-input" placeholder="https://youtube.com/...">
+                </div>
+                <div class="wiz-form-group">
+                    <label>Duration (minutes)</label>
+                    <input type="number" id="videoDuration" class="wiz-input" placeholder="15">
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP: Flashcards -->
+        <section class="workspace-content" id="step-flashcards">
+            <div class="workspace-header">
+                <h2 class="workspace-title">Flashcards</h2>
+                <p class="workspace-desc">Build interactive flashcards for vocabulary practice.</p>
+            </div>
+            
+            <div class="fc-builder">
+                <!-- Sidebar -->
+                <div class="fc-sidebar">
+                    <div class="fc-sidebar-list" id="fcSidebarList">
+                        <!-- JS Injected -->
+                    </div>
+                    <div class="fc-add-wrapper">
+                        <button class="btn-wizard btn-wizard-outline" id="fcAddBtn" style="width: 100%; border-style: dashed;">+ Add Flashcard</button>
+                    </div>
+                </div>
+                <!-- Editor -->
+                <div class="fc-editor" id="fcEditor">
+                    <div class="fc-editor-empty" id="fcEditorEmpty">
+                        Select or add a flashcard to edit
+                    </div>
+                    <div id="fcEditorForm" style="display: none; height: 100%; flex-direction: column;">
+                        <div class="wiz-form-group">
+                            <label>Word *</label>
+                            <input type="text" id="fcEditWord" class="wiz-input" placeholder="e.g. Achievement">
+                        </div>
+                        <div class="wiz-form-group">
+                            <label>Description / Meaning *</label>
+                            <textarea id="fcEditDesc" class="wiz-textarea" placeholder="Something successfully completed..." style="min-height: 80px;"></textarea>
+                        </div>
+                        <div class="wiz-form-group" style="flex: 1; display:flex; flex-direction:column;">
+                            <label>Example Sentence *</label>
+                            <textarea id="fcEditEx" class="wiz-textarea" placeholder="Her greatest achievement was..." style="flex: 1; min-height: 120px;"></textarea>
+                        </div>
+                        <div class="fc-editor-actions">
+                            <button class="btn-wizard btn-wizard-outline" id="fcDupBtn"><i class="bi bi-copy"></i> Duplicate</button>
+                            <button class="btn-wizard btn-wizard-outline" id="fcDelBtn" style="color: #ef4444; border-color: #fca5a5;"><i class="bi bi-trash"></i> Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP: Grammar -->
+        <section class="workspace-content" id="step-grammar">
+            <div class="workspace-header">
+                <h2 class="workspace-title">Grammar Quiz</h2>
+                <p class="workspace-desc">Create multiple-choice grammar questions.</p>
+            </div>
+            
+            <div class="wiz-card" style="background:transparent; border:none; box-shadow:none; padding:0;">
+                <div id="grammarList" class="wiz-item-list"></div>
+                <button class="btn-wizard btn-wizard-outline" id="addGrammarBtn" style="width: 100%; border-style: dashed;">+ Add Question</button>
+            </div>
+        </section>
+        
+        <!-- Additional steps (Vocab, Reading, etc.) can be similarly structured. We will combine them into the preview later. -->
+        <!-- STEP: Preview -->
+        <section class="workspace-content" id="step-preview">
+            <div class="workspace-header">
+                <h2 class="workspace-title">Review & Publish</h2>
+                <p class="workspace-desc">Review your lesson modules before publishing.</p>
+            </div>
+            
+            <div class="wiz-card">
+                <div class="preview-summary">
+                    <div class="preview-stat">
+                        <span class="preview-stat-label">Title</span>
+                        <strong class="preview-stat-value" id="previewTitle" style="font-size:1.1rem; color:var(--wiz-text);"></strong>
+                    </div>
+                    <div class="preview-stat">
+                        <span class="preview-stat-label">Tasks</span>
+                        <strong class="preview-stat-value" id="previewTaskCount">0</strong>
+                    </div>
+                    <div class="preview-stat">
+                        <span class="preview-stat-label">Est. Time</span>
+                        <strong class="preview-stat-value" id="previewTime">0 min</strong>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 30px; margin-bottom:16px;">Lesson Modules</h3>
+                <div class="preview-task-list" id="previewTasksList">
+                    <!-- JS injected -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="mobile-stepper">
+        <button class="btn-wizard btn-wizard-outline" id="mobilePrevBtn">Back</button>
+        <button class="btn-wizard btn-wizard-outline" id="mobileDraftBtn">Save Draft</button>
+        <button class="btn-wizard btn-wizard-primary" id="mobileNextBtn">Next Step</button>
+    </nav>
+</div>
+
+<!-- TEMPLATES -->
+
+
+<template id="grammarTemplate">
+    <div class="wiz-list-item">
+        <div class="wiz-list-item-header">
+            <span class="wiz-item-title">Question <span class="q-num"></span></span>
+            <button class="wiz-remove-btn"><i class="bi bi-trash"></i></button>
+        </div>
+        <div class="wiz-form-group" style="margin-bottom:0;">
+            <label>Question Text</label>
+            <input type="text" class="wiz-input g-qtext" placeholder="She ___ to the store yesterday.">
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+            <div class="wiz-form-group" style="margin-bottom:0;">
+                <label>Option A (Correct)</label>
+                <input type="text" class="wiz-input g-opt-a" placeholder="went" style="border-left: 3px solid var(--wiz-success);">
+            </div>
+            <div class="wiz-form-group" style="margin-bottom:0;">
+                <label>Option B</label>
+                <input type="text" class="wiz-input g-opt-b" placeholder="goes">
+            </div>
+            <div class="wiz-form-group" style="margin-bottom:0;">
+                <label>Option C</label>
+                <input type="text" class="wiz-input g-opt-c" placeholder="gone">
+            </div>
+            <div class="wiz-form-group" style="margin-bottom:0;">
+                <label>Option D</label>
+                <input type="text" class="wiz-input g-opt-d" placeholder="going">
+            </div>
+        </div>
+    </div>
+</template>
+
+<script src="lesson-wizard.js"></script>
+</body>
+</html>

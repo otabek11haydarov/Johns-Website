@@ -63,31 +63,13 @@ function renderDashboardActivity(activity) {
     tbody.innerHTML = activity
     .map(
       (item, index) => {
-        // Formatter for large numbers (e.g. 9842 -> 9,842)
         const formattedScore = new Intl.NumberFormat('en-US').format(item.score || 0);
         
-        // Mock avatar and course name based on index for the UI
-        const mockAvatars = [
-          "https://i.pravatar.cc/150?u=a042581f4e29026024d",
-          "https://i.pravatar.cc/150?u=a042581f4e29026704d",
-          "https://i.pravatar.cc/150?u=a04258114e29026702d",
-          "https://i.pravatar.cc/150?u=a048581f4e29026701d",
-          ""
-        ];
-        const mockCourses = [
-          "Advanced Mastery",
-          "Data Structures",
-          "UI/UX Fundamentals",
-          "Machine Learning",
-          "Marketing Strategy"
-        ];
-        
-        const avatarSrc = mockAvatars[index % 5];
-        const avatarHtml = avatarSrc 
-          ? `<div class="avatar-wrapper"><img src="${avatarSrc}" alt="${item.name}" class="student-avatar" />${index === 0 ? '<span class="star-icon">★</span>' : ''}</div>`
-          : `<div class="avatar-wrapper"><div class="student-avatar-placeholder">${item.name.substring(0, 2).toUpperCase()}</div></div>`;
+        // Generate dynamic avatar based on student name
+        const avatarSrc = `https://ui-avatars.com/api/?name=${encodeURIComponent(item.name)}&background=random`;
+        const avatarHtml = `<div class="avatar-wrapper"><img src="${avatarSrc}" alt="${item.name}" class="student-avatar" />${index === 0 ? '<span class="star-icon">★</span>' : ''}</div>`;
           
-        const courseName = mockCourses[index % 5];
+        const courseName = item.group || "TBD";
         const rankClass = index === 0 ? 'rank-1' : (index % 2 === 0 ? 'rank-even' : 'rank-odd');
         const levelClass = item.group ? item.group.toLowerCase().replace(/[^a-z0-9]/g, '') : 'default';
 
