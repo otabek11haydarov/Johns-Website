@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Portal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="student.css" />
+</head>
+
+<body>
+    <div class="student-app">
+        <aside class="sidebar" id="sidebar">
+            <div class="brand">
+                <div class="brand-mark">J</div>
+                <div>
+                    <strong>Student Portal</strong>
+                    <span>Johns LMS</span>
+                </div>
+            </div>
+
+            <nav class="nav-block" aria-label="Main navigation">
+                <a class="nav-item active" href="#" data-section="dashboard">
+                    <span class="icon grid-icon"></span>
+                    <span>Dashboard</span>
+                </a>
+            </nav>
+
+            <div class="nav-heading">Academics</div>
+            <nav class="nav-block" aria-label="Academics">
+                <a class="nav-item" href="#" data-section="attendance">
+                    <span class="icon user-icon"></span>
+                    <span>Attendance</span>
+                </a>
+            </nav>
+
+            <div class="nav-heading">My Learning</div>
+            <nav class="nav-block" aria-label="Learning">
+                <a class="nav-item" href="#" data-section="assignments">
+                    <span class="icon clipboard-icon"></span>
+                    <span>My Assignments</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <a class="nav-item" href="../auth/login.html" onclick="localStorage.removeItem('token'); localStorage.removeItem('role');">
+                    <span class="icon logout-icon"></span>
+                    <span>Logout</span>
+                </a>
+                <button class="nav-item button-nav" id="collapseBtn" type="button">
+                    <span class="icon chevron-icon"></span>
+                    <span>Collapse</span>
+                </button>
+            </div>
+        </aside>
+
+        <div class="sidebar-scrim" id="sidebarScrim"></div>
+
+        <div class="content">
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button class="menu-btn" id="menuBtn" type="button" aria-label="Open menu">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
+                    <div class="breadcrumb">
+                        <a href="student.html" style="color: inherit; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='inherit'">Student Portal</a>
+                        <span class="separator">></span>
+                        <strong id="breadcrumbCurrent">Statistics</strong>
+                    </div>
+                </div>
+
+                <div class="topbar-actions">
+                    <button class="round-btn" id="themeToggle" type="button" aria-label="Switch to light mode"
+                        title="Switch to light mode">
+                        <span class="theme-icon sun-icon" id="themeIcon"></span>
+                    </button>
+                    <div class="avatar" id="header-avatar">OH</div>
+                    <a class="round-btn" href="../auth/login.html" aria-label="Logout" onclick="localStorage.removeItem('token')">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                            <polyline points="16 17 21 12 16 7"></polyline>
+                            <line x1="21" y1="12" x2="9" y2="12"></line>
+                        </svg>
+                    </a>
+                </div>
+            </header>
+
+            <main class="dashboard stats-page">
+                <section class="welcome">
+                    <div>
+                        <h1>Your Learning Stats <span class="wave">📊</span></h1>
+                        <p>Analyze your progress, XP, and learning habits.</p>
+                    </div>
+                </section>
+
+                <section class="kpi-grid" aria-label="Student summary">
+                    <article class="kpi-card">
+                        <div class="kpi-icon blue">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                        </div>
+                        <strong id="stat-total-time">0h 0m</strong>
+                        <span>Total Learning Time</span>
+                    </article>
+                    <article class="kpi-card">
+                        <div class="kpi-icon gold">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                        </div>
+                        <strong id="stat-total-xp">0</strong>
+                        <span>Total XP Earned</span>
+                    </article>
+                    <article class="kpi-card">
+                        <div class="kpi-icon red">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path></svg>
+                        </div>
+                        <strong id="stat-current-streak">0 Days</strong>
+                        <span>Current Streak</span>
+                    </article>
+                    <article class="kpi-card">
+                        <div class="kpi-icon green">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+                        </div>
+                        <strong id="stat-longest-streak">0 Days</strong>
+                        <span>Longest Streak</span>
+                    </article>
+                </section>
+
+                <section class="layout-grid" style="grid-template-columns: 1fr;">
+                    <article class="panel">
+                        <div class="panel-title">
+                            <h2>Activity Streak</h2>
+                            <p>Your daily learning activity (Duolingo Style)</p>
+                        </div>
+                        <div class="calendar-container" style="overflow-x: auto; margin-top: 20px; padding-bottom: 10px;">
+                            <div class="calendar-grid" id="streak-calendar">
+                                <!-- Calendar cells will be injected here via JS -->
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="panel">
+                        <div class="panel-title">
+                            <h2>XP History (Last 30 Days)</h2>
+                            <p>See how much XP you earned each day</p>
+                        </div>
+                        <div class="chart-wrap" style="height: 300px; margin-top: 20px;">
+                            <canvas id="xpHistoryChart" style="width: 100%; height: 100%;" aria-label="XP History chart"></canvas>
+                        </div>
+                    </article>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <script src="../shared/config.js"></script>
+    <script src="../shared/roleResolver.js"></script>
+    <script src="stats.js"></script>
+</body>
+
+</html>

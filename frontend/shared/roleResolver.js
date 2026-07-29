@@ -44,3 +44,16 @@ function enforceRole(expectedRole) {
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = { resolveUserRole, getRoleRoute, enforceRole };
 }
+
+// Global logout handler: Attach to any link pointing to login.html
+if (typeof document !== 'undefined') {
+    document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll('a[href*="login.html"]').forEach(link => {
+            link.addEventListener('click', () => {
+                localStorage.removeItem('token');
+                localStorage.removeItem('role');
+                localStorage.removeItem('userId');
+            });
+        });
+    });
+}

@@ -295,3 +295,149 @@ export async function getLeaderboardData(req, res) {
     return res.status(500).json({ success: false, message: "Internal server error" });
   }
 }
+
+export async function getStudentStats(req, res) {
+  try {
+    const studentId = req.user.id;
+    
+    // Fetch all assessments
+    const assessments = await prisma.lessonAssessment.findMany({
+      where: { studentId: studentId },
+      orderBy: { createdAt: 'asc' }
+    });
+
+    // XP calculation and mapping
+    let totalXP = 0;
+    const xpByDate = {}; // 'YYYY-MM-DD' -> XP
+    const activityDates = new Set();
+    
+    assessments.forEach(a => {
+      const xp = Math.round(a.overallScore);
+      totalXP += xp;
+      
+      const dateStr = new Date(a.createdAt).toISOString().split('T')[0];
+      activityDates.add(dateStr);
+      
+      if (!xpByDate[dateStr]) xpByDate[dateStr] = 0;
+      xpByDate[dateStr] += xp;
+    });
+
+    // Calculate Streak (Consecutive days backwards from today or yesterday)
+    let currentStreak = 0;
+    let longestStreak = 0;
+    
+    const sortedDates = Array.from(activityDates).sort();
+    
+    // Simple longest streak calc
+    let tempStreak = 0;
+    for (let i = 0; i < sortedDates.length; i++) {
+      if (i === 0) {
+        tempStreak = 1;
+      } else {
+        const d1 = new Date(sortedDates[i-1]);
+        const d2 = new Date(sortedDates[i]);
+        const diffTime = Math.abs(d2 - d1);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+        
+        if (diffDays === 1) {
+          tempStreak++;
+        } else {
+          tempStreak = 1;
+        }
+      }
+      if (tempStreak > longestStreak) longestStreak = tempStreak;
+    }
+    
+    // Current streak
+    const todayStr = new Date().toISOString().split('T')[0];
+    const yesterdayDate = new Date();
+    yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+    const yesterdayStr = yesterdayDate.toISOString().split('T')[0];
+    
+    if (activityDates.has(todayStr)) {
+       let streak = 1;
+       let checkDate = new Date();
+       while (true) {
+         checkDate.setDate(checkDate.getDate() - 1);
+         const cStr = checkDate.toISOString().split('T')[0];
+         if (activityDates.has(cStr)) streak++;
+         else break;
+       }
+       currentStreak = streak;
+    } else if (activityDates.has(yesterdayStr)) {
+       let streak = 1;
+       let checkDate = new Date(yesterdayDate);
+       while (true) {
+         checkDate.setDate(checkDate.getDate() - 1);
+         const cStr = checkDate.toISOString().split('T')[0];
+         if (activityDates.has(cStr)) streak++;
+         else break;
+       }
+       currentStreak = streak;
+    } else {
+       currentStreak = 0;
+    }
+
+    // Video/Learning Time
+    const videoAssessments = await prisma.videoAssessment.findMany({
+      where: { studentId: studentId }
+    });
+    let totalSeconds = videoAssessments.reduce((acc, curr) => acc + (curr.watchedSeconds || 0), 0);
+    
+    // Add estimated time for general tasks (e.g. 15 mins per assessment if no video)
+    totalSeconds += assessments.length * 900; 
+
+    // Generate Calendar Array (Last 365 Days)
+    const calendar = [];
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - 364);
+    
+    for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+       const dStr = d.toISOString().split('T')[0];
+       const xp = xpByDate[dStr] || 0;
+       let level = 0;
+       if (xp > 0) level = 1;
+       if (xp > 50) level = 2;
+       if (xp > 100) level = 3;
+       
+       calendar.push({
+         date: dStr,
+         level: level,
+         xp: xp
+       });
+    }
+
+    // Generate XP History for chart (Last 30 days)
+    const xpHistory = [];
+    const chartStart = new Date();
+    chartStart.setDate(chartStart.getDate() - 29);
+    for (let d = new Date(chartStart); d <= endDate; d.setDate(d.getDate() + 1)) {
+       const dStr = d.toISOString().split('T')[0];
+       const xp = xpByDate[dStr] || 0;
+       xpHistory.push({
+         date: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+         xp: xp
+       });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        totalXP,
+        totalLearningTime: {
+          hours: Math.floor(totalSeconds / 3600),
+          minutes: Math.floor((totalSeconds % 3600) / 60)
+        },
+        currentStreak,
+        longestStreak,
+        calendar,
+        xpHistory
+      }
+    });
+
+  } catch (error) {
+    console.error("Error fetching stats:", error);
+    return res.status(500).json({ success: false, message: "Internal server error" });
+  }
+}
