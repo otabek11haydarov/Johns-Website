@@ -63,12 +63,27 @@ export async function createLessonWithTasks(data) {
                     }
                 });
             } else if (type === 'FLASHCARD' || type === 'VOCABULARY') {
-                await tx.flashcardTask.create({
+                const flashcardTask = await tx.flashcardTask.create({
                     data: {
                         taskId: newTask.id,
                         deckName: config.deckName || 'Vocabulary Deck'
                     }
                 });
+
+                if (Array.isArray(config.cards)) {
+                    for (const card of config.cards) {
+                        if (card.word || card.def || card.definition) {
+                            await tx.flashcardItem.create({
+                                data: {
+                                    flashcardTaskId: flashcardTask.id,
+                                    word: card.word || '',
+                                    description: card.def || card.definition || '',
+                                    example: card.ex || card.example || card.exampleSentence || null
+                                }
+                            });
+                        }
+                    }
+                }
             } else if (type === 'SPEAKING') {
                 await tx.speakingTask.create({
                     data: {
@@ -139,7 +154,7 @@ export async function createLessonWithTasks(data) {
         }
 
         return newLesson;
-    });
+    }, { maxWait: 15000, timeout: 30000 });
 }
 
 /**
@@ -342,10 +357,27 @@ export async function updateLesson(lessonId, data) {
                             }
                         });
                     } else if ((type === 'FLASHCARD' || type === 'VOCABULARY') && existingTask.flashcardTask) {
+                        const flashcardTaskId = existingTask.flashcardTask.id;
                         await tx.flashcardTask.update({
                             where: { taskId: existingTask.id },
                             data: { deckName: config.deckName || 'Vocabulary Deck' }
                         });
+
+                        if (Array.isArray(config.cards)) {
+                            await tx.flashcardItem.deleteMany({ where: { flashcardTaskId } });
+                            for (const card of config.cards) {
+                                if (card.word || card.def || card.definition) {
+                                    await tx.flashcardItem.create({
+                                        data: {
+                                            flashcardTaskId: flashcardTaskId,
+                                            word: card.word || '',
+                                            description: card.def || card.definition || '',
+                                            example: card.ex || card.example || card.exampleSentence || null
+                                        }
+                                    });
+                                }
+                            }
+                        }
                     } else if (type === 'SPEAKING' && existingTask.speakingTask) {
                         await tx.speakingTask.update({
                             where: { taskId: existingTask.id },
@@ -425,9 +457,23 @@ export async function updateLesson(lessonId, data) {
                             }
                         });
                     } else if (type === 'FLASHCARD' || type === 'VOCABULARY') {
-                        await tx.flashcardTask.create({
+                        const flashcardTask = await tx.flashcardTask.create({
                             data: { taskId: newTask.id, deckName: config.deckName || 'Vocabulary Deck' }
                         });
+                        if (Array.isArray(config.cards)) {
+                            for (const card of config.cards) {
+                                if (card.word || card.def || card.definition) {
+                                    await tx.flashcardItem.create({
+                                        data: {
+                                            flashcardTaskId: flashcardTask.id,
+                                            word: card.word || '',
+                                            description: card.def || card.definition || '',
+                                            example: card.ex || card.example || card.exampleSentence || null
+                                        }
+                                    });
+                                }
+                            }
+                        }
                     } else if (type === 'SPEAKING') {
                         await tx.speakingTask.create({
                             data: {
@@ -490,5 +536,5 @@ export async function updateLesson(lessonId, data) {
         }
 
         return updatedLesson;
-    });
+    }, { maxWait: 15000, timeout: 30000 });
 }
