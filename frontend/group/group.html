@@ -430,85 +430,103 @@
 
     <!-- Enterprise Lesson Creation Wizard Modal -->
     <div class="modal fade" id="lessonWizardModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
-        <div class="modal-dialog modal-dialog-centered" style="max-width: 85%;">
-            <div class="modal-content admin-modal-panel">
-                <div class="modal-header border-bottom border-secondary">
-                    <h3 class="modal-title">Create New Lesson</h3>
-                    <button type="button" class="modal-close" data-bs-dismiss="modal" aria-label="Close" id="wizardCloseBtn">&times;</button>
-                </div>
-                
-                <div class="modal-body p-0 d-flex flex-column">
-                    <!-- Stepper Header -->
-                    <div class="wizard-stepper p-4 border-bottom border-secondary position-relative" id="wizardStepper">
-                        <!-- Connecting line will be drawn here -->
-                        <div class="wizard-stepper-line"></div>
-                        <!-- Steps will be dynamically injected by JS -->
-                    </div>
-
-                    <div class="wizard-content-area p-4 position-relative" id="wizardContentArea">
-                        <!-- Step 1: Lesson Information -->
-                        <div class="wizard-step active" id="wizardStep-lessonInfo">
-                            <h4 class="mb-4">Lesson Information</h4>
-                            <div class="form-group mb-4">
-                                <label for="wizardLessonTitle">Lesson Title <span class="text-danger">*</span></label>
-                                <input type="text" id="wizardLessonTitle" placeholder="e.g. Unit 1: Present Simple" required>
-                                <div class="invalid-feedback">Lesson title is required.</div>
-                            </div>
-                            <div class="form-group mb-4">
-                                <label for="wizardLessonDesc">Lesson Description</label>
-                                <textarea id="wizardLessonDesc" rows="4" placeholder="Optional description"></textarea>
-                            </div>
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 88vw !important; width: 88vw !important;">
+            <div class="modal-content admin-modal-panel wizard-modal-container">
+                <div class="modal-body p-0 d-flex flex-column flex-md-row" style="min-height: 580px;">
+                    <!-- Left Sidebar (Image 2 Style) -->
+                    <aside class="wizard-sidebar p-4 d-flex flex-column" id="wizardSidebar">
+                        <div class="wizard-sidebar-header mb-4">
+                            <h4 class="wizard-sidebar-title">Lesson Creator Wizard</h4>
+                            <p class="wizard-sidebar-sub">Build structured lessons step-by-step</p>
                         </div>
 
-                        <!-- Step 2: Select Tasks -->
-                        <div class="wizard-step d-none" id="wizardStep-selectTasks">
-                            <div class="d-flex justify-content-between align-items-start mb-4">
-                                <div>
-                                    <h4 class="mb-1">Lesson Tasks</h4>
-                                    <p class="text-muted mb-0">Choose the tasks you want to include in this lesson. You can reorder them below.</p>
+                        <!-- Vertical Stepper Container -->
+                        <div class="wizard-vertical-stepper flex-grow-1" id="wizardStepper">
+                            <!-- Vertical step items dynamically injected by JS -->
+                        </div>
+
+                        <div class="wizard-sidebar-footer pt-3 mt-3 border-top border-secondary">
+                            <button type="button" class="btn btn-ghost w-100 mb-2" id="wizardDraftBtn" style="border-radius: 10px; font-size: 0.85rem;">Save as Draft</button>
+                            <div class="wizard-help-link text-center text-muted small"><i class="bi bi-question-circle me-1"></i> Help Center</div>
+                        </div>
+                    </aside>
+
+                    <!-- Right Main Content Area -->
+                    <main class="wizard-main-content flex-grow-1 p-4 d-flex flex-column">
+                        <div class="wizard-main-header d-flex justify-content-between align-items-center pb-3 mb-3 border-bottom border-secondary">
+                            <div>
+                                <h3 class="wizard-step-title mb-1 text-white fw-bold" id="wizardHeaderTitle">Advanced Lesson Creator Wizard</h3>
+                                <p class="text-muted mb-0 small" id="wizardHeaderSubtitle">Configure your lesson block</p>
+                            </div>
+                            <button type="button" class="modal-close" data-bs-dismiss="modal" aria-label="Close" id="wizardCloseBtn">&times;</button>
+                        </div>
+
+                        <div class="wizard-content-area flex-grow-1" id="wizardContentArea">
+                            <!-- Step 1: Lesson Information -->
+                            <div class="wizard-step active" id="wizardStep-lessonInfo">
+                                <h4 class="mb-4 text-white">Lesson Information</h4>
+                                <div class="form-group mb-4">
+                                    <label for="wizardLessonTitle" class="form-label text-light">Lesson Title <span class="text-danger">*</span></label>
+                                    <input type="text" id="wizardLessonTitle" class="form-control dark-input" placeholder="e.g. Unit 1: Present Simple" required>
+                                    <div class="invalid-feedback">Lesson title is required.</div>
                                 </div>
-                                <button type="button" class="btn btn-primary btn-shine" id="btnOpenTaskPicker">+ Add New Task</button>
+                                <div class="form-group mb-4">
+                                    <label for="wizardLessonDesc" class="form-label text-light">Lesson Description</label>
+                                    <textarea id="wizardLessonDesc" class="form-control dark-input" rows="4" placeholder="Optional description"></textarea>
+                                </div>
                             </div>
 
-                            <div class="selected-tasks-list" id="wizardSelectedTasksList">
-                                <!-- Selected tasks with drag/reorder will appear here -->
+                            <!-- Step 2: Select Tasks -->
+                            <div class="wizard-step d-none" id="wizardStep-selectTasks">
+                                <div class="d-flex justify-content-between align-items-start mb-4">
+                                    <div>
+                                        <h4 class="mb-1 text-white">Lesson Tasks</h4>
+                                        <p class="text-muted mb-0">Choose the tasks you want to include in this lesson. You can reorder them below.</p>
+                                    </div>
+                                    <button type="button" class="btn btn-primary btn-shine" id="btnOpenTaskPicker">+ Add New Task</button>
+                                </div>
+
+                                <div class="selected-tasks-list" id="wizardSelectedTasksList">
+                                    <!-- Selected tasks with drag/reorder will appear here -->
+                                </div>
+                                
+                                <div id="wizardNoTasksEmptyState" class="text-center p-5 rounded" style="border: 2px dashed rgba(255,255,255,0.15); display: none;">
+                                    <div style="font-size: 2rem; color: var(--muted); margin-bottom: 10px;">📋</div>
+                                    <p class="text-muted mb-0" style="font-size: 1.05rem;">No tasks added yet.</p>
+                                    <p class="text-muted" style="font-size: 0.9rem;">Click "+ Add New Task" to begin.</p>
+                                </div>
                             </div>
-                            
-                            <div id="wizardNoTasksEmptyState" class="text-center p-5 rounded" style="border: 2px dashed var(--secondary); display: none;">
-                                <div style="font-size: 2rem; color: var(--muted); margin-bottom: 10px;">📋</div>
-                                <p class="text-muted mb-0" style="font-size: 1.05rem;">No tasks added yet.</p>
-                                <p class="text-muted" style="font-size: 0.9rem;">Click "+ Add New Task" to begin.</p>
+
+                            <!-- Dynamic Task Config Steps Container -->
+                            <div id="wizardDynamicStepsContainer">
+                                <!-- JS will inject config forms here -->
+                            </div>
+
+                            <!-- Final Step: Preview -->
+                            <div class="wizard-step d-none" id="wizardStep-preview">
+                                <h4 class="mb-4 text-white">Lesson Preview</h4>
+                                <div class="preview-lesson-info mb-4 p-4 rounded bg-dark border border-secondary">
+                                    <h4 id="previewLessonTitle" class="text-white mb-2">Lesson Title</h4>
+                                    <p class="text-muted mb-0" id="previewLessonDesc"></p>
+                                </div>
+                                
+                                <h5 class="mb-3 text-white">Task Flow</h5>
+                                <div class="preview-task-flow" id="previewTaskFlow">
+                                    <!-- JS will inject summary cards here -->
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Dynamic Task Config Steps Container -->
-                        <div id="wizardDynamicStepsContainer">
-                            <!-- JS will inject config forms here -->
-                        </div>
-
-                        <!-- Final Step: Preview -->
-                        <div class="wizard-step d-none" id="wizardStep-preview">
-                            <h4 class="mb-4">Lesson Preview</h4>
-                            <div class="preview-lesson-info mb-4 p-4 rounded bg-dark border border-secondary">
-                                <h4 id="previewLessonTitle" class="text-white mb-2">Lesson Title</h4>
-                                <p class="text-muted mb-0" id="previewLessonDesc"></p>
-                            </div>
-                            
-                            <h5 class="mb-3">Task Flow</h5>
-                            <div class="preview-task-flow" id="previewTaskFlow">
-                                <!-- JS will inject summary cards here -->
+                        <!-- Footer -->
+                        <div class="wizard-footer pt-3 mt-4 border-top border-secondary d-flex justify-content-between align-items-center">
+                            <button type="button" class="btn btn-ghost" id="wizardBtnBack" style="display: none;">Back</button>
+                            <div class="ms-auto d-flex gap-2">
+                                <button type="button" class="btn btn-ghost" id="wizardBtnCancel" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-primary btn-shine" id="wizardBtnNext">Save & Next</button>
+                                <button type="button" class="btn btn-success btn-shine" id="wizardBtnFinish" style="display: none;">Finish & Save Lesson</button>
                             </div>
                         </div>
-                    </div>
-                </div>
-
-                <div class="modal-footer px-4 py-3 border-top border-secondary">
-                    <button type="button" class="btn btn-ghost" id="wizardBtnBack" style="display: none;">Back</button>
-                    <div class="ms-auto d-flex gap-2">
-                        <button type="button" class="btn btn-ghost" id="wizardBtnCancel" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-primary btn-shine" id="wizardBtnNext">Next</button>
-                        <button type="button" class="btn btn-success btn-shine" id="wizardBtnFinish" style="display: none;">Finish & Save Lesson</button>
-                    </div>
+                    </main>
                 </div>
             </div>
         </div>

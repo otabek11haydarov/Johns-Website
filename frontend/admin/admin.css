@@ -67,6 +67,46 @@ select {
     border: 1px solid #d7beb3;
     box-shadow: var(--shadow);
     overflow: hidden;
+    transition: grid-template-columns 0.3s ease;
+}
+
+.page-frame.collapsed {
+    grid-template-columns: 80px 1fr;
+}
+
+.page-frame.collapsed .brand-copy,
+.page-frame.collapsed .nav-label,
+.page-frame.collapsed .nav-section-label {
+    display: none !important;
+}
+
+.page-frame.collapsed .sidebar {
+    padding: 24px 10px;
+    align-items: center;
+}
+
+.page-frame.collapsed .sidebar-top {
+    justify-content: center;
+}
+
+.page-frame.collapsed .sidebar-nav {
+    width: 100%;
+}
+
+.page-frame.collapsed .nav-link,
+.page-frame.collapsed .logout-link,
+.page-frame.collapsed .collapse-link {
+    justify-content: center;
+    padding: 12px 0;
+    gap: 0;
+}
+
+.page-frame.collapsed .collapse-link .nav-icon {
+    transform: rotate(180deg);
+}
+
+.page-frame.collapsed .sidebar-bottom {
+    width: 100%;
 }
 
 .sidebar {
@@ -303,6 +343,9 @@ select {
     background: #fff;
     color: var(--muted);
     cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     transition:
         transform var(--transition),
         border-color var(--transition),
@@ -315,6 +358,12 @@ select {
     color: var(--title);
     border-color: #e4c9bc;
     transform: translateY(-1px);
+}
+
+.logout-topbar-icon:hover {
+    color: #c85a52;
+    background: #fff0ee;
+    border-color: #f7c5c0;
 }
 
 .topbar-icon.accent {

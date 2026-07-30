@@ -909,32 +909,40 @@ document.addEventListener('DOMContentLoaded', () => {
         
         displaySteps.push({ id: 'preview', label: 'Preview' });
 
-        // Calculate progress line width
-        const totalSteps = displaySteps.length;
-        const progressPercentage = totalSteps > 1 ? (currentStepIndex / (totalSteps - 1)) * 100 : 0;
-        
-        stepperContainer.innerHTML = `
-            <div class="wizard-stepper-line"></div>
-            <div class="wizard-stepper-line-progress" style="width: ${progressPercentage * 0.8}%"></div>
-        `;
-
         displaySteps.forEach((step, index) => {
             let statusClass = '';
             if (index < currentStepIndex) statusClass = 'completed';
             else if (index === currentStepIndex) statusClass = 'active';
 
             const indicator = document.createElement('div');
-            indicator.className = `wizard-step-indicator ${statusClass}`;
+            indicator.className = `wizard-step-item ${statusClass}`;
             
-            let iconHtml = index < currentStepIndex ? '<i class="bi bi-check"></i>' : (index + 1);
+            let badgeContent = index < currentStepIndex ? '<i class="bi bi-check-lg"></i>' : (index + 1);
             
             indicator.innerHTML = `
-                <div class="wizard-step-circle">${iconHtml}</div>
-                <div class="wizard-step-label">${step.label}</div>
+                <span class="wizard-step-item-label">${index + 1}. ${step.label}</span>
+                <span class="wizard-step-item-badge">${badgeContent}</span>
             `;
+
+            indicator.addEventListener('click', () => {
+                if (index <= currentStepIndex || validateCurrentStep()) {
+                    saveCurrentStepData();
+                    currentStepIndex = index;
+                    if (stepsFlow[currentStepIndex] === 'preview') {
+                        renderPreview();
+                    }
+                    showCurrentStep();
+                    renderStepper();
+                }
+            });
             
             stepperContainer.appendChild(indicator);
         });
+
+        const subTitleEl = document.getElementById('wizardHeaderSubtitle');
+        if (subTitleEl) {
+            subTitleEl.textContent = `Step ${currentStepIndex + 1} of ${displaySteps.length} — ${displaySteps[currentStepIndex]?.label || ''}`;
+        }
     }
 
     function validateCurrentStep() {
@@ -970,6 +978,252 @@ document.addEventListener('DOMContentLoaded', () => {
         return true;
     }
 
+    function renderCardRowHtml(stepId, index, card = {}) {
+        const isWarning = card.warning || card.found === false;
+        const pos = card.partOfSpeech || card.pos || "";
+        const pronunciation = card.pronunciation || "";
+        const def = card.def || card.definition || "";
+        const ex = card.ex || card.example || card.exampleSentence || "";
+        const hasNoExample = !ex && card.word && !isWarning;
+
+        return `
+            <div class="flashcard-card-row ${isWarning ? 'has-warning' : ''}" id="cardRow-${stepId}-${index}">
+                <div class="flashcard-card-row-title">
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <span class="fw-bold">Card ${index + 1}</span>
+                        ${pos ? `<span class="badge badge-pos">${escapeHtml(pos)}</span>` : ''}
+                        ${pronunciation ? `<span class="badge badge-ipa">${escapeHtml(pronunciation)}</span>` : ''}
+                        ${isWarning ? `<span class="warning-card-pill"><i class="bi bi-exclamation-triangle-fill"></i> No definition found</span>` : ''}
+                        ${hasNoExample ? `<span class="badge-no-example"><i class="bi bi-info-circle"></i> No example provided by Oxford.</span>` : ''}
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="flashcard-remove-card-btn text-info" onclick="duplicateFlashcardRow('${stepId}', ${index})" title="Duplicate Card"><i class="bi bi-copy"></i> Duplicate</button>
+                        ${index > 0 ? `<button type="button" class="flashcard-remove-card-btn" onclick="removeFlashcardRow('${stepId}', ${index})" title="Remove Card"><i class="bi bi-trash"></i> Remove</button>` : ''}
+                    </div>
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label small text-muted m-0">Word</label>
+                        <input type="text" class="form-control dark-input fc-input-word" data-index="${index}" value="${escapeHtml(card.word || '')}" placeholder="Enter word" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small text-muted m-0">Pronunciation (IPA)</label>
+                        <input type="text" class="form-control dark-input fc-input-pronunciation" data-index="${index}" value="${escapeHtml(pronunciation)}" placeholder="/IPA/">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small text-muted m-0">Part of Speech</label>
+                        <input type="text" class="form-control dark-input fc-input-pos" data-index="${index}" value="${escapeHtml(pos)}" placeholder="noun / verb / etc.">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small text-muted m-0">Definition</label>
+                        <input type="text" class="form-control dark-input fc-input-def" data-index="${index}" value="${escapeHtml(def)}" placeholder="Enter definition">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small text-muted m-0">Example Sentence</label>
+                        <input type="text" class="form-control dark-input fc-input-ex" data-index="${index}" value="${escapeHtml(ex)}" placeholder="Enter an example sentence">
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    window.parseWordList = function(text) {
+        if (!text || typeof text !== 'string') return [];
+        const lines = text.split(/[\r\n,;]+/);
+        const words = [];
+        const seen = new Set();
+
+        for (let line of lines) {
+            // Strip numbering like 1., 2), 3 - etc.
+            let clean = line.trim().replace(/^[0-9]+[\.\)\-]\s*/, '').replace(/^[^\w\s]+|[^\w\s]+$/g, '').trim();
+            if (!clean) continue;
+
+            // Handle space-separated tokens if pasted plain text
+            const subWords = clean.split(/\s+/);
+            for (let w of subWords) {
+                let finalWord = w.trim().replace(/^[^\w\s]+|[^\w\s]+$/g, '').trim();
+                if (finalWord && !seen.has(finalWord.toLowerCase())) {
+                    seen.add(finalWord.toLowerCase());
+                    words.push(finalWord);
+                }
+            }
+        }
+
+        return words;
+    };
+
+    window.onBulkTextareaInput = function(stepId) {
+        const textarea = document.getElementById(`bulkTextarea-${stepId}`);
+        const badge = document.getElementById(`bulkWordCountBadge-${stepId}`);
+        if (!textarea || !badge) return;
+
+        const words = parseWordList(textarea.value);
+        badge.textContent = `Imported Words: ${words.length}`;
+    };
+
+    window.duplicateFlashcardRow = function(stepId, index) {
+        const row = document.getElementById(`cardRow-${stepId}-${index}`);
+        if (!row) return;
+
+        const card = {
+            word: row.querySelector('.fc-input-word')?.value || '',
+            pronunciation: row.querySelector('.fc-input-pronunciation')?.value || '',
+            partOfSpeech: row.querySelector('.fc-input-pos')?.value || '',
+            def: row.querySelector('.fc-input-def')?.value || '',
+            ex: row.querySelector('.fc-input-ex')?.value || ''
+        };
+
+        const container = document.getElementById(`cardsListContainer-${stepId}`);
+        if (!container) return;
+
+        const currentCount = container.querySelectorAll('.flashcard-card-row').length;
+        const newRowHtml = renderCardRowHtml(stepId, currentCount, card);
+        container.insertAdjacentHTML('beforeend', newRowHtml);
+
+        const badge = document.getElementById(`cardCountBadge-${stepId}`);
+        if (badge) badge.textContent = `${currentCount + 1} Cards`;
+
+        const tabCount = document.getElementById(`tabCardCount-${stepId}`);
+        if (tabCount) tabCount.textContent = `${currentCount + 1}`;
+    };
+
+    window.removeFlashcardRow = function(stepId, index) {
+        const row = document.getElementById(`cardRow-${stepId}-${index}`);
+        if (row) row.remove();
+        const container = document.getElementById(`cardsListContainer-${stepId}`);
+        if (container) {
+            const remaining = container.querySelectorAll('.flashcard-card-row').length;
+            const badge = document.getElementById(`cardCountBadge-${stepId}`);
+            if (badge) badge.textContent = `${remaining} Cards`;
+            const tabCount = document.getElementById(`tabCardCount-${stepId}`);
+            if (tabCount) tabCount.textContent = `${remaining}`;
+        }
+    };
+
+    window.addFlashcardRow = function(stepId) {
+        const container = document.getElementById(`cardsListContainer-${stepId}`);
+        if (!container) return;
+        const currentCount = container.querySelectorAll('.flashcard-card-row').length;
+        const newRowHtml = renderCardRowHtml(stepId, currentCount, { word: '', def: '', ex: '', pronunciation: '', partOfSpeech: '' });
+        container.insertAdjacentHTML('beforeend', newRowHtml);
+        const badge = document.getElementById(`cardCountBadge-${stepId}`);
+        if (badge) badge.textContent = `${currentCount + 1} Cards`;
+        const tabCount = document.getElementById(`tabCardCount-${stepId}`);
+        if (tabCount) tabCount.textContent = `${currentCount + 1}`;
+    };
+
+    window.bulkGenerateFlashcards = async function(stepId) {
+        const textarea = document.getElementById(`bulkTextarea-${stepId}`);
+        if (!textarea) return;
+
+        const words = parseWordList(textarea.value);
+        if (words.length === 0) {
+            alert("Please paste or type at least one word to generate flashcards.");
+            return;
+        }
+
+        const btnGenerate = document.getElementById(`btnGenerateBulk-${stepId}`);
+        const progressWrapper = document.getElementById(`bulkProgressWrapper-${stepId}`);
+        const countText = document.getElementById(`progressCountText-${stepId}`);
+        const currentWordText = document.getElementById(`progressCurrentWord-${stepId}`);
+        const barFill = document.getElementById(`progressBarFill-${stepId}`);
+        const estTimeText = document.getElementById(`progressEstTime-${stepId}`);
+        const summaryStats = document.getElementById(`bulkSummaryStats-${stepId}`);
+
+        if (btnGenerate) btnGenerate.disabled = true;
+        if (progressWrapper) progressWrapper.classList.remove('d-none');
+        if (summaryStats) summaryStats.classList.add('d-none');
+
+        // Simulate progress updates for smooth UX
+        let completedCount = 0;
+        const totalWords = words.length;
+        if (countText) countText.textContent = `0 / ${totalWords}`;
+        if (barFill) barFill.style.width = '5%';
+
+        const startTime = Date.now();
+        const interval = setInterval(() => {
+            if (completedCount < totalWords) {
+                completedCount = Math.min(completedCount + Math.ceil(totalWords / 8), totalWords - 1);
+                const currentWord = words[completedCount] || words[0];
+                const pct = Math.round((completedCount / totalWords) * 90);
+                if (barFill) barFill.style.width = `${pct}%`;
+                if (countText) countText.textContent = `${completedCount} / ${totalWords}`;
+                if (currentWordText) currentWordText.textContent = `Current: ${currentWord}`;
+
+                const elapsedSec = (Date.now() - startTime) / 1000;
+                const remSec = Math.max(1, Math.round((elapsedSec / (completedCount || 1)) * (totalWords - completedCount)));
+                if (estTimeText) estTimeText.textContent = `Est. remaining: ~${remSec}s`;
+            }
+        }, 220);
+
+        try {
+            const API_URL = window.API_BASE_URL || 'http://localhost:5000/api';
+            const response = await fetch(`${API_URL}/dictionary/bulk`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ words })
+            });
+
+            clearInterval(interval);
+            if (barFill) barFill.style.width = '100%';
+            if (countText) countText.textContent = `${totalWords} / ${totalWords}`;
+            if (currentWordText) currentWordText.textContent = 'Completed!';
+            if (estTimeText) estTimeText.textContent = 'Est. remaining: 0s';
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Failed to generate definitions');
+            }
+
+            const cards = data.cards || [];
+            const container = document.getElementById(`cardsListContainer-${stepId}`);
+
+            if (container && cards.length > 0) {
+                container.innerHTML = cards.map((c, idx) => renderCardRowHtml(stepId, idx, {
+                    word: c.word,
+                    def: c.definition,
+                    ex: c.example,
+                    pronunciation: c.pronunciation,
+                    partOfSpeech: c.partOfSpeech,
+                    warning: c.warning,
+                    found: c.found
+                })).join('');
+
+                const badge = document.getElementById(`cardCountBadge-${stepId}`);
+                if (badge) badge.textContent = `${cards.length} Cards`;
+                const tabCount = document.getElementById(`tabCardCount-${stepId}`);
+                if (tabCount) tabCount.textContent = `${cards.length}`;
+            }
+
+            // Show UX Summary Stats
+            if (summaryStats) {
+                summaryStats.classList.remove('d-none');
+                document.getElementById(`statImported-${stepId}`).textContent = data.total || words.length;
+                document.getElementById(`statGenerated-${stepId}`).textContent = data.generated || 0;
+                document.getElementById(`statFailed-${stepId}`).textContent = data.failed || 0;
+            }
+
+            // Auto switch tab to Cards Editor after 800ms
+            setTimeout(() => {
+                const editorTabBtn = document.getElementById(`tab-editor-${stepId}`);
+                if (editorTabBtn) {
+                    const tab = new bootstrap.Tab(editorTabBtn);
+                    tab.show();
+                }
+                if (progressWrapper) progressWrapper.classList.add('d-none');
+            }, 800);
+
+        } catch (err) {
+            clearInterval(interval);
+            console.error('[Bulk Generate] Error:', err);
+            alert(err.message || 'Failed to connect to Oxford Dictionary backend.');
+            if (progressWrapper) progressWrapper.classList.add('d-none');
+        } finally {
+            if (btnGenerate) btnGenerate.disabled = false;
+        }
+    };
+
     function saveCurrentStepData() {
         const currentStepId = stepsFlow[currentStepIndex];
         
@@ -988,6 +1242,27 @@ document.addEventListener('DOMContentLoaded', () => {
             if (taskId === 'GRAMMAR') {
                 if (window.grammarBuilder) {
                     wizardState.taskConfigs[taskId].questions = window.grammarBuilder.getQuestions();
+                }
+            } else if (taskId === 'FLASHCARD' || taskId === 'VOCABULARY') {
+                const stepForm = document.getElementById(`form-${currentStepId}`);
+                if (stepForm) {
+                    const deckNameInput = stepForm.querySelector('input[name="deckName"]');
+                    const cards = [];
+                    const rowEls = stepForm.querySelectorAll('.flashcard-card-row');
+                    rowEls.forEach(row => {
+                        const word = row.querySelector('.fc-input-word')?.value.trim() || '';
+                        const pronunciation = row.querySelector('.fc-input-pronunciation')?.value.trim() || '';
+                        const partOfSpeech = row.querySelector('.fc-input-pos')?.value.trim() || '';
+                        const def = row.querySelector('.fc-input-def')?.value.trim() || '';
+                        const ex = row.querySelector('.fc-input-ex')?.value.trim() || '';
+                        if (word || def || ex) {
+                            cards.push({ word, pronunciation, partOfSpeech, def, ex });
+                        }
+                    });
+                    wizardState.taskConfigs[taskId] = {
+                        deckName: deckNameInput?.value.trim() || 'Vocabulary Deck',
+                        cards: cards.length ? cards : [{ word: '', pronunciation: '', partOfSpeech: '', def: '', ex: '' }]
+                    };
                 }
             } else {
                 const form = document.getElementById(`form-${currentStepId}`);
@@ -1154,12 +1429,95 @@ document.addEventListener('DOMContentLoaded', () => {
                 break;
             case 'FLASHCARD':
             case 'VOCABULARY':
+                const existingConfig = wizardState.taskConfigs[taskId] || {};
+                const existingCards = Array.isArray(existingConfig.cards) && existingConfig.cards.length > 0
+                    ? existingConfig.cards
+                    : [{ word: '', def: '', ex: '', pronunciation: '', partOfSpeech: '' }];
+                const deckNameVal = existingConfig.deckName || '';
+
                 html += `
-                    <div class="form-group mb-3">
-                        <label>Deck Name</label>
-                        <input type="text" class="form-control" name="deckName" placeholder="e.g. Unit 1 Vocab" required>
+                    <div class="form-group mb-4">
+                        <label class="form-label text-light fw-bold mb-2">Deck Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control dark-input" name="deckName" value="${escapeHtml(deckNameVal)}" placeholder="e.g. Unit 1 Vocabulary" required>
                     </div>
-                    <p class="text-muted small">Cards can be added later from the dashboard.</p>
+
+                    <!-- Mode Nav Tabs -->
+                    <ul class="nav nav-tabs custom-tabs mb-4" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active fw-bold text-light" id="tab-bulk-${stepId}" data-bs-toggle="tab" data-bs-target="#panel-bulk-${stepId}" type="button" role="tab">
+                                🚀 Bulk Import & Auto-Generate (Oxford)
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link text-light" id="tab-editor-${stepId}" data-bs-toggle="tab" data-bs-target="#panel-editor-${stepId}" type="button" role="tab">
+                                ✍️ Cards Editor (<span id="tabCardCount-${stepId}">${existingCards.length}</span>)
+                            </button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content">
+                        <!-- Panel 1: Bulk Import & Auto-Generate -->
+                        <div class="tab-pane fade show active" id="panel-bulk-${stepId}" role="tabpanel">
+                            <div class="bulk-import-container">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <label class="form-label text-white fw-bold m-0">Paste Words List</label>
+                                    <span class="badge badge-oxford rounded-pill px-3 py-1" id="bulkWordCountBadge-${stepId}">
+                                        Imported Words: 0
+                                    </span>
+                                </div>
+                                <p class="text-muted small mb-3">
+                                    Paste words copied from Oxford/Cambridge word lists, PDFs, Word, or Excel. Numbers (e.g. <code>1. achievement</code>), duplicates, and extra whitespace will be automatically cleaned!
+                                </p>
+
+                                <textarea class="bulk-textarea" id="bulkTextarea-${stepId}" placeholder="achievement&#10;ability&#10;abroad&#10;accept&#10;...or paste numbered lists (e.g. 1. achievement)" oninput="onBulkTextareaInput('${stepId}')"></textarea>
+
+                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                    <span class="text-muted small"><i class="bi bi-shield-check text-warning"></i> Powered by Oxford Dictionary API & Fallback Engine</span>
+                                    <button type="button" class="btn btn-primary btn-shine px-4 py-2" id="btnGenerateBulk-${stepId}" onclick="bulkGenerateFlashcards('${stepId}')">
+                                        ✨ Generate Flashcards
+                                    </button>
+                                </div>
+
+                                <!-- Progress Bar Wrapper (Initially Hidden) -->
+                                <div class="bulk-progress-wrapper d-none" id="bulkProgressWrapper-${stepId}">
+                                    <div class="d-flex justify-content-between align-items-center small text-white fw-bold">
+                                        <span>Generating Flashcards... <span id="progressCountText-${stepId}" class="badge bg-warning text-dark ms-2">0 / 0</span></span>
+                                        <span id="progressCurrentWord-${stepId}" class="text-warning">Current: -</span>
+                                    </div>
+                                    <div class="bulk-progress-bar-track">
+                                        <div class="bulk-progress-bar-fill" id="progressBarFill-${stepId}"></div>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center small text-muted">
+                                        <span><i class="bi bi-cpu"></i> Max 5 concurrent requests active</span>
+                                        <span id="progressEstTime-${stepId}">Est. remaining: calc...</span>
+                                    </div>
+                                </div>
+
+                                <!-- UX Generation Stats Summary -->
+                                <div class="bulk-stats-bar mt-3 d-none" id="bulkSummaryStats-${stepId}">
+                                    <span class="text-white small"><strong>Imported:</strong> <span id="statImported-${stepId}">0</span></span>
+                                    <span class="text-success small"><strong>Generated:</strong> <span id="statGenerated-${stepId}">0</span></span>
+                                    <span class="text-warning small"><strong>Failed / Warnings:</strong> <span id="statFailed-${stepId}">0</span></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Panel 2: Cards Editor List -->
+                        <div class="tab-pane fade" id="panel-editor-${stepId}" role="tabpanel">
+                            <div class="flashcards-block-container mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="m-0 text-white fw-bold">Flashcards Block</h5>
+                                    <span class="badge rounded-pill bg-warning text-dark px-3 py-2" id="cardCountBadge-${stepId}">${existingCards.length} Cards</span>
+                                </div>
+                                <div id="cardsListContainer-${stepId}">
+                                    ${existingCards.map((card, idx) => renderCardRowHtml(stepId, idx, card)).join('')}
+                                </div>
+                                <button type="button" class="btn-add-another-card mt-3" onclick="addFlashcardRow('${stepId}')">
+                                    <i class="bi bi-plus-lg"></i> Add another card
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 `;
                 break;
             case 'SPEAKING':
@@ -1271,7 +1629,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (config.videoUrl) detailLines.push(`<span>🎬 ${config.videoUrl}</span>`);
                 if (config.duration) detailLines.push(`<span>⏱ ${config.duration} min</span>`);
             } else if (taskId === 'VOCABULARY' || taskId === 'FLASHCARD') {
-                if (config.deckName) detailLines.push(`<span>📦 ${config.deckName}</span>`);
+                if (config.deckName) detailLines.push(`<span>📦 Deck: ${config.deckName}</span>`);
+                if (Array.isArray(config.cards)) detailLines.push(`<span>🎴 ${config.cards.length} card(s) added</span>`);
             } else if (taskId === 'SPEAKING' || taskId === 'WRITING') {
                 if (config.prompt) detailLines.push(`<span>💬 ${config.prompt.substring(0, 80)}${config.prompt.length > 80 ? '...' : ''}</span>`);
                 if (config.limit) detailLines.push(`<span>⏱ Limit: ${config.limit}</span>`);

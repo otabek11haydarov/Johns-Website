@@ -1,84 +1,288 @@
-/* Enterprise Lesson Creation Wizard Styles */
+/* Enterprise Lesson Creation Wizard Styles - Vertical Sidebar Layout */
 
-.wizard-stepper {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    padding: 0 5%;
+.wizard-modal-container {
+    background: linear-gradient(145deg, #1d1210 0%, #291714 50%, #361b16 100%);
+    border: 1px solid rgba(255, 210, 186, 0.18);
+    border-radius: 20px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+    color: #fff4ec;
+    overflow: hidden;
 }
 
-.wizard-stepper-line {
-    position: absolute;
-    top: 39px; /* roughly middle of the 32px circle + padding */
-    left: 10%;
-    right: 10%;
-    height: 2px;
-    background-color: #475569; /* grey for future */
-    z-index: 0;
-}
-
-.wizard-stepper-line-progress {
-    position: absolute;
-    top: 39px;
-    left: 10%;
-    height: 2px;
-    background-color: #f97316; /* orange */
-    z-index: 0;
-    transition: width 0.4s ease;
-}
-
-.wizard-step-indicator {
-    position: relative;
-    z-index: 1;
+.wizard-sidebar {
+    width: 270px;
+    background: rgba(18, 10, 8, 0.55);
+    border-right: 1px solid rgba(255, 210, 186, 0.14);
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    width: 80px;
 }
 
-.wizard-step-circle {
-    width: 32px;
-    height: 32px;
+.wizard-sidebar-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #fff4ec;
+    margin-bottom: 4px;
+}
+
+.wizard-sidebar-sub {
+    font-size: 0.8rem;
+    color: #e5c4b2;
+    opacity: 0.85;
+}
+
+.wizard-vertical-stepper {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.wizard-step-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    color: #e5c4b2;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    user-select: none;
+}
+
+.wizard-step-item:hover {
+    background: rgba(255, 255, 255, 0.07);
+    color: #fff4ec;
+}
+
+.wizard-step-item.active {
+    background: linear-gradient(135deg, #d97b31 0%, #a54d24 100%);
+    border-color: rgba(255, 210, 186, 0.4);
+    color: #ffffff;
+    font-weight: 600;
+    box-shadow: 0 8px 24px rgba(217, 123, 49, 0.35);
+}
+
+.wizard-step-item.completed {
+    background: rgba(217, 123, 49, 0.12);
+    border-color: rgba(217, 123, 49, 0.25);
+    color: #ffd7bf;
+}
+
+.wizard-step-item-badge {
+    width: 26px;
+    height: 26px;
     border-radius: 50%;
-    background-color: #1e293b;
-    color: #94a3b8; /* grey */
+    background: rgba(255, 255, 255, 0.15);
     display: flex;
     align-items: center;
     justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.wizard-step-item.completed .wizard-step-item-badge {
+    background: rgba(217, 123, 49, 0.85);
+    color: #fff;
+}
+
+.wizard-step-item.active .wizard-step-item-badge {
+    background: #ffffff;
+    color: #a54d24;
+}
+
+/* Flashcards Block Rich Container (Image 2 Style) */
+.flashcards-block-container {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 210, 186, 0.16);
+    border-radius: 16px;
+    padding: 24px;
+}
+
+.flashcard-card-row {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 223, 204, 0.12);
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 14px;
+    position: relative;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.flashcard-card-row:focus-within {
+    border-color: rgba(217, 123, 49, 0.7);
+    box-shadow: 0 0 0 3px rgba(217, 123, 49, 0.15);
+}
+
+.flashcard-card-row-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #ffd7bf;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.flashcard-remove-card-btn {
+    background: transparent;
+    border: none;
+    color: #f87171;
+    font-size: 0.82rem;
+    cursor: pointer;
+    padding: 3px 8px;
+    border-radius: 6px;
+    transition: background 0.18s ease;
+}
+
+.flashcard-remove-card-btn:hover {
+    background: rgba(248, 113, 113, 0.18);
+}
+
+.btn-add-another-card {
+    width: 100%;
+    padding: 13px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px dashed rgba(255, 210, 186, 0.3);
+    border-radius: 12px;
+    color: #ffd7bf;
     font-weight: 600;
-    font-size: 14px;
-    transition: all 0.4s ease;
-    border: 2px solid #475569; /* grey */
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
-.wizard-step-indicator.active .wizard-step-circle {
-    background-color: #1e293b;
-    border-color: #f97316; /* orange */
-    color: #f97316; /* orange */
-    box-shadow: 0 0 10px rgba(249, 115, 22, 0.3);
+.btn-add-another-card:hover {
+    background: rgba(217, 123, 49, 0.16);
+    border-color: rgba(217, 123, 49, 0.7);
+    color: #ffffff;
 }
 
-.wizard-step-indicator.completed .wizard-step-circle {
-    background-color: #10b981; /* green */
-    border-color: #10b981;
-    color: white;
+.dark-input {
+    background: rgba(255, 245, 238, 0.07) !important;
+    border: 1px solid rgba(255, 223, 204, 0.16) !important;
+    color: #fff4ec !important;
+    border-radius: 10px !important;
+    padding: 10px 14px !important;
 }
 
-.wizard-step-label {
-    font-size: 12px;
-    color: #94a3b8; /* grey */
-    font-weight: 500;
-    text-align: center;
-    transition: color 0.4s ease;
+.dark-input::placeholder {
+    color: rgba(255, 230, 215, 0.45) !important;
 }
 
-.wizard-step-indicator.active .wizard-step-label {
-    color: #f97316; /* orange */
+.dark-input:focus {
+    border-color: rgba(217, 123, 49, 0.8) !important;
+    box-shadow: 0 0 0 3px rgba(217, 123, 49, 0.15) !important;
+    background: rgba(255, 245, 238, 0.12) !important;
 }
 
-.wizard-step-indicator.completed .wizard-step-label {
-    color: #10b981; /* green */
+/* Bulk Flashcard Generator & Oxford Integration Styles */
+.bulk-import-container {
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 210, 186, 0.16);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.bulk-textarea {
+    width: 100%;
+    min-height: 130px;
+    background: rgba(255, 245, 238, 0.05);
+    border: 1px solid rgba(255, 223, 204, 0.18);
+    border-radius: 12px;
+    color: #fff4ec;
+    padding: 14px;
+    font-family: monospace, sans-serif;
+    font-size: 0.95rem;
+    resize: vertical;
+}
+
+.bulk-textarea:focus {
+    outline: none;
+    border-color: rgba(217, 123, 49, 0.8);
+    box-shadow: 0 0 0 3px rgba(217, 123, 49, 0.15);
+}
+
+.bulk-stats-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 10px;
+    margin-top: 12px;
+}
+
+.bulk-progress-wrapper {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(217, 123, 49, 0.4);
+    border-radius: 14px;
+    padding: 16px 20px;
+    margin-top: 14px;
+}
+
+.bulk-progress-bar-track {
+    height: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 999px;
+    overflow: hidden;
+    margin: 10px 0;
+}
+
+.bulk-progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #d97b31 0%, #b23a34 100%);
+    width: 0%;
+    transition: width 0.25s ease-out;
+}
+
+.badge-oxford {
+    background: linear-gradient(135deg, #d97b31 0%, #b23a34 100%);
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.badge-ipa {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 210, 186, 0.2);
+    color: #ffd7bf;
+    font-family: monospace;
+}
+
+.badge-pos {
+    background: rgba(217, 123, 49, 0.18);
+    color: #ffb88c;
+    border: 1px solid rgba(217, 123, 49, 0.3);
+    text-transform: lowercase;
+}
+
+.warning-card-pill {
+    background: rgba(248, 113, 113, 0.15);
+    border: 1px solid rgba(248, 113, 113, 0.3);
+    color: #f87171;
+    font-size: 0.78rem;
+    padding: 2px 8px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.badge-no-example {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px dashed rgba(255, 210, 186, 0.3);
+    color: #e5c4b2;
+    font-size: 0.78rem;
+    padding: 2px 8px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
 }
 
 /* Smooth Progress Transitions */
@@ -323,6 +527,27 @@
 /* Advanced Book Page Turn Modal Animation */
 #lessonWizardModal {
     perspective: 2000px;
+}
+
+#lessonWizardModal .modal-dialog {
+    max-width: 88vw !important;
+    width: 88vw !important;
+    min-width: 75vw !important;
+    margin: 1.75rem auto !important;
+}
+
+#lessonWizardModal .modal-content {
+    width: 100% !important;
+}
+
+#lessonWizardModal .wizard-sidebar {
+    width: 250px !important;
+    flex-shrink: 0 !important;
+}
+
+#lessonWizardModal .wizard-main-content {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
 }
 
 #lessonWizardModal.fade .modal-dialog {

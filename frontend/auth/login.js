@@ -2,6 +2,27 @@ const loginBtn = document.getElementById("loginBtn");
 const usernameInput = document.getElementById("username");
 const passwordInput = document.getElementById("password");
 
+function showToast(message, type = "success") {
+  Toastify({
+    text: message,
+    duration: 3000,
+    gravity: "top",
+    position: "right",
+    stopOnFocus: true,
+    style: {
+      background: type === "success" 
+        ? "linear-gradient(135deg, var(--pumpkin) 0%, var(--red-accent) 100%)" 
+        : "linear-gradient(135deg, #b23a34 0%, #7f2623 100%)",
+      borderRadius: "14px",
+      boxShadow: "0 14px 40px rgba(17, 10, 8, 0.25)",
+      fontFamily: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif',
+      color: "#fff4ec",
+      padding: "12px 24px",
+      border: "1px solid rgba(255, 210, 186, 0.18)"
+    },
+  }).showToast();
+}
+
 loginBtn.addEventListener("click", function () {
   login();
 });
@@ -9,7 +30,7 @@ loginBtn.addEventListener("click", function () {
 async function login() {
   try {
     if (!usernameInput.value || !passwordInput.value) {
-      alert("All fields are required");
+      showToast("All fields are required", "error");
       return;
     }
 
@@ -31,22 +52,22 @@ async function login() {
       localStorage.setItem("userId", data.id);
       passwordInput.value = "";
       usernameInput.value = "";
-      alert(data.message);
+      showToast(data.message || "Login successful", "success");
 
       const route = getRoleRoute(data.role);
       if (route) {
-        window.location.href = route;
+        setTimeout(() => { window.location.href = route; }, 800);
         return;
       }
 
-      alert("Unknown user role");
+      showToast("Unknown user role", "error");
       return;
     }
 
-    alert(data.message || "Login failed");
+    showToast(data.message || "Login failed", "error");
   } catch (error) {
     console.error("Network error:", error);
-    alert("Server bilan bog'lanib bo'lmadi");
+    showToast("Server bilan bog'lanib bo'lmadi", "error");
   }
 }
 

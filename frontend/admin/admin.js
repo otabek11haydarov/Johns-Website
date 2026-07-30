@@ -222,6 +222,21 @@ function openSidebar() {
   sidebarOverlay.classList.add("open");
 }
 
+function toggleSidebar() {
+  if (window.innerWidth <= 900) {
+    if (sidebar.classList.contains("open")) {
+      closeSidebar();
+    } else {
+      openSidebar();
+    }
+  } else {
+    if (pageFrame) {
+      pageFrame.classList.toggle("collapsed");
+      localStorage.setItem("sidebar-collapsed", pageFrame.classList.contains("collapsed"));
+    }
+  }
+}
+
 function showSection(name) {
   sections.forEach((section) => section.classList.remove("active"));
   navLinks.forEach((link) => link.classList.remove("active"));
@@ -256,10 +271,24 @@ navLinks.forEach((link) => {
   });
 });
 
-sidebarToggle?.addEventListener("click", openSidebar);
+sidebarToggle?.addEventListener("click", toggleSidebar);
 sidebarClose?.addEventListener("click", closeSidebar);
 sidebarOverlay?.addEventListener("click", closeSidebar);
 themeToggle?.addEventListener("click", toggleTheme);
+
+const collapseBtn = document.querySelector(".collapse-link");
+const pageFrame = document.querySelector(".page-frame");
+
+if (collapseBtn && pageFrame) {
+  if (localStorage.getItem("sidebar-collapsed") === "true") {
+    pageFrame.classList.add("collapsed");
+  }
+
+  collapseBtn.addEventListener("click", () => {
+    pageFrame.classList.toggle("collapsed");
+    localStorage.setItem("sidebar-collapsed", pageFrame.classList.contains("collapsed"));
+  });
+}
 
 function clearFormErrors() {
   document.querySelectorAll(".field-error").forEach((el) => {
