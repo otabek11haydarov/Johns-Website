@@ -2,6 +2,36 @@
  * Enterprise Lesson Creation Wizard Logic
  */
 
+function showToast(message, type = 'info') {
+    const isError = type === 'error';
+    const isSuccess = type === 'success';
+    if (typeof Toastify === 'function') {
+        Toastify({
+            text: message,
+            duration: 4000,
+            gravity: "top",
+            position: "right",
+            stopOnFocus: true,
+            style: {
+                background: isError 
+                    ? "linear-gradient(135deg, #b23a34 0%, #7f1d1d 100%)" 
+                    : isSuccess
+                    ? "linear-gradient(135deg, #10b981 0%, #047857 100%)"
+                    : "linear-gradient(135deg, #d97b31 0%, #a54d24 100%)",
+                borderRadius: "12px",
+                boxShadow: "0 8px 24px rgba(0, 0, 0, 0.4)",
+                color: "#ffffff",
+                fontWeight: "600",
+                fontFamily: "Inter, sans-serif",
+                padding: "14px 20px"
+            }
+        }).showToast();
+    } else {
+        alert(message);
+    }
+}
+window.showToast = showToast;
+
 class GrammarBuilder {
     constructor(rootElementId) {
         this.rootElementId = rootElementId;
@@ -767,18 +797,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (window.LessonLibrary && typeof window.LessonLibrary.refresh === 'function') {
                         window.LessonLibrary.refresh();
                     }
-                    // Show success toast if available
-                    const container = document.getElementById('toastContainer');
-                    if (container) {
-                        const el = document.createElement('div');
-                        el.className = 'toast align-items-center text-bg-success border-0 show';
-                        el.setAttribute('role', 'alert');
-                        el.innerHTML = '<div class="d-flex"><div class="toast-body">Lesson updated successfully!</div><button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button></div>';
-                        container.appendChild(el);
-                        setTimeout(() => el.remove(), 3500);
-                    }
+                    showToast('Lesson updated successfully!', 'success');
                 } else {
-                    alert('Error updating lesson: ' + (data.error || data.message));
+                    showToast('Error updating lesson: ' + (data.error || data.message), 'error');
                 }
             } else {
                 // ── CREATE new lesson via wizard ──
@@ -810,22 +831,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     } else if (window.TaskManagerPage && window.TaskManagerPage.loadTasks) {
                         window.TaskManagerPage.loadTasks();
                     }
-                    const container = document.getElementById('toastContainer');
-                    if (container) {
-                        const el = document.createElement('div');
-                        el.className = 'toast align-items-center text-bg-success border-0 show';
-                        el.setAttribute('role', 'alert');
-                        el.innerHTML = '<div class="d-flex"><div class="toast-body">Lesson created successfully!</div><button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button></div>';
-                        container.appendChild(el);
-                        setTimeout(() => el.remove(), 3500);
-                    }
+                    showToast('Lesson created successfully!', 'success');
                 } else {
-                    alert('Error creating lesson: ' + (data.error || data.message));
+                    showToast('Error creating lesson: ' + (data.error || data.message), 'error');
                 }
             }
         } catch (error) {
             console.error(error);
-            alert('Failed to connect to the server.');
+            showToast('Failed to connect to the server.', 'error');
         } finally {
             btnFinish.disabled = false;
             btnFinish.innerHTML = wizardEditingLessonId ? 'Save Changes' : 'Finish & Save Lesson';
@@ -959,7 +972,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (currentStepId === 'selectTasks') {
             if (wizardState.selectedTasks.length === 0) {
-                alert('Please select at least one task to continue.');
+                showToast('Please select at least one task to continue.', 'error');
                 return false;
             }
             return true;

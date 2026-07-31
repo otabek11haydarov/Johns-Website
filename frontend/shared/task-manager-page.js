@@ -214,17 +214,18 @@
       const profile = GROUP_PROFILES[currentGroup];
 
       document.title = pageTitle;
-      elements.title.textContent = pageTitle;
-      elements.groupBadge.textContent = currentGroup;
-      elements.heroChip.textContent = profile.chip;
-      elements.heroTitle.textContent = profile.title;
-      elements.heroDescription.textContent = profile.description;
-      elements.metricTotal.textContent = tasks.length;
-      elements.metricActive.textContent = countByStatus("Active");
-      elements.metricDraft.textContent = countByStatus("Draft");
+      if (elements.title) elements.title.textContent = pageTitle;
+      if (elements.groupBadge) elements.groupBadge.textContent = currentGroup;
+      if (elements.heroChip && profile) elements.heroChip.textContent = profile.chip;
+      if (elements.heroTitle && profile) elements.heroTitle.textContent = profile.title;
+      if (elements.heroDescription && profile) elements.heroDescription.textContent = profile.description;
+      if (elements.metricTotal) elements.metricTotal.textContent = tasks.length;
+      if (elements.metricActive) elements.metricActive.textContent = countByStatus("Active");
+      if (elements.metricDraft) elements.metricDraft.textContent = countByStatus("Draft");
     }
 
     function updateCategoryCounts() {
+      if (!elements.categoryTabs) return;
       CATEGORY_ORDER.forEach((category) => {
         const countNode = elements.categoryTabs.querySelector(`[data-count-for="${category}"]`);
 
@@ -235,6 +236,7 @@
     }
 
     function syncActiveTab() {
+      if (!elements.categoryTabs) return;
       const tabButtons = elements.categoryTabs.querySelectorAll("[data-category]");
 
       tabButtons.forEach((button) => {
@@ -245,11 +247,13 @@
     }
 
     function setStatusClass(node, status) {
+      if (!node) return;
       node.classList.remove("is-active", "is-draft");
       node.classList.add(status.toLowerCase() === "active" ? "is-active" : "is-draft");
     }
 
     function createTaskCard(task) {
+      if (!elements.taskCardTemplate) return document.createElement("div");
       const fragment = elements.taskCardTemplate.content.cloneNode(true);
       const card = fragment.querySelector(".task-card");
       const titleNode = fragment.querySelector(".task-card__title");
@@ -260,13 +264,15 @@
       const editButton = fragment.querySelector("[data-action='edit']");
       const deleteButton = fragment.querySelector("[data-action='delete']");
 
-      card.dataset.taskId = task.id;
-      titleNode.textContent = task.title;
-      typeNode.textContent = task.type;
-      descriptionNode.textContent = task.description;
-      groupNode.textContent = `${task.group} group`;
-      statusNode.textContent = task.status;
-      setStatusClass(statusNode, task.status);
+      if (card) card.dataset.taskId = task.id;
+      if (titleNode) titleNode.textContent = task.title;
+      if (typeNode) typeNode.textContent = task.type;
+      if (descriptionNode) descriptionNode.textContent = task.description;
+      if (groupNode) groupNode.textContent = `${task.group} group`;
+      if (statusNode) {
+        statusNode.textContent = task.status;
+        setStatusClass(statusNode, task.status);
+      }
 
       if (editButton) {
         editButton.dataset.id = task.id;
@@ -281,26 +287,28 @@
 
     function renderTasks() {
       const filteredTasks = getTasksByCategory(currentCategory);
-      elements.taskGrid.innerHTML = "";
+      if (elements.taskGrid) elements.taskGrid.innerHTML = "";
 
       syncActiveTab();
-      elements.activeCategoryLabel.textContent = capitalize(currentCategory);
-      elements.resultsSummary.textContent = `${filteredTasks.length} ${capitalize(currentCategory)} task${filteredTasks.length === 1 ? "" : "s"}`;
-      elements.addTaskButton.textContent = `+ Add ${capitalize(currentCategory)} Task`;
+      if (elements.activeCategoryLabel) elements.activeCategoryLabel.textContent = capitalize(currentCategory);
+      if (elements.resultsSummary) elements.resultsSummary.textContent = `${filteredTasks.length} ${capitalize(currentCategory)} task${filteredTasks.length === 1 ? "" : "s"}`;
+      if (elements.addTaskButton) elements.addTaskButton.textContent = `+ Add ${capitalize(currentCategory)} Task`;
 
       if (!filteredTasks.length) {
-        elements.taskEmpty.hidden = false;
+        if (elements.taskEmpty) elements.taskEmpty.hidden = false;
         return;
       }
 
-      elements.taskEmpty.hidden = true;
+      if (elements.taskEmpty) elements.taskEmpty.hidden = true;
 
       const fragment = document.createDocumentFragment();
       filteredTasks.forEach((task) => {
-        fragment.appendChild(createTaskCard(task));
+        if (elements.taskCardTemplate) {
+          fragment.appendChild(createTaskCard(task));
+        }
       });
 
-      elements.taskGrid.appendChild(fragment);
+      if (elements.taskGrid) elements.taskGrid.appendChild(fragment);
     }
 
     function refreshUI() {
@@ -523,14 +531,14 @@
 
     function init() {
       refreshUI();
-      elements.categoryTabs.addEventListener("click", handleCategoryClick);
-      elements.addTaskButton.addEventListener("click", openCreateTaskModal);
+      elements.categoryTabs?.addEventListener("click", handleCategoryClick);
+      elements.addTaskButton?.addEventListener("click", openCreateTaskModal);
       elements.taskCategorySelect?.addEventListener("change", syncVideoSourceInput);
       elements.videoSourceType?.addEventListener("change", syncVideoSourceInput);
-      elements.taskForm.addEventListener("submit", handleTaskSubmit);
-      elements.confirmDeleteTaskButton.addEventListener("click", deleteTask);
-      elements.taskModal.addEventListener("hidden.bs.modal", resetTaskForm);
-      elements.deleteTaskModal.addEventListener("hidden.bs.modal", () => {
+      elements.taskForm?.addEventListener("submit", handleTaskSubmit);
+      elements.confirmDeleteTaskButton?.addEventListener("click", deleteTask);
+      elements.taskModal?.addEventListener("hidden.bs.modal", resetTaskForm);
+      elements.deleteTaskModal?.addEventListener("hidden.bs.modal", () => {
         pendingDeleteTaskId = null;
       });
       document.addEventListener("click", handleDocumentClick);
