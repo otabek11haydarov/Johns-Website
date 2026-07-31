@@ -1,7 +1,7 @@
 const flashcard = document.getElementById("flashcard");
 const knowButton = document.getElementById("knowButton");
 const dontKnowButton = document.getElementById("dontKnowButton");
-const routeButton = document.getElementById("routeButton");
+const rotatebtn = document.getElementById("rotatebtn");
 const nextButton = document.getElementById("nextButton");
 
 const words = [
@@ -24,10 +24,9 @@ const words = [
 
 let currentIndex = 0;
 let isFlipped = false;
-let hasChoice = false;
+let selectedChoice = null;
 
 const wordEl = document.getElementById("flashcardWord");
-const backWordEl = document.getElementById("flashcardBackWord");
 const descriptionEl = document.getElementById("flashcardDescription");
 const exampleEl = document.getElementById("flashcardExample");
 const hintEl = document.querySelector(".flashcard-hint");
@@ -36,7 +35,6 @@ const renderCard = () => {
   const current = words[currentIndex];
 
   if (wordEl) wordEl.textContent = current.word;
-  if (backWordEl) backWordEl.textContent = current.word;
   if (descriptionEl) descriptionEl.textContent = current.description;
   if (exampleEl) exampleEl.textContent = current.example;
   if (hintEl) hintEl.textContent = "Choose if you know the word or want the meaning.";
@@ -47,25 +45,29 @@ const updateCardState = () => {
   if (nextButton) {
     nextButton.disabled = !hasChoice;
   }
+  knowButton?.classList.toggle("is-selected", selectedChoice === "know");
+  dontKnowButton?.classList.toggle("is-selected", selectedChoice === "dontKnow");
 };
 
 const resetForNextWord = () => {
   hasChoice = false;
   isFlipped = false;
+  selectedChoice = null;
   renderCard();
   updateCardState();
 };
 
-const chooseWord = () => {
+const chooseWord = (choice) => {
   hasChoice = true;
+  selectedChoice = choice;
   isFlipped = false;
   updateCardState();
 };
 
-knowButton?.addEventListener("click", chooseWord);
-dontKnowButton?.addEventListener("click", chooseWord);
+knowButton?.addEventListener("click", () => chooseWord("know"));
+dontKnowButton?.addEventListener("click", () => chooseWord("dontKnow"));
 
-routeButton?.addEventListener("click", () => {
+rotatebtn?.addEventListener("click", () => {
   isFlipped = !isFlipped;
   updateCardState();
 });

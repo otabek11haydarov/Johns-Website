@@ -45,6 +45,7 @@
 }
 
 .flashcard-shell {
+  position: relative;
   width: min(100%, 620px);
   perspective: 1400px;
 }
@@ -96,6 +97,7 @@
   display: flex;
   justify-content: center;
   pointer-events: none;
+  z-index: 10;
 }
 
 .flashcard-label {
@@ -153,13 +155,13 @@
 .flashcard-button {
   min-width: 168px;
   min-height: 52px;
-  border: 0;
+  border: 2px solid transparent;
   border-radius: 10px;
   color: #fff;
   font-size: 1.02rem;
   font-weight: 900;
   cursor: pointer;
-  transition: transform 0.2s ease, filter 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s ease, filter 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 }
 
 .flashcard-button:hover {
@@ -181,6 +183,22 @@
   background: linear-gradient(135deg, #3a2923 0%, #241714 100%);
 }
 
+.flashcard-button.is-selected {
+  transform: translateY(-2px) scale(1.03);
+  filter: brightness(1.15);
+}
+
+.know-button.is-selected {
+  border-color: #ff9d73;
+  box-shadow: 0 0 24px rgba(255, 106, 51, 0.65), 0 12px 28px rgba(240, 75, 23, 0.4);
+}
+
+.dont-know-button.is-selected {
+  border-color: #ff5252;
+  box-shadow: 0 0 24px rgba(255, 82, 82, 0.6), 0 12px 28px rgba(220, 40, 40, 0.35);
+  background: linear-gradient(135deg, #5c201d 0%, #381210 100%);
+}
+
 .flashcard-control {
   flex: 1;
   min-height: 50px;
@@ -193,7 +211,14 @@
   transition: transform 0.2s ease, opacity 0.2s ease, background 0.2s ease;
 }
 
-.route-button {
+.inner_btn {
+    max-width: 150px;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+.rotate-button,
+.rotatebtn {
   background: linear-gradient(135deg, #4a342d 0%, #2a1a16 100%);
 }
 

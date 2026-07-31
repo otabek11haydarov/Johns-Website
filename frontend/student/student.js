@@ -74,6 +74,75 @@ function toggleSidebarFromMenu() {
   setDesktopSidebarHidden(!isHidden);
 }
 
+let studentLessons = [
+  {
+    id: "fc-lesson-1",
+    order: 1,
+    title: "Lesson 1: Essential Flashcards & Vocabulary",
+    description: "A1 darajadagi eng muhim so'zlarni interaktiv 3D flashcardlar orqali o'rganing va yodlang.",
+    badge: "1-DARS • FLASHCARD",
+    status: "Yangi",
+    tags: ["🎴 Flashcard", "🗣️ Vocabulary"],
+    link: "../Flashkard/fleshkard.html"
+  },
+  {
+    id: "fc-lesson-2",
+    order: 2,
+    title: "Lesson 2: Daily Expressions & Speaking",
+    description: "Kunlik so'z birikmalari va iboralarni takrorlang hamda xotirani sinab ko'ring.",
+    badge: "2-DARS • FLASHCARD",
+    status: "Topshiriq",
+    tags: ["🎴 Flashcard", "🎙️ Speaking"],
+    link: "../Flashkard/fleshkard.html"
+  },
+  {
+    id: "fc-lesson-3",
+    order: 3,
+    title: "Lesson 3: Grammar Test & Quiz",
+    description: "Grammatika qoidalarini sinovdan o'tkazish uchun interaktiv testlar.",
+    badge: "3-DARS • GRAMMAR",
+    status: "Dars",
+    tags: ["📝 Grammar Test", "⏱️ 15 min"],
+    link: "../lesson/grammar_test.html"
+  }
+];
+
+function renderAssignmentsGrid(apiLessons) {
+  const container = document.getElementById("assignments-grid");
+  if (!container) return;
+
+  const lessonsToRender = (apiLessons && apiLessons.length > 0) ? apiLessons.map((l, index) => ({
+    id: l.id,
+    order: l.order || index + 1,
+    title: l.title || `${index + 1}-Dars`,
+    description: l.description || "Interactive dars mashqlari va flashcardlar.",
+    badge: `${l.order || index + 1}-DARS`,
+    status: "Mavjud",
+    tags: ["🎴 Flashcard", `Vazifalar: ${l.taskCount || 1}`],
+    link: "../Flashkard/fleshkard.html"
+  })) : studentLessons;
+
+  container.innerHTML = lessonsToRender.map(item => `
+    <article class="assignment-card">
+      <div>
+        <div class="assignment-card-top">
+          <span class="assignment-badge">${item.badge}</span>
+          <span class="assignment-status-tag">${item.status}</span>
+        </div>
+        <h3 class="assignment-title">${item.title}</h3>
+        <p class="assignment-desc">${item.description}</p>
+        <div class="assignment-meta">
+          ${item.tags.map(t => `<span class="assignment-tag">${t}</span>`).join('')}
+        </div>
+      </div>
+      <a href="${item.link}" class="assignment-start-btn">
+        <span>Boshlash</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+      </a>
+    </article>
+  `).join('');
+}
+
 function setActiveSection(section) {
   navItems.forEach((item) => {
     item.classList.toggle("active", item.dataset.section === section);
@@ -81,6 +150,18 @@ function setActiveSection(section) {
 
   if (breadcrumbCurrent) {
     breadcrumbCurrent.textContent = sectionNames[section] || "Dashboard";
+  }
+
+  const dashSection = document.getElementById("section-dashboard");
+  const assignSection = document.getElementById("section-assignments");
+
+  if (section === "assignments") {
+    if (dashSection) dashSection.style.display = "none";
+    if (assignSection) assignSection.style.display = "block";
+    renderAssignmentsGrid();
+  } else {
+    if (assignSection) assignSection.style.display = "none";
+    if (dashSection) dashSection.style.display = "block";
   }
 
   closeSidebar();
@@ -270,13 +351,29 @@ async function fetchDashboardData() {
       document.getElementById("current-lesson-teacher").textContent = cl.teacher;
       document.getElementById("current-lesson-type").textContent = cl.groupLabel ? `Guruh: ${cl.groupLabel}` : `Vazifalar: ${cl.taskCount}`;
       document.getElementById("current-lesson-status").textContent = "Boshlash";
-      document.getElementById("current-lesson-status").href = `../lesson/lesson-wizard.html?lessonId=${cl.id}`;
+      document.getElementById("current-lesson-status").href = `../Flashkard/fleshkard.html`;
     } else {
       document.getElementById("current-lesson-title").textContent = "Barcha darslar tugatildi!";
       document.getElementById("current-lesson-teacher").textContent = "Tabriklaymiz!";
       document.getElementById("current-lesson-type").textContent = "";
       document.getElementById("current-lesson-status").textContent = "Tugatilgan";
       document.getElementById("current-lesson-status").href = "#";
+    }
+
+    if (data.profile && data.profile.level) {
+      try {
+        const lRes = await fetch(`${BASE_URL}/api/lessons/group/${data.profile.level}`, {
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+        if (lRes.ok) {
+          const lJson = await lRes.json();
+          if (lJson.data && Array.isArray(lJson.data)) {
+            renderAssignmentsGrid(lJson.data);
+          }
+        }
+      } catch (err) {
+        console.log("Could not load group lessons:", err);
+      }
     }
 
     // Top Students
