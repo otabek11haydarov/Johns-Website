@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../admin/admin.css" />
+    <link rel="stylesheet" href="test.css" />
+</head>
+
+<body>
+    <div class="page-shell">
+        <div class="page-frame">
+            <aside class="sidebar" id="sidebar">
+                <div class="sidebar-top">
+                    <div class="brand-mark">J</div>
+                    <div class="brand-copy">
+                        <div class="sidebar-title">Johns LMS</div>
+                        <span>Admin Panel</span>
+                    </div>
+                    <button class="sidebar-close" id="sidebarClose" type="button" aria-label="Close menu">x</button>
+                </div>
+
+                <nav class="sidebar-nav">
+                    <a href="../admin/index.html" class="nav-link active">
+                        <span class="nav-icon">&#9638;</span>
+                        <span class="nav-label">Dashboard</span>
+                    </a>
+                    <span class="nav-section-label">User Management</span>
+                    <a href="../admin/index.html#users" class="nav-link">
+                        <span class="nav-icon">&#128101;</span>
+                        <span class="nav-label">Students</span>
+                    </a>
+                    <a href="#" class="nav-link muted-link">
+                        <span class="nav-icon">&#127891;</span>
+                        <span class="nav-label">Teachers</span>
+                    </a>
+                    <span class="nav-section-label">Academic</span>
+                </nav>
+
+                <div class="sidebar-bottom">
+                    <a href="../auth/login.html" class="logout-link">
+                        <span class="nav-icon">&#8617;</span>
+                        <span class="nav-label">Logout</span>
+                    </a>
+                </div>
+            </aside>
+
+            <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+            <nav class="bottom-nav">
+                <a href="../admin/index.html" class="bottom-nav-item">
+                    <span class="nav-icon">&#9638;</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="../admin/index.html" class="bottom-nav-item">
+                    <span class="nav-icon">&#128101;</span>
+                    <span>Students</span>
+                </a>
+                <a href="../admin/index.html" class="bottom-nav-item muted-link">
+                    <span class="nav-icon">&#128104;</span>
+                    <span>Teachers</span>
+                </a>
+                <a href="../admin/index.html" class="bottom-nav-item muted-link">
+                    <span class="nav-icon">&#128197;</span>
+                    <span>Attendance</span>
+                </a>
+            </nav>
+
+            <div class="main-wrapper test-wrapper">
+                <header class="topbar">
+                    <div class="topbar-left">
+                        <button class="sidebar-toggle" id="sidebarToggle" type="button" aria-label="Open menu">&#8801;</button>
+                        <div class="breadcrumb-line">
+                            <span>Admin</span>
+                            <strong>Test</strong>
+                        </div>
+                    </div>
+
+                    <div class="topbar-right">
+                        <a class="topbar-icon" href="../admin/index.html" aria-label="Back to dashboard">&#8249;</a>
+                        <button class="topbar-icon has-dot" type="button" aria-label="Notifications">&#128276;</button>
+                        <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">
+                            <span class="theme-toggle-ring">
+                                <span class="theme-toggle-core"></span>
+                            </span>
+                        </button>
+                        <div class="topbar-user">
+                            <div class="mini-avatar">JA</div>
+                        </div>
+                        <a class="topbar-icon" href="../auth/login.html" aria-label="Logout">&#8618;</a>
+                    </div>
+                </header>
+
+                <main class="test-main" aria-labelledby="testTitle">
+                    <section class="test-panel">
+                        <div class="test-panel-header">
+                            <p class="test-eyebrow">Grammar Test</p>
+                            <h1 class="test-title" id="testTitle">Choose the correct answer</h1>
+                            <p class="test-subtitle">Read the sentence and select one of the four answers below.</p>
+                        </div>
+
+                        <div class="test-question-block">
+                            <label class="question-label" for="questionText">Sentence / Question Text</label>
+                            <div class="question-text" id="questionText">
+                                She ____ to school every day.
+                            </div>
+                        </div>
+
+                        <div class="test-options-block">
+                            <div class="options-heading">Options (Select the correct one)</div>
+
+                            <label class="option-row">
+                                <input type="radio" name="answer" value="A" />
+                                <span class="option-letter">A)</span>
+                                <span class="option-box">go</span>
+                            </label>
+
+                            <label class="option-row">
+                                <input type="radio" name="answer" value="B" />
+                                <span class="option-letter">B)</span>
+                                <span class="option-box">goes</span>
+                            </label>
+
+                            <label class="option-row">
+                                <input type="radio" name="answer" value="C" />
+                                <span class="option-letter">C)</span>
+                                <span class="option-box">going</span>
+                            </label>
+
+                            <label class="option-row">
+                                <input type="radio" name="answer" value="D" />
+                                <span class="option-letter">D)</span>
+                                <span class="option-box">gone</span>
+                            </label>
+                        </div>
+
+                        <div class="test-actions">
+                            <button class="test-btn test-btn-ghost" type="button" id="clearBtn">Clear</button>
+                            <button class="test-btn test-btn-primary" type="button" id="submitBtn">Submit</button>
+                            <button class="test-btn test-btn-secondary" type="button" id="nextBtn">Next</button>
+                        </div>
+                    </section>
+                </main>
+            </div>
+        </div>
+    </div>
+
+    <script src="../admin/admin.js"></script>
+    <script src="test.js"></script>
+</body>
+
+</html>
