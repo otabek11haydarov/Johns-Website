@@ -103,14 +103,6 @@ function parseOxfordData(data, originalWord) {
       noExampleProvided: !exampleSentence
     };
 
-    console.log(`[Oxford Parser] Parsed '${originalWord}':`, {
-      word: parsedResult.word,
-      pronunciation: parsedResult.pronunciation,
-      partOfSpeech: parsedResult.partOfSpeech,
-      definition: parsedResult.definition,
-      exampleSentence: parsedResult.exampleSentence
-    });
-
     return parsedResult;
   } catch (err) {
     console.error(`[Oxford Parser] Error parsing '${originalWord}':`, err);
@@ -244,14 +236,6 @@ function parseFreeDictionaryData(data, originalWord) {
       warning: false,
       noExampleProvided: !exampleSentence
     };
-
-    console.log(`[FreeDict Parser] Parsed '${originalWord}':`, {
-      word: parsedResult.word,
-      pronunciation: parsedResult.pronunciation,
-      partOfSpeech: parsedResult.partOfSpeech,
-      definition: parsedResult.definition,
-      exampleSentence: parsedResult.exampleSentence
-    });
 
     return parsedResult;
   } catch (err) {
