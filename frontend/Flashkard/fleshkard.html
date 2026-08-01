@@ -4,154 +4,54 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Speaking Task</title>
+    <title>Flashcard Task</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="../admin/admin.css" />
     <link rel="stylesheet" href="fleshkard.css" />
 </head>
 
 <body>
-    <div class="page-shell">
-        <div class="page-frame">
-            <aside class="sidebar" id="sidebar">
-                <div class="sidebar-top">
-                    <div class="brand-mark">J</div>
-                    <div class="brand-copy">
-                        <div class="sidebar-title">Johns LMS</div>
-                        <span>Admin Panel</span>
+    <main class="speaking-main">
+        <section class="flashcard-section">
+            <div class="flashcard-shell">
+                <div class="flashcard" id="flashcard" aria-live="polite">
+                    <div class="flashcard-face flashcard-front">
+                        <div class="flashcard-badge-row">
+                            <span class="flashcard-label">Word</span>
+                            <span class="flashcard-counter" id="cardCounter">1 / 3</span>
+                        </div>
+                        <h2 class="flashcard-word" id="flashcardWord">Beautiful</h2>
+                        <p class="flashcard-hint">Choose if you know the word or want the meaning.</p>
                     </div>
-                    <button class="sidebar-close" id="sidebarClose" type="button" aria-label="Close menu">
-                        x
-                    </button>
+                    <div class="flashcard-face flashcard-back">
+                        <span class="flashcard-label">Description</span>
+                        <p class="flashcard-description" id="flashcardDescription">
+                            Very attractive or pleasing to look at.
+                        </p>
+                        <p class="flashcard-example-title">Example</p>
+                        <p class="flashcard-example" id="flashcardExample">
+                            She wore a beautiful dress to the party.
+                        </p>
+                    </div>
                 </div>
-
-                <nav class="sidebar-nav">
-                    <a href="../admin/index.html" class="nav-link active">
-                        <span class="nav-icon">&#9638;</span>
-                        <span class="nav-label">Dashboard</span>
-                    </a>
-                    <span class="nav-section-label">User Management</span>
-                    <a href="../admin/index.html#users" class="nav-link">
-                        <span class="nav-icon">&#128101;</span>
-                        <span class="nav-label">Students</span>
-                    </a>
-                    <a href="#" class="nav-link muted-link">
-                        <span class="nav-icon">&#127891;</span>
-                        <span class="nav-label">Teachers</span>
-                    </a>
-
-                    <span class="nav-section-label">Academic</span>
-
-                </nav>
-
-                <div class="sidebar-bottom">
-                    <a href="../auth/login.html" class="logout-link">
-                        <span class="nav-icon">&#8617;</span>
-                        <span class="nav-label">Logout</span>
-                    </a>
+                <div class="flashcard-inner-actions">
+                    <div class="flashcard-footer">
+                        <button class="flashcard-control prev-word-btn" id="prevWordBtn" type="button" disabled>&larr; Ortga</button>
+                        <button class="flashcard-control rotate-button" id="rotatebtn" type="button">Rotate</button>
+                        <button class="flashcard-control next-word-btn" id="nextWordBtn" type="button">Keyingi so'z &rarr;</button>
+                    </div>
                 </div>
-            </aside>
-
-            <div class="sidebar-overlay" id="sidebarOverlay"></div>
-
-            <!-- // -- Mobile Bottom Navigation --------- -->
-            <nav class="bottom-nav">
-                <a href="../admin/index.html" class="bottom-nav-item">
-                    <span class="nav-icon">&#9638;</span>
-                    <span>Dashboard</span>
-                </a>
-                <a href="../admin/index.html" class="bottom-nav-item">
-                    <span class="nav-icon">&#128101;</span>
-                    <span>Students</span>
-                </a>
-                <a href="../admin/index.html" class="bottom-nav-item muted-link">
-                    <span class="nav-icon">&#128104;</span>
-                    <span>Teachers</span>
-                </a>
-                <a href="../admin/index.html" class="bottom-nav-item muted-link">
-                    <span class="nav-icon">&#128197;</span>
-                    <span>Attendance</span>
-                </a>
-            </nav>
-
-            <div class="main-wrapper speaking-wrapper">
-                <header class="topbar">
-                    <div class="topbar-left">
-                        <button class="sidebar-toggle" id="sidebarToggle" type="button" aria-label="Open menu">
-                            &#8801;
-                        </button>
-                        <div class="breadcrumb-line">
-                            <span>Admin</span>
-                            <strong>Speaking</strong>
-                        </div>
-                    </div>
-
-                    <div class="topbar-right">
-                        <a class="topbar-icon" href="../admin/index.html" aria-label="Back to dashboard">&#8249;</a>
-                        <button class="topbar-icon has-dot" type="button" aria-label="Notifications">&#128276;</button>
-                        <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode"
-                            title="Toggle dark mode">
-                            <span class="theme-toggle-ring">
-                                <span class="theme-toggle-core"></span>
-                            </span>
-                        </button>
-                        <div class="topbar-user">
-                            <div class="mini-avatar">JA</div>
-                        </div>
-                        <a class="topbar-icon" href="../auth/login.html" aria-label="Logout">&#8618;</a>
-                    </div>
-                </header>
-
-                <main class="speaking-main" aria-labelledby="speakingTitle">
-                    <section class="flashcard-section">
-                        <p class="speaking-eyebrow">Flashcard</p>
-                        <h1 class="speaking-title" id="speakingTitle">Learn one word at a time</h1>
-                        <div class="flashcard-shell">
-                            <div class="flashcard" id="flashcard" aria-live="polite">
-                                <div class="flashcard-face flashcard-front">
-                                    <p class="flashcard-label">Word</p>
-                                    <h2 class="flashcard-word" id="flashcardWord">Beautiful</h2>
-                                    <p class="flashcard-hint">Choose if you know the word or want the meaning.</p>
-                                </div>
-                                <div class="flashcard-face flashcard-back">
-                                    <p class="flashcard-label">Description</p>
-                                    <p class="flashcard-description" id="flashcardDescription">
-                                        Very attractive or pleasing to look at.
-                                    </p>
-                                    <p class="flashcard-example-title">Example</p>
-                                    <p class="flashcard-example" id="flashcardExample">
-                                        She wore a beautiful dress to the party.
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="flashcard-inner-actions">
-                                <div class="flashcard-footer">
-                                    <button class="flashcard-control rotate-button inner_btn" id="rotatebtn"
-                                        type="button">
-                                        Rotate
-                                    </button>
-                                    <button class="flashcard-control next-button inner_btn" id="nextButton"
-                                        type="button" disabled>
-                                        Next
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="flashcard-actions">
-                            <button class="flashcard-button know-button" id="knowButton" type="button">
-                                I know
-                            </button>
-                            <button class="flashcard-button dont-know-button" id="dontKnowButton" type="button">
-                                I don't know
-                            </button>
-                        </div>
-                    </section>
-                </main>
             </div>
-        </div>
-    </div>
+            <div class="flashcard-actions">
+                <button class="flashcard-button know-button" id="knowButton" type="button">
+                    I know
+                </button>
+                <button class="flashcard-button dont-know-button" id="dontKnowButton" type="button">
+                    I don't know
+                </button>
+            </div>
+        </section>
+    </main>
 
-    <script src="../admin/admin.js"></script>
     <script src="fleshkard.js"></script>
 </body>
 

@@ -76,34 +76,34 @@ function toggleSidebarFromMenu() {
 
 let studentLessons = [
   {
-    id: "fc-lesson-1",
+    id: "lesson-1",
     order: 1,
     title: "Lesson 1: Essential Flashcards & Vocabulary",
-    description: "A1 darajadagi eng muhim so'zlarni interaktiv 3D flashcardlar orqali o'rganing va yodlang.",
-    badge: "1-DARS • FLASHCARD",
+    description: "A1 darajadagi eng muhim so'zlarni interaktiv 3D flashcardlar va video dars orqali o'rganing.",
+    badge: "1-DARS • 4 TASKS",
     status: "Yangi",
-    tags: ["🎴 Flashcard", "🗣️ Vocabulary"],
-    link: "../Flashkard/fleshkard.html"
+    tags: ["🎬 Video", "🎴 Flashcard", "📝 Test", "🎙️ Speaking"],
+    link: "lesson-runner.html?lessonId=lesson-1"
   },
   {
-    id: "fc-lesson-2",
+    id: "lesson-2",
     order: 2,
     title: "Lesson 2: Daily Expressions & Speaking",
     description: "Kunlik so'z birikmalari va iboralarni takrorlang hamda xotirani sinab ko'ring.",
-    badge: "2-DARS • FLASHCARD",
+    badge: "2-DARS • 4 TASKS",
     status: "Topshiriq",
-    tags: ["🎴 Flashcard", "🎙️ Speaking"],
-    link: "../Flashkard/fleshkard.html"
+    tags: ["🎬 Video", "🎴 Flashcard", "📝 Test", "🎙️ Speaking"],
+    link: "lesson-runner.html?lessonId=lesson-2"
   },
   {
-    id: "fc-lesson-3",
+    id: "lesson-3",
     order: 3,
     title: "Lesson 3: Grammar Test & Quiz",
-    description: "Grammatika qoidalarini sinovdan o'tkazish uchun interaktiv testlar.",
-    badge: "3-DARS • GRAMMAR",
+    description: "Grammatika qoidalarini sinovdan o'tkazish uchun interaktiv testlar va darslar.",
+    badge: "3-DARS • 4 TASKS",
     status: "Dars",
-    tags: ["📝 Grammar Test", "⏱️ 15 min"],
-    link: "../lesson/grammar_test.html"
+    tags: ["🎬 Video", "🎴 Flashcard", "📝 Test", "🎙️ Speaking"],
+    link: "lesson-runner.html?lessonId=lesson-3"
   }
 ];
 
@@ -115,11 +115,11 @@ function renderAssignmentsGrid(apiLessons) {
     id: l.id,
     order: l.order || index + 1,
     title: l.title || `${index + 1}-Dars`,
-    description: l.description || "Interactive dars mashqlari va flashcardlar.",
-    badge: `${l.order || index + 1}-DARS`,
+    description: l.description || "Interactive dars mashqlari va vazifalar.",
+    badge: `${l.order || index + 1}-DARS • ${l.taskCount || 4} TASKS`,
     status: "Mavjud",
-    tags: ["🎴 Flashcard", `Vazifalar: ${l.taskCount || 1}`],
-    link: "../Flashkard/fleshkard.html"
+    tags: ["🎬 Video", "🎴 Flashcard", "📝 Test", "🎙️ Speaking"],
+    link: `lesson-runner.html?lessonId=${l.id}`
   })) : studentLessons;
 
   container.innerHTML = lessonsToRender.map(item => `
@@ -351,7 +351,7 @@ async function fetchDashboardData() {
       document.getElementById("current-lesson-teacher").textContent = cl.teacher;
       document.getElementById("current-lesson-type").textContent = cl.groupLabel ? `Guruh: ${cl.groupLabel}` : `Vazifalar: ${cl.taskCount}`;
       document.getElementById("current-lesson-status").textContent = "Boshlash";
-      document.getElementById("current-lesson-status").href = `../Flashkard/fleshkard.html`;
+      document.getElementById("current-lesson-status").href = `lesson-runner.html?lessonId=${cl.id}`;
     } else {
       document.getElementById("current-lesson-title").textContent = "Barcha darslar tugatildi!";
       document.getElementById("current-lesson-teacher").textContent = "Tabriklaymiz!";

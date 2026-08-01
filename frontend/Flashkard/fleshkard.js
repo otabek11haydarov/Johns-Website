@@ -2,7 +2,9 @@ const flashcard = document.getElementById("flashcard");
 const knowButton = document.getElementById("knowButton");
 const dontKnowButton = document.getElementById("dontKnowButton");
 const rotatebtn = document.getElementById("rotatebtn");
-const nextButton = document.getElementById("nextButton");
+const prevWordBtn = document.getElementById("prevWordBtn");
+const nextWordBtn = document.getElementById("nextWordBtn");
+const cardCounter = document.getElementById("cardCounter");
 
 const words = [
   {
@@ -29,7 +31,6 @@ let selectedChoice = null;
 const wordEl = document.getElementById("flashcardWord");
 const descriptionEl = document.getElementById("flashcardDescription");
 const exampleEl = document.getElementById("flashcardExample");
-const hintEl = document.querySelector(".flashcard-hint");
 
 const renderCard = () => {
   const current = words[currentIndex];
@@ -37,30 +38,20 @@ const renderCard = () => {
   if (wordEl) wordEl.textContent = current.word;
   if (descriptionEl) descriptionEl.textContent = current.description;
   if (exampleEl) exampleEl.textContent = current.example;
-  if (hintEl) hintEl.textContent = "Choose if you know the word or want the meaning.";
+  if (cardCounter) cardCounter.textContent = `${currentIndex + 1} / ${words.length}`;
 };
 
 const updateCardState = () => {
   flashcard?.classList.toggle("is-flipped", isFlipped);
-  if (nextButton) {
-    nextButton.disabled = !hasChoice;
-  }
   knowButton?.classList.toggle("is-selected", selectedChoice === "know");
   dontKnowButton?.classList.toggle("is-selected", selectedChoice === "dontKnow");
-};
 
-const resetForNextWord = () => {
-  hasChoice = false;
-  isFlipped = false;
-  selectedChoice = null;
-  renderCard();
-  updateCardState();
+  if (prevWordBtn) prevWordBtn.disabled = currentIndex === 0;
+  if (nextWordBtn) nextWordBtn.disabled = currentIndex === words.length - 1;
 };
 
 const chooseWord = (choice) => {
-  hasChoice = true;
   selectedChoice = choice;
-  isFlipped = false;
   updateCardState();
 };
 
@@ -72,15 +63,22 @@ rotatebtn?.addEventListener("click", () => {
   updateCardState();
 });
 
-nextButton?.addEventListener("click", () => {
-  if (nextButton.disabled) return;
+const switchWord = (newIndex) => {
+  if (newIndex < 0 || newIndex >= words.length) return;
   flashcard?.classList.add("is-advancing");
-  currentIndex = (currentIndex + 1) % words.length;
+  currentIndex = newIndex;
+  isFlipped = false;
+  selectedChoice = null;
+
   window.setTimeout(() => {
     flashcard?.classList.remove("is-advancing");
-    resetForNextWord();
-  }, 220);
-});
+    renderCard();
+    updateCardState();
+  }, 200);
+};
+
+prevWordBtn?.addEventListener("click", () => switchWord(currentIndex - 1));
+nextWordBtn?.addEventListener("click", () => switchWord(currentIndex + 1));
 
 renderCard();
 updateCardState();

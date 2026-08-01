@@ -1,31 +1,48 @@
-.speaking-wrapper {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #090604;
+}
+
+.page-shell, .page-frame, .speaking-wrapper {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 .speaking-main {
-  flex: 1;
-  min-height: 0;
-  display: grid;
-  place-items: center;
-  padding: 32px;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  box-sizing: border-box;
   background:
     radial-gradient(circle at 50% 25%, rgba(98, 22, 15, 0.16), transparent 26%),
     #090604;
 }
 
 .speaking-box {
-  width: min(100%, 520px);
-  display: grid;
-  justify-items: center;
+  width: 100%;
+  max-width: 580px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   gap: 16px;
-  padding: 34px;
+  padding: 24px;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
+  border-radius: 14px;
   background: linear-gradient(180deg, rgba(26, 19, 16, 0.96), rgba(18, 13, 11, 0.98));
   color: #efe7e0;
   text-align: center;
+  box-sizing: border-box;
 }
 
 .speaking-eyebrow {

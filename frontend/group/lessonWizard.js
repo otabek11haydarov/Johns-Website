@@ -2,6 +2,30 @@
  * Enterprise Lesson Creation Wizard Logic
  */
 
+/**
+ * YouTube linkdan embed URL yasaydi
+ * Standart, qisqartirilgan, mobil va har xil YouTube URL formatlarini qo'llab-quvvatlaydi.
+ */
+function getYouTubeEmbedUrl(url) {
+    if (!url || typeof url !== 'string') return null;
+    const regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    if (match && match[2].length === 11) {
+        return `https://www.youtube.com/embed/${match[2]}?rel=0&iv_load_policy=3`;
+    }
+    return null; // YouTube havola emas — asl URL saqlanadi
+}
+
+/**
+ * URL'dan faqat Video ID ni ajratib olish (Duration hisoblash uchun)
+ */
+function getYouTubeVideoIdFromUrl(url) {
+    if (!url || typeof url !== 'string') return null;
+    const regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : null;
+}
+
 function showToast(message, type = 'info') {
     const isError = type === 'error';
     const isSuccess = type === 'success';
@@ -1282,7 +1306,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (form) {
                     const formData = new FormData(form);
                     for (let [key, value] of formData.entries()) {
-                        wizardState.taskConfigs[taskId][key] = value;
+                        // VIDEO task: YouTube linkni avtomatik embed formatga aylantir
+                        if (key === 'videoUrl' && value) {
+                            const embedUrl = getYouTubeEmbedUrl(value);
+                            wizardState.taskConfigs[taskId][key] = embedUrl || value;
+                        } else {
+                            wizardState.taskConfigs[taskId][key] = value;
+                        }
                     }
                 }
             }
@@ -1433,6 +1463,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="form-group mb-3">
                         <label>Video URL <span class="text-danger">*</span></label>
                         <input type="url" class="form-control" name="videoUrl" placeholder="https://youtube.com/..." required>
+                        <small class="text-info video-status-text mt-1 d-block"></small>
                     </div>
                     <div class="form-group mb-3">
                         <label>Duration (minutes)</label>
@@ -1595,6 +1626,70 @@ document.addEventListener('DOMContentLoaded', () => {
         if (taskId === 'GRAMMAR') {
             window.grammarBuilder = new GrammarBuilder('grammar-builder-root');
             window.grammarBuilder.render();
+        }
+
+        // Auto-detect Video Duration if this is a VIDEO task
+        if (taskId === 'VIDEO') {
+            const urlInput = stepDiv.querySelector('input[name="videoUrl"]');
+            const durationInput = stepDiv.querySelector('input[name="duration"]');
+            const statusText = stepDiv.querySelector('.video-status-text');
+
+            urlInput.addEventListener('change', () => {
+                const url = urlInput.value.trim();
+                const vId = getYouTubeVideoIdFromUrl(url);
+                if (vId) {
+                    statusText.textContent = '⏳ Videoning davomiyligi aniqlanmoqda...';
+                    statusText.className = 'text-warning video-status-text mt-1 d-block';
+                    
+                    const hiddenDiv = document.createElement('div');
+                    hiddenDiv.id = 'temp-yt-player-' + Date.now();
+                    hiddenDiv.style.display = 'none';
+                    document.body.appendChild(hiddenDiv);
+
+                    if (!window.YT) {
+                        const tag = document.createElement('script');
+                        tag.src = "https://www.youtube.com/iframe_api";
+                        document.head.appendChild(tag);
+                    }
+
+                    const tryInitPlayer = () => {
+                        if (window.YT && window.YT.Player) {
+                            new YT.Player(hiddenDiv.id, {
+                                height: '1', width: '1',
+                                videoId: vId,
+                                events: {
+                                    'onReady': (event) => {
+                                        const durSec = event.target.getDuration();
+                                        if (durSec) {
+                                            durationInput.value = Math.ceil(durSec / 60);
+                                            statusText.textContent = '✅ Davomiylik avtomatik aniqlandi (' + Math.ceil(durSec / 60) + ' min)';
+                                            statusText.className = 'text-success video-status-text mt-1 d-block';
+                                        } else {
+                                            statusText.textContent = "❌ Videoni aniqlab bo'lmadi.";
+                                            statusText.className = 'text-danger video-status-text mt-1 d-block';
+                                        }
+                                        event.target.destroy();
+                                        hiddenDiv.remove();
+                                    },
+                                    'onError': (event) => {
+                                        statusText.textContent = "❌ Xatolik: yopiq yoki noto'g'ri video.";
+                                        statusText.className = 'text-danger video-status-text mt-1 d-block';
+                                        hiddenDiv.remove();
+                                    }
+                                }
+                            });
+                        } else {
+                            setTimeout(tryInitPlayer, 500);
+                        }
+                    };
+                    tryInitPlayer();
+                } else if (url) {
+                    statusText.textContent = "❌ Noto'g'ri YouTube havolasi.";
+                    statusText.className = 'text-danger video-status-text mt-1 d-block';
+                } else {
+                    statusText.textContent = '';
+                }
+            });
         }
 
         return stepDiv;

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure LMS YouTube Player</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #0f1115;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        /* 1. Responsive 16:9 Wrapper */
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            aspect-ratio: 16 / 9;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        /* YouTube iframe container */
+        #youtube-player {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* 2. CSS Transparent Blocker for top hover cards (Avatar, Title, More Videos) */
+        .click-blocker-top {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 70px;
+            z-index: 5;
+            background: transparent;
+            /* Prevents user from hovering or clicking the top area */
+        }
+
+        /* 3. Transparent shield for bottom-right channel watermark/logo */
+        .logo-blocker {
+            position: absolute;
+            bottom: 50px; /* Above the player controls */
+            right: 0;
+            width: 120px;
+            height: 70px;
+            background: transparent;
+            z-index: 5;
+        }
+
+        /* 4. Custom Pause/End Overlay */
+        .custom-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(8px);
+            z-index: 10;
+            display: flex; /* Hidden by JS when playing */
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .custom-overlay h3 {
+            margin: 0 0 20px 0;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .resume-btn {
+            padding: 12px 32px;
+            background: linear-gradient(135deg, #ff6a33 0%, #f04b17 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, filter 0.2s;
+        }
+
+        .resume-btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="video-wrapper">
+        <!-- Transparent shield to block hover on top area -->
+        <div class="click-blocker-top"></div>
+
+        <!-- Transparent shield to block bottom-right logo -->
+        <div class="logo-blocker"></div>
+
+        <!-- The YouTube IFrame will replace this div -->
+        <div id="youtube-player"></div>
+
+        <!-- Custom Overlay -->
+        <div class="custom-overlay" id="ytOverlay">
+            <h3 id="overlay-text">Video Paused</h3>
+            <button class="resume-btn" id="resumeBtn">Resume Lesson ▶</button>
+        </div>
+    </div>
+
+    <script>
+        // VIDEO ID FROM BACKEND OR URL
+        const videoId = "dQw4w9WgXcQ"; // Replace with actual ID
+        
+        let player;
+        const overlay = document.getElementById('ytOverlay');
+        const overlayText = document.getElementById('overlay-text');
+        const resumeBtn = document.getElementById('resumeBtn');
+
+        // 1. Load YouTube IFrame API asynchronously
+        const tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        const firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        // 2. Setup Player when API is ready
+        window.onYouTubeIframeAPIReady = function() {
+            player = new YT.Player('youtube-player', {
+                videoId: videoId,
+                playerVars: {
+                    'rel': 0,             // Don't show related videos from other channels
+                    'modestbranding': 1,  // Hide YouTube Logo
+                    'iv_load_policy': 3,  // Hide video annotations and cards
+                    'controls': 1         // Show default play/pause controls
+                },
+                events: {
+                    'onStateChange': onPlayerStateChange,
+                    'onReady': onPlayerReady
+                }
+            });
+        };
+
+        function onPlayerReady(event) {
+            // Video is ready, overlay is visible by default requiring user interaction to start.
+            overlayText.innerText = "Ready to Start";
+            resumeBtn.innerText = "Start Lesson ▶";
+        }
+
+        // 3. Handle state changes (Play / Pause / End)
+        function onPlayerStateChange(event) {
+            if (event.data === YT.PlayerState.PLAYING) {
+                // Hide overlay when playing
+                overlay.style.display = 'none';
+            } 
+            else if (event.data === YT.PlayerState.PAUSED) {
+                // Show overlay when paused
+                overlayText.innerText = "Lesson Paused";
+                resumeBtn.innerText = "Resume Lesson ▶";
+                overlay.style.display = 'flex';
+            } 
+            else if (event.data === YT.PlayerState.ENDED) {
+                // Show overlay when ended
+                overlayText.innerText = "Lesson Completed!";
+                resumeBtn.innerText = "Replay Lesson ↺";
+                overlay.style.display = 'flex';
+            }
+        }
+
+        // 4. Resume/Play button click handler
+        resumeBtn.addEventListener('click', () => {
+            if (player && typeof player.playVideo === 'function') {
+                player.playVideo();
+                overlay.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -33,6 +33,9 @@ model User {
   groupId        String?
   group          Group?  @relation("GroupStudents", fields: [groupId], references: [id])
   mentoredGroups Group[] @relation("GroupMentor")
+
+  @@index([groupId])
+  @@index([role])
 }
 
 model Group {
@@ -50,6 +53,8 @@ model Group {
 
   // Relations
   students User[] @relation("GroupStudents")
+
+  @@index([mentorId])
 }
 
 model Lesson {
@@ -60,6 +65,9 @@ model Lesson {
   status      String  @default("DRAFT")
   order       Int     @default(0)
   tasks       Task[]  // Barcha turdagi vazifalar ro'yxati
+
+  @@index([order])
+  @@index([status])
 }
 
 // ASOSIY JADVAL
@@ -81,6 +89,9 @@ model Task {
   listeningTask ListeningTask?
   writingTask   WritingTask?
   grammarTest   GrammarTest?
+
+  @@index([lessonId])
+  @@index([order])
 }
 
 // 1. VIDEO UCHUN ALOHIDA JADVAL
@@ -118,6 +129,8 @@ model TestQuestion {
   
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+
+  @@index([testTaskId])
 }
 
 model TestOption {
@@ -130,6 +143,8 @@ model TestOption {
   
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+
+  @@index([questionId])
 }
 
 // 3. FLASHCARD UCHUN ALOHIDA JADVAL
@@ -150,6 +165,8 @@ model FlashcardItem {
   word        String
   description String
   example     String?
+
+  @@index([flashcardTaskId])
 }
 
 // 4. SPEAKING UCHUN ALOHIDA JADVAL
@@ -214,6 +231,9 @@ model LessonAssessment {
   status          String   @default("FAILED") // "PASSED" or "FAILED"
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+
+  @@index([lessonId])
+  @@index([studentId])
 }
 
 model VideoAssessment {
@@ -227,6 +247,9 @@ model VideoAssessment {
   completed       Boolean  @default(false)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+
+  @@index([studentId])
+  @@index([lessonCardId])
 }
 
 // 8. GRAMMAR UCHUN ALOHIDA JADVAL
@@ -256,6 +279,8 @@ model GrammarQuestion {
   
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+
+  @@index([grammarTestId])
 }
 
 model GrammarOption {
@@ -268,6 +293,8 @@ model GrammarOption {
   
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+
+  @@index([questionId])
 }
 
 model StudentGrammarAttempt {
@@ -283,6 +310,9 @@ model StudentGrammarAttempt {
   answers        StudentGrammarAnswer[]
   
   createdAt      DateTime @default(now())
+
+  @@index([grammarTestId])
+  @@index([studentId])
 }
 
 model StudentGrammarAnswer {
@@ -292,6 +322,9 @@ model StudentGrammarAnswer {
   questionId     String
   selectedOptionId String?
   isCorrect      Boolean
+
+  @@index([attemptId])
+  @@index([questionId])
 }
 
 model LessonTaskType {
