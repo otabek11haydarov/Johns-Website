@@ -26,6 +26,15 @@ function getYouTubeVideoIdFromUrl(url) {
     return (match && match[2].length === 11) ? match[2] : null;
 }
 
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+
 function showToast(message, type = 'info') {
     const isError = type === 'error';
     const isSuccess = type === 'success';
@@ -646,7 +655,18 @@ document.addEventListener('DOMContentLoaded', () => {
         taskConfigs: {}    // e.g. { VIDEO: { videoUrl: '', duration: 0 } }
     };
 
-    let AVAILABLE_TASKS = [];
+    const DEFAULT_AVAILABLE_TASKS = [
+        { id: 'VIDEO',      label: 'Video',      icon: 'bi-play-circle',   desc: 'Video lesson content', color: '#3b82f6' },
+        { id: 'VOCABULARY', label: 'Vocabulary', icon: 'bi-translate',     desc: 'Word lists and flashcards', color: '#8b5cf6' },
+        { id: 'GRAMMAR',    label: 'Grammar',    icon: 'bi-spellcheck',    desc: 'Grammar rules and tests', color: '#f97316' },
+        { id: 'FLASHCARD',  label: 'Flashcard',  icon: 'bi-card-text',     desc: 'Interactive flip cards', color: '#ec4899' },
+        { id: 'READING',    label: 'Reading',    icon: 'bi-book',          desc: 'Reading comprehension text', color: '#10b981' },
+        { id: 'LISTENING',  label: 'Listening',  icon: 'bi-earbuds',       desc: 'Audio listening tasks', color: '#f59e0b' },
+        { id: 'WRITING',    label: 'Writing',    icon: 'bi-pencil-square', desc: 'Writing prompt', color: '#ef4444' },
+        { id: 'SPEAKING',   label: 'Speaking',   icon: 'bi-mic',           desc: 'Voice recording prompt', color: '#14b8a6' }
+    ];
+
+    let AVAILABLE_TASKS = [...DEFAULT_AVAILABLE_TASKS];
 
     const API_BASE = window.API_BASE_URL || 'http://localhost:5000/api';
 
@@ -656,20 +676,18 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!res.ok) throw new Error('Failed to load task types');
             const data = await res.json();
             
-            AVAILABLE_TASKS = data.map(t => ({
-                id: t.code,
-                label: t.name,
-                icon: t.icon,
-                desc: t.description || '',
-                color: t.color || '#6b7280'
-            }));
-        } catch (err) {
-            console.error('[LessonWizard] Error loading task types:', err);
-            if (window.showToast) {
-                window.showToast('Could not connect to server. Please reload the page.', 'danger');
-            } else {
-                alert('Could not load task types from server. Please check if the backend is running and reload the page.');
+            if (Array.isArray(data) && data.length > 0) {
+                AVAILABLE_TASKS = data.map(t => ({
+                    id: t.code,
+                    label: t.name,
+                    icon: t.icon,
+                    desc: t.description || '',
+                    color: t.color || '#6b7280'
+                }));
+                renderTaskSelectionGrid();
             }
+        } catch (err) {
+            console.error('[LessonWizard] Error loading task types, using defaults:', err);
         }
     }
 
@@ -702,14 +720,15 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (btnOpenTaskPicker) {
         btnOpenTaskPicker.addEventListener('click', () => {
+            renderTaskSelectionGrid();
             if (taskPickerModal) taskPickerModal.show();
         });
     }
 
     // Init function
     async function initWizard() {
-        await loadTaskTypes();
         renderTaskSelectionGrid();
+        await loadTaskTypes();
         updateWizardFlow();
         renderStepper();
         showCurrentStep();
@@ -738,6 +757,10 @@ document.addEventListener('DOMContentLoaded', () => {
         updateWizardFlow();
         renderStepper();
         showCurrentStep();
+
+        if (dynamicStepsContainer) {
+            dynamicStepsContainer.innerHTML = '';
+        }
 
         // Pre-populate form inputs if editing
         if (wizardEditingLessonId) {
@@ -1459,15 +1482,16 @@ document.addEventListener('DOMContentLoaded', () => {
         // In a real app, these schemas would be more robust.
         switch(taskId) {
             case 'VIDEO':
+                const videoCfg = wizardState.taskConfigs[taskId] || {};
                 html += `
                     <div class="form-group mb-3">
                         <label>Video URL <span class="text-danger">*</span></label>
-                        <input type="url" class="form-control" name="videoUrl" placeholder="https://youtube.com/..." required>
+                        <input type="url" class="form-control" name="videoUrl" value="${escapeHtml(videoCfg.videoUrl || '')}" placeholder="https://youtube.com/..." required>
                         <small class="text-info video-status-text mt-1 d-block"></small>
                     </div>
                     <div class="form-group mb-3">
                         <label>Duration (minutes)</label>
-                        <input type="number" class="form-control" name="duration" min="1">
+                        <input type="number" class="form-control" name="duration" value="${escapeHtml(videoCfg.duration || '')}" min="1">
                     </div>
                 `;
                 break;
@@ -1565,39 +1589,48 @@ document.addEventListener('DOMContentLoaded', () => {
                 `;
                 break;
             case 'SPEAKING':
+                const spkCfg = wizardState.taskConfigs[taskId] || {};
                 html += `
                     <div class="form-group mb-3">
-                        <label>Speaking Text / Prompt</label>
+                        <label>Speaking Text / Prompt <span class="text-danger">*</span></label>
                         <p class="text-muted small mb-2">Paste the text the student needs to read, or the speaking topic.</p>
-                        <textarea class="form-control" name="prompt" rows="8" placeholder="Paste text here..." required></textarea>
+                        <textarea class="form-control" name="prompt" rows="6" placeholder="Paste text here..." required>${escapeHtml(spkCfg.prompt || '')}</textarea>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label>Time Limit (minutes) [A1 Level: Min 5 min, Max 10 min]</label>
+                        <input type="number" class="form-control" name="limit" value="${escapeHtml(spkCfg.limit || '10')}" min="5" max="10" placeholder="e.g. 10">
+                        <small class="text-muted">Min: 5 minutes required, Max: 10 minutes limit for A1 students.</small>
                     </div>
                 `;
                 break;
             case 'WRITING':
+                const wrtCfg = wizardState.taskConfigs[taskId] || {};
                 html += `
                     <div class="form-group mb-3">
                         <label>Prompt / Question</label>
-                        <textarea class="form-control" name="prompt" rows="3" required></textarea>
+                        <textarea class="form-control" name="prompt" rows="3" required>${escapeHtml(wrtCfg.prompt || '')}</textarea>
                     </div>
                     <div class="form-group mb-3">
                         <label>Word Limit</label>
-                        <input type="number" class="form-control" name="limit" placeholder="e.g. 250">
+                        <input type="number" class="form-control" name="limit" value="${escapeHtml(wrtCfg.limit || '')}" placeholder="e.g. 250">
                     </div>
                 `;
                 break;
             case 'READING':
+                const rdgCfg = wizardState.taskConfigs[taskId] || {};
                 html += `
                     <div class="form-group mb-3">
                         <label>Text Content</label>
-                        <textarea class="form-control" name="text" rows="5" required></textarea>
+                        <textarea class="form-control" name="text" rows="5" required>${escapeHtml(rdgCfg.text || '')}</textarea>
                     </div>
                 `;
                 break;
             case 'LISTENING':
+                const lstCfg = wizardState.taskConfigs[taskId] || {};
                 html += `
                     <div class="form-group mb-3">
                         <label>Audio URL</label>
-                        <input type="url" class="form-control" name="audioUrl" required>
+                        <input type="url" class="form-control" name="audioUrl" value="${escapeHtml(lstCfg.audioUrl || '')}" required>
                     </div>
                 `;
                 break;
@@ -1625,6 +1658,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // Initialize GrammarBuilder if this is a GRAMMAR task
         if (taskId === 'GRAMMAR') {
             window.grammarBuilder = new GrammarBuilder('grammar-builder-root');
+            const gCfg = wizardState.taskConfigs['GRAMMAR'];
+            if (gCfg && Array.isArray(gCfg.questions) && gCfg.questions.length > 0) {
+                window.grammarBuilder.questions = JSON.parse(JSON.stringify(gCfg.questions));
+                window.grammarBuilder.activeIndex = 0;
+            }
             window.grammarBuilder.render();
         }
 
@@ -1634,16 +1672,45 @@ document.addEventListener('DOMContentLoaded', () => {
             const durationInput = stepDiv.querySelector('input[name="duration"]');
             const statusText = stepDiv.querySelector('.video-status-text');
 
-            urlInput.addEventListener('change', () => {
+            let debounceTimer = null;
+
+            const handleDetect = async () => {
                 const url = urlInput.value.trim();
-                const vId = getYouTubeVideoIdFromUrl(url);
-                if (vId) {
+                if (!url) {
+                    if (statusText) statusText.textContent = '';
+                    return;
+                }
+
+                if (statusText) {
                     statusText.textContent = '⏳ Videoning davomiyligi aniqlanmoqda...';
                     statusText.className = 'text-warning video-status-text mt-1 d-block';
-                    
+                }
+
+                // 1. Try server-side API first
+                try {
+                    const apiBase = window.API_BASE_URL || 'http://localhost:5000/api';
+                    const res = await fetch(`${apiBase}/video-tasks/info?url=${encodeURIComponent(url)}`);
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data.success && data.durationMinutes) {
+                            durationInput.value = data.durationMinutes;
+                            if (statusText) {
+                                statusText.textContent = `✅ Davomiylik avtomatik aniqlandi (${data.durationMinutes} min)`;
+                                statusText.className = 'text-success video-status-text mt-1 d-block';
+                            }
+                            return;
+                        }
+                    }
+                } catch (err) {
+                    console.log('[VideoDuration] Backend API fetch skipped or failed, trying iframe player fallback:', err);
+                }
+
+                // 2. Fallback: YouTube Iframe API
+                const vId = getYouTubeVideoIdFromUrl(url);
+                if (vId) {
                     const hiddenDiv = document.createElement('div');
                     hiddenDiv.id = 'temp-yt-player-' + Date.now();
-                    hiddenDiv.style.display = 'none';
+                    hiddenDiv.style.cssText = 'position:absolute; width:200px; height:200px; left:-9999px; top:-9999px; opacity:0; pointer-events:none;';
                     document.body.appendChild(hiddenDiv);
 
                     if (!window.YT) {
@@ -1652,44 +1719,69 @@ document.addEventListener('DOMContentLoaded', () => {
                         document.head.appendChild(tag);
                     }
 
+                    let tries = 0;
                     const tryInitPlayer = () => {
+                        tries++;
                         if (window.YT && window.YT.Player) {
                             new YT.Player(hiddenDiv.id, {
-                                height: '1', width: '1',
+                                height: '200', width: '200',
                                 videoId: vId,
                                 events: {
                                     'onReady': (event) => {
                                         const durSec = event.target.getDuration();
-                                        if (durSec) {
-                                            durationInput.value = Math.ceil(durSec / 60);
-                                            statusText.textContent = '✅ Davomiylik avtomatik aniqlandi (' + Math.ceil(durSec / 60) + ' min)';
-                                            statusText.className = 'text-success video-status-text mt-1 d-block';
-                                        } else {
-                                            statusText.textContent = "❌ Videoni aniqlab bo'lmadi.";
-                                            statusText.className = 'text-danger video-status-text mt-1 d-block';
+                                        if (durSec && durSec > 0) {
+                                            const mins = Math.ceil(durSec / 60);
+                                            durationInput.value = mins;
+                                            if (statusText) {
+                                                statusText.textContent = `✅ Davomiylik avtomatik aniqlandi (${mins} min)`;
+                                                statusText.className = 'text-success video-status-text mt-1 d-block';
+                                            }
+                                        } else if (statusText) {
+                                            statusText.textContent = "❌ Davomiylikni aniqlab bo'lmadi. Qo'lda kiriting.";
+                                            statusText.className = 'text-muted video-status-text mt-1 d-block';
                                         }
                                         event.target.destroy();
                                         hiddenDiv.remove();
                                     },
-                                    'onError': (event) => {
-                                        statusText.textContent = "❌ Xatolik: yopiq yoki noto'g'ri video.";
-                                        statusText.className = 'text-danger video-status-text mt-1 d-block';
+                                    'onError': () => {
+                                        if (statusText) {
+                                            statusText.textContent = "❌ Xatolik: yopiq yoki noto'g'ri video URL.";
+                                            statusText.className = 'text-danger video-status-text mt-1 d-block';
+                                        }
                                         hiddenDiv.remove();
                                     }
                                 }
                             });
+                        } else if (tries < 20) {
+                            setTimeout(tryInitPlayer, 300);
                         } else {
-                            setTimeout(tryInitPlayer, 500);
+                            if (statusText) {
+                                statusText.textContent = "❌ Video ma'lumotlarini yuklab bo'lmadi. Davomiylikni qo'lda kiriting.";
+                                statusText.className = 'text-muted video-status-text mt-1 d-block';
+                            }
+                            hiddenDiv.remove();
                         }
                     };
                     tryInitPlayer();
-                } else if (url) {
-                    statusText.textContent = "❌ Noto'g'ri YouTube havolasi.";
+                } else if (statusText) {
+                    statusText.textContent = "❌ Noto'g'ri video URL havolasi.";
                     statusText.className = 'text-danger video-status-text mt-1 d-block';
-                } else {
-                    statusText.textContent = '';
                 }
-            });
+            };
+
+            const debouncedDetect = () => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(handleDetect, 350);
+            };
+
+            urlInput.addEventListener('input', debouncedDetect);
+            urlInput.addEventListener('change', handleDetect);
+            urlInput.addEventListener('paste', () => setTimeout(handleDetect, 100));
+
+            // Auto run detection on step render if URL is pre-filled but duration is missing
+            if (urlInput.value.trim() && !durationInput.value) {
+                handleDetect();
+            }
         }
 
         return stepDiv;
@@ -1733,6 +1825,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (qs.length > 0) {
                     detailLines.push(`<span>${answered} / ${qs.length} with correct answer set</span>`);
                 }
+                detailLines.push(`<span>⏱ 45 min test time limit</span>`);
             } else if (taskId === 'VIDEO') {
                 if (config.videoUrl) detailLines.push(`<span>🎬 ${config.videoUrl}</span>`);
                 if (config.duration) detailLines.push(`<span>⏱ ${config.duration} min</span>`);
@@ -1799,7 +1892,64 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 wizardState.selectedTasks = [];
             }
+            
             wizardState.taskConfigs = {};
+            if (Array.isArray(lesson.tasks)) {
+                lesson.tasks.forEach(t => {
+                    const type = t.type;
+                    if (type === 'VIDEO' && t.videoTask) {
+                        wizardState.taskConfigs[type] = {
+                            videoUrl: t.videoTask.videoUrl || '',
+                            duration: t.videoTask.duration || ''
+                        };
+                    } else if (type === 'SPEAKING' && t.speakingTask) {
+                        wizardState.taskConfigs[type] = {
+                            prompt: t.speakingTask.prompt || '',
+                            limit: t.speakingTask.durationLimit || ''
+                        };
+                    } else if (type === 'WRITING' && t.writingTask) {
+                        wizardState.taskConfigs[type] = {
+                            prompt: t.writingTask.prompt || '',
+                            limit: t.writingTask.wordLimit || ''
+                        };
+                    } else if (type === 'READING' && t.readingTask) {
+                        wizardState.taskConfigs[type] = {
+                            text: t.readingTask.text || ''
+                        };
+                    } else if (type === 'LISTENING' && t.listeningTask) {
+                        wizardState.taskConfigs[type] = {
+                            audioUrl: t.listeningTask.audioUrl || ''
+                        };
+                    } else if ((type === 'FLASHCARD' || type === 'VOCABULARY') && t.flashcardTask) {
+                        wizardState.taskConfigs[type] = {
+                            deckName: t.flashcardTask.deckName || 'Vocabulary Deck',
+                            cards: Array.isArray(t.flashcardTask.cards) ? t.flashcardTask.cards.map(c => ({
+                                word: c.word || '',
+                                pronunciation: c.pronunciation || '',
+                                partOfSpeech: c.partOfSpeech || '',
+                                def: c.description || c.def || '',
+                                ex: c.example || c.ex || ''
+                            })) : []
+                        };
+                    } else if (type === 'GRAMMAR' && t.grammarTest) {
+                        wizardState.taskConfigs[type] = {
+                            questions: Array.isArray(t.grammarTest.questions) ? t.grammarTest.questions.map(q => ({
+                                questionText: q.questionText || '',
+                                explanation: q.explanation || '',
+                                type: q.type || 'MULTIPLE_CHOICE',
+                                options: Array.isArray(q.options) ? q.options.map(opt => ({
+                                    optionText: opt.optionText || '',
+                                    isCorrect: !!opt.isCorrect
+                                })) : []
+                            })) : []
+                        };
+                    }
+                });
+            }
+
+            if (dynamicStepsContainer) {
+                dynamicStepsContainer.innerHTML = '';
+            }
 
             // Open the wizard modal
             bootstrap.Modal.getOrCreateInstance(modalElement).show();

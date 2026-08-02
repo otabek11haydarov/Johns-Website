@@ -12,6 +12,13 @@
 <body>
     <main class="speaking-main">
         <section class="flashcard-section">
+            <div class="flashcard-timer text-center mb-4">
+                <h4 class="text-white">⏳ Qolgan vaqt: <span id="timeRemaining">25:00</span></h4>
+                <small class="text-warning" id="minTimeStatus">Keyingi darsga o'tish uchun kamida 3 daqiqa o'qishingiz kerak.</small>
+                <div id="reviewBanner" class="alert alert-info py-2 px-3 mt-2 text-center small fw-bold" style="display: none; background: rgba(59, 130, 246, 0.2); border: 1px solid #3b82f6; color: #60a5fa; border-radius: 10px;">
+                    🔄 Takrorlash bosqichi: "I don't know" deb belgilangan so'zlar qayta ko'rsatiladi!
+                </div>
+            </div>
             <div class="flashcard-shell">
                 <div class="flashcard" id="flashcard" aria-live="polite">
                     <div class="flashcard-face flashcard-front">

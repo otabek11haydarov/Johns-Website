@@ -57,6 +57,20 @@ const renderVideo = (rawUrl, title) => {
         Your browser does not support the video tag.
       </video>
     `;
+    const vEl = videoBox.querySelector('video');
+    if (vEl) {
+      vEl.addEventListener('timeupdate', () => {
+        if (vEl.duration > 0) {
+          const pct = Math.min(100, Math.round((vEl.currentTime / vEl.duration) * 100));
+          if (pct > videoWatchedPercentage) {
+            videoWatchedPercentage = pct;
+            window.parent.postMessage({ type: 'VIDEO_PROGRESS', percentage: pct, lessonId }, '*');
+            if (lessonId) localStorage.setItem(`video_progress_${lessonId}`, pct);
+            updateVideoStatusUI(pct);
+          }
+        }
+      });
+    }
   } else if (result.isYoutube && result.videoId) {
     // YouTube embed via API for custom overlay
     videoBox.style.position = 'relative'; // Make sure the overlay positions correctly
@@ -175,6 +189,46 @@ nextButton?.addEventListener("click", () => {
   );
 });
 
+// Progress tracking
+let videoWatchedPercentage = 0;
+let watchProgressInterval = null;
+
+function updateVideoStatusUI(pct) {
+  const statusEl = document.getElementById('videoWatchedStatus');
+  if (statusEl) {
+    if (pct >= 80) {
+      statusEl.textContent = `✅ Video ${pct}% ko'rildi (Keyingi task ochildi!)`;
+      statusEl.style.color = '#10b981';
+      statusEl.style.border = '1px solid rgba(16, 185, 129, 0.4)';
+      statusEl.style.background = 'rgba(16, 185, 129, 0.15)';
+    } else {
+      statusEl.textContent = `⏱️ Video ko'rildi: ${pct}% / 80% talab qilinadi`;
+      statusEl.style.color = '#f59e0b';
+      statusEl.style.border = '1px solid rgba(245, 158, 11, 0.4)';
+      statusEl.style.background = 'rgba(245, 158, 11, 0.15)';
+    }
+  }
+}
+
+function trackVideoProgress(player) {
+  if (watchProgressInterval) clearInterval(watchProgressInterval);
+  watchProgressInterval = setInterval(() => {
+    if (player && typeof player.getDuration === 'function' && typeof player.getCurrentTime === 'function') {
+      const duration = player.getDuration();
+      const current = player.getCurrentTime();
+      if (duration > 0) {
+        const pct = Math.min(100, Math.round((current / duration) * 100));
+        if (pct > videoWatchedPercentage) {
+          videoWatchedPercentage = pct;
+          window.parent.postMessage({ type: 'VIDEO_PROGRESS', percentage: pct, lessonId }, '*');
+          if (lessonId) localStorage.setItem(`video_progress_${lessonId}`, pct);
+          updateVideoStatusUI(pct);
+        }
+      }
+    }
+  }, 1000);
+}
+
 // YouTube API Initialization
 window.initYouTubePlayer = function(videoId) {
     window.ytPlayer = new YT.Player('youtube-player', {
@@ -188,15 +242,15 @@ window.initYouTubePlayer = function(videoId) {
         events: {
             'onStateChange': function(event) {
                 const overlay = document.getElementById('ytOverlay');
-                if (!overlay) return;
                 
                 // If PAUSED or ENDED
                 if (event.data === YT.PlayerState.PAUSED || event.data === YT.PlayerState.ENDED) {
-                    overlay.style.display = 'flex';
+                    if (overlay) overlay.style.display = 'flex';
                 } 
                 // If PLAYING
                 else if (event.data === YT.PlayerState.PLAYING) {
-                    overlay.style.display = 'none';
+                    if (overlay) overlay.style.display = 'none';
+                    trackVideoProgress(window.ytPlayer);
                 }
             }
         }

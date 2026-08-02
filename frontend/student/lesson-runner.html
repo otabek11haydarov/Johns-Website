@@ -150,6 +150,28 @@
         </div>
     </div>
 
+    <!-- Rich Custom Lock Notification Modal -->
+    <div class="runner-modal-overlay" id="noticeModal" style="display: none;">
+        <div class="runner-modal-card notice-modal-card">
+            <button type="button" class="notice-modal-close" id="closeNoticeModalBtn" aria-label="Close">&times;</button>
+            <div class="modal-icon" id="noticeModalIcon">🔒</div>
+            <h3 class="modal-title" id="noticeModalTitle">Keyingi topshiriq qulflangan</h3>
+            <p class="modal-text mb-3" id="noticeModalText">Videoning kamida 80% qismini ko'rib chiqishingiz kerak!</p>
+            
+            <div class="notice-progress-box mb-4" id="noticeProgressBox">
+                <div class="d-flex justify-content-between align-items-center mb-2" style="font-size:0.85rem;">
+                    <span id="noticeProgressLabel" class="text-muted">Hozircha ko'rilgan:</span>
+                    <strong id="noticeProgressVal" style="color: #ff6a33;">1% / 80% talab qilinadi</strong>
+                </div>
+                <div class="notice-progress-track">
+                    <div class="notice-progress-fill" id="noticeProgressFill" style="width: 1.25%;"></div>
+                </div>
+            </div>
+
+            <button class="btn-runner btn-runner-primary modal-btn w-100" type="button" id="confirmNoticeBtn">Tushunarli 👍</button>
+        </div>
+    </div>
+
     <!-- Celebration Overlay -->
     <div class="runner-modal-overlay" id="completionOverlay" style="display: none;">
         <div class="runner-modal-card">

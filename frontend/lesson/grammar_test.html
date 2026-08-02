@@ -11,9 +11,15 @@
 </head>
 <body class="dark-mode">
     <div class="test-container">
-        <!-- Header with Progress -->
+        <!-- Header with Progress and 45-min Timer -->
         <header class="test-header">
-            <h2 id="testTitle">Grammar Test</h2>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 id="testTitle" class="m-0">Grammar Test</h2>
+                <div class="timer-pill" id="timerBadge" title="Grammar Test Time Limit: 45 Minutes">
+                    <i class="bi bi-clock-history me-1"></i>
+                    <span id="timerDisplay">45:00</span>
+                </div>
+            </div>
             <div class="progress-wrapper">
                 <div class="progress">
                     <div id="progressBar" class="progress-bar bg-primary" role="progressbar" style="width: 0%;"></div>

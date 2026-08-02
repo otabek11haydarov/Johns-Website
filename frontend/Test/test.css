@@ -3,7 +3,7 @@ html, body {
   padding: 0;
   width: 100%;
   height: 100%;
-  overflow: hidden;
+  overflow-y: auto;
   background: #090604;
 }
 
@@ -16,12 +16,12 @@ html, body {
 
 .test-main {
   width: 100%;
-  height: 100%;
+  min-height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 16px;
+  justify-content: flex-start;
+  padding: 24px 16px;
   box-sizing: border-box;
   background:
     radial-gradient(circle at 50% 16%, rgba(255, 98, 40, 0.12), transparent 24%),
@@ -30,16 +30,16 @@ html, body {
 
 .test-panel {
   width: 100%;
-  max-width: 900px;
-  height: 100%;
+  max-width: 960px;
+  min-height: 720px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 14px;
+  border-radius: 18px;
   background: linear-gradient(180deg, rgba(34, 24, 20, 0.96), rgba(17, 12, 10, 0.98));
   box-shadow: 0 16px 36px rgba(0, 0, 0, 0.32);
-  padding: 16px 20px;
+  padding: 28px 32px;
   box-sizing: border-box;
 }
 
@@ -242,6 +242,38 @@ body:not(.dark-mode) .question-text {
   border-color: rgba(255, 255, 255, 0.08);
 }
 
+.timer-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 106, 51, 0.12);
+  border: 1px solid rgba(255, 106, 51, 0.35);
+  color: #ff6a33;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-weight: 800;
+  font-size: 0.95rem;
+  box-shadow: 0 0 12px rgba(255, 106, 51, 0.2);
+}
+
+.timer-badge-pill.warning {
+  background: rgba(245, 158, 11, 0.2);
+  border-color: #f59e0b;
+  color: #fbbf24;
+}
+
+.timer-badge-pill.danger {
+  background: rgba(239, 68, 68, 0.25);
+  border-color: #ef4444;
+  color: #f87171;
+  animation: timerPulse 1s infinite alternate;
+}
+
+@keyframes timerPulse {
+  from { box-shadow: 0 0 4px rgba(239, 68, 68, 0.4); }
+  to { box-shadow: 0 0 16px rgba(239, 68, 68, 0.8); }
+}
+
 /* Test Progress Bar & Question Pills */
 .test-progress-bar {
   margin-top: 24px;
@@ -274,35 +306,35 @@ body:not(.dark-mode) .question-text {
 }
 
 .q-pill {
-  width: 36px;
-  height: 36px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 9px;
-  background: rgba(255, 255, 255, 0.04);
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
   color: #b1a3a0;
   font-size: 0.92rem;
   font-weight: 800;
   cursor: pointer;
-  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .q-pill:hover {
-  transform: translateY(-1px);
+  transform: translateY(-2px);
   color: #fff;
-  border-color: rgba(255, 116, 57, 0.4);
+  border-color: rgba(255, 116, 57, 0.6);
 }
 
 .q-pill.is-answered {
-  background: rgba(24, 212, 122, 0.16);
-  border-color: rgba(24, 212, 122, 0.45);
-  color: #18d47a;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+  border-color: #10b981 !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
 }
 
 .q-pill.active {
-  border-color: #ff7439;
-  box-shadow: 0 0 12px rgba(255, 116, 57, 0.4);
-  background: linear-gradient(135deg, rgba(255, 106, 42, 0.25), rgba(240, 75, 23, 0.12));
-  color: #fff;
+  border: 2px solid #ff7439 !important;
+  box-shadow: 0 0 14px rgba(255, 116, 57, 0.6) !important;
+  transform: scale(1.1);
 }
 
 .test-btn-finish {

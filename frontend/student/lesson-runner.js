@@ -22,9 +22,10 @@ const backToAssignmentsBtn = document.getElementById("backToAssignmentsBtn");
 
 const TASK_TYPE_META = {
   VIDEO: { name: "Video Intro", duration: "5 min", icon: "🎬", url: "../Video/video.html" },
-  FLASHCARD: { name: "Flashcards", duration: "8 min", icon: "🎴", url: "../Flashkard/fleshkard.html" },
-  TEST: { name: "Grammar Test", duration: "10 min", icon: "📝", url: "../Test/test.html" },
-  GRAMMAR: { name: "Grammar Test", duration: "10 min", icon: "📝", url: "../Test/test.html" },
+  FLASHCARD: { name: "Vocabulary Flashcards", duration: "15 min", icon: "🎴", url: "../Flashkard/fleshkard.html" },
+  VOCABULARY: { name: "Vocabulary Flashcards", duration: "15 min", icon: "📖", url: "../Flashkard/fleshkard.html" },
+  TEST: { name: "Grammar Test", duration: "45 min", icon: "📝", url: "../Test/test.html" },
+  GRAMMAR: { name: "Grammar Test", duration: "45 min", icon: "📝", url: "../Test/test.html" },
   SPEAKING: { name: "Speaking Module", duration: "5 min", icon: "🎙️", url: "../speaking/speak.html" },
 };
 
@@ -245,6 +246,9 @@ function loadCurrentTask() {
   const task = tasksList[currentTaskIndex];
   if (!task) return;
 
+  // Reset task timer
+  currentTaskStartTime = Date.now();
+
   if (taskIframe) {
     taskIframe.src = task.url;
   }
@@ -281,7 +285,124 @@ prevTaskBtn?.addEventListener("click", () => {
   }
 });
 
+function showNoticeModal(title, message, icon = '🔒', currentPct = 0, requiredPct = 80) {
+  const modal = document.getElementById('noticeModal');
+  const titleEl = document.getElementById('noticeModalTitle');
+  const textEl = document.getElementById('noticeModalText');
+  const iconEl = document.getElementById('noticeModalIcon');
+  const valEl = document.getElementById('noticeProgressVal');
+  const fillEl = document.getElementById('noticeProgressFill');
+  const boxEl = document.getElementById('noticeProgressBox');
+
+  if (titleEl) titleEl.textContent = title;
+  if (textEl) textEl.textContent = message;
+  if (iconEl) iconEl.textContent = icon;
+
+  if (requiredPct > 0) {
+    if (boxEl) boxEl.style.display = 'block';
+    if (valEl) valEl.textContent = `${currentPct}% / ${requiredPct}% talab qilinadi`;
+    const ratio = Math.min(100, Math.round((currentPct / requiredPct) * 100));
+    if (fillEl) fillEl.style.width = `${ratio}%`;
+  } else {
+    if (boxEl) boxEl.style.display = 'none';
+  }
+
+  if (modal) modal.style.display = 'flex';
+}
+
+function hideNoticeModal() {
+  const modal = document.getElementById('noticeModal');
+  if (modal) modal.style.display = 'none';
+}
+
+document.getElementById('closeNoticeModalBtn')?.addEventListener('click', hideNoticeModal);
+document.getElementById('confirmNoticeBtn')?.addEventListener('click', hideNoticeModal);
+
+let currentVideoWatchedPct = 0;
+let grammarTestProgress = { answered: 0, total: 10, isSubmitted: false };
+let dontKnowFlashcards = [];
+
+window.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "VIDEO_PROGRESS") {
+    currentVideoWatchedPct = Math.max(currentVideoWatchedPct, event.data.percentage || 0);
+  } else if (event.data && event.data.type === "GRAMMAR_TEST_PROGRESS") {
+    grammarTestProgress = {
+      answered: event.data.answered || 0,
+      total: event.data.total || 10,
+      isSubmitted: !!event.data.isSubmitted
+    };
+
+    if (event.data.autoAdvance) {
+      if (currentTaskIndex < tasksList.length - 1) {
+        currentTaskIndex++;
+        updateProgressHeader();
+        renderHorizontalStepper();
+        renderSidebarOutline();
+        loadCurrentTask();
+      }
+    }
+  } else if (event.data && event.data.type === "FLASHCARD_DONT_KNOW_UPDATE") {
+    dontKnowFlashcards = event.data.dontKnowWords || [];
+  }
+});
+
 nextTaskBtn?.addEventListener("click", () => {
+  const currentTask = tasksList[currentTaskIndex];
+
+  // Video 80% completion requirement logic
+  if (currentTask && currentTask.type === "VIDEO") {
+    const storedPct = parseInt(localStorage.getItem(`video_progress_${lessonId}`) || "0", 10);
+    const watchedPct = Math.max(currentVideoWatchedPct, storedPct);
+
+    if (watchedPct < 80) {
+      showNoticeModal(
+        "Keyingi topshiriq qulflangan 🎬",
+        "Videoning kamida 80% qismini ko'rib chiqishingiz kerak!",
+        "🔒",
+        watchedPct,
+        80
+      );
+      return; // Stop navigation
+    }
+  }
+
+  // Grammar test completion requirement logic (Must answer all questions & submit)
+  if (currentTask && (currentTask.type === "GRAMMAR" || currentTask.type === "TEST")) {
+    const storedSubmitted = localStorage.getItem(`grammar_test_submitted_${lessonId}`) === 'true';
+    let storedAnswers = [];
+    try { storedAnswers = JSON.parse(localStorage.getItem(`grammar_test_answers_${lessonId}`) || "[]"); } catch(e){}
+    const answeredCount = Math.max(grammarTestProgress.answered, storedAnswers.filter(a => a !== null).length);
+    const totalQuestions = grammarTestProgress.total || 10;
+    const isSubmitted = grammarTestProgress.isSubmitted || storedSubmitted;
+
+    if (!isSubmitted || answeredCount < totalQuestions) {
+      showNoticeModal(
+        "Grammar Test tugatilmadi 📝",
+        "Keyingi topshiriqqa o'tish uchun Grammar testdagi barcha savollarni belgilab, testni topshirishingiz kerak!",
+        "🔒",
+        answeredCount,
+        totalQuestions
+      );
+      return; // Stop navigation
+    }
+  }
+
+  // Flashcard / Vocabulary minimum time logic (3 minutes)
+  if (currentTask && (currentTask.type === "FLASHCARD" || currentTask.type === "VOCABULARY")) {
+    const elapsedMinutes = (Date.now() - currentTaskStartTime) / 60000;
+    if (elapsedMinutes < 3) {
+      const currentMins = Math.floor(elapsedMinutes);
+      showNoticeModal(
+        "Topshiriq bajarilmoqda 📖",
+        "Siz vocabulary (flashcards)ni kamida 3 daqiqa o'rganishingiz kerak!",
+        "⏱️",
+        currentMins,
+        3
+      );
+      return; // Stop navigation
+    }
+  }
+
   if (currentTaskIndex < tasksList.length - 1) {
     currentTaskIndex++;
     updateProgressHeader();

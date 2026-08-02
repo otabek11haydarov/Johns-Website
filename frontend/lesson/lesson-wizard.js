@@ -459,6 +459,39 @@ document.addEventListener("DOMContentLoaded", () => {
     const isDarkMode = document.body.classList.contains("dark-mode") || localStorage.getItem("edu-dashboard-theme") === "dark";
     if (isDarkMode) document.body.classList.add("dark-mode");
 
+    // Video Duration Auto-Detect
+    if (elVideoUrl && elVideoDur) {
+        let debounceTimer = null;
+        const handleDetect = async () => {
+            const url = elVideoUrl.value.trim();
+            if (!url) return;
+
+            try {
+                const apiBase = window.API_BASE_URL || 'http://localhost:5000/api';
+                const res = await fetch(`${apiBase}/video-tasks/info?url=${encodeURIComponent(url)}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.success && data.durationMinutes) {
+                        elVideoDur.value = data.durationMinutes;
+                        tasksData.video.duration = String(data.durationMinutes);
+                        return;
+                    }
+                }
+            } catch (err) {
+                console.log('[VideoWizard] Backend duration fetch error:', err);
+            }
+        };
+
+        const debouncedDetect = () => {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(handleDetect, 350);
+        };
+
+        elVideoUrl.addEventListener('input', debouncedDetect);
+        elVideoUrl.addEventListener('change', handleDetect);
+        elVideoUrl.addEventListener('paste', () => setTimeout(handleDetect, 100));
+    }
+
     // Initialize
     loadExistingLesson();
     if (tasksData.flashcards.length === 0) {
@@ -469,3 +502,4 @@ document.addEventListener("DOMContentLoaded", () => {
     if (tasksData.grammar.length === 0) addGrammar();
     updateWorkspace();
 });
+

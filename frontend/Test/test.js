@@ -17,37 +17,57 @@ const resultsPercentage = document.getElementById("resultsPercentage");
 const restartBtn = document.getElementById("restartBtn");
 
 const questions = [
-  {
-    text: "She ____ to school every day.",
-    options: ["go", "goes", "going", "gone"],
-    answerIndex: 1,
-  },
-  {
-    text: "They ____ football on weekends.",
-    options: ["plays", "play", "playing", "played"],
-    answerIndex: 1,
-  },
-  {
-    text: "He ____ a new book yesterday.",
-    options: ["buy", "buys", "bought", "buying"],
-    answerIndex: 2,
-  },
-  {
-    text: "We have ____ living here since 2018.",
-    options: ["be", "being", "been", "was"],
-    answerIndex: 2,
-  },
-  {
-    text: "If it rains tomorrow, we ____ at home.",
-    options: ["will stay", "stayed", "stays", "would stay"],
-    answerIndex: 0,
-  },
+  { text: "1. I _____ from Uzbekistan.", options: ["am", "is", "are", "be"], answerIndex: 0 },
+  { text: "2. This is my friend. _____ name is Tom.", options: ["Her", "He", "His", "She"], answerIndex: 2 },
+  { text: "3. She _____ a car.", options: ["don't have", "doesn't have", "doesn't has", "haven't"], answerIndex: 1 },
+  { text: "4. _____ you like tea?", options: ["Are", "Does", "Is", "Do"], answerIndex: 3 },
+  { text: "5. We play football _____ Sunday.", options: ["in", "on", "at", "to"], answerIndex: 1 },
+  { text: "6. They _____ at home yesterday.", options: ["was", "are", "were", "is"], answerIndex: 2 },
+  { text: "7. _____ is your favorite color?", options: ["Who", "Where", "What", "How"], answerIndex: 2 },
+  { text: "8. There is _____ milk in the fridge.", options: ["some", "any", "a", "many"], answerIndex: 0 },
+  { text: "9. Look at _____ dogs over there!", options: ["this", "that", "these", "those"], answerIndex: 3 },
+  { text: "10. Can you _____ me with my homework?", options: ["helps", "to help", "help", "helping"], answerIndex: 2 },
 ];
 
-let currentIndex = 0;
-let userAnswers = Array(questions.length).fill(null);
+const urlParams = new URLSearchParams(window.location.search);
+const lessonId = urlParams.get('lessonId') || 'default';
+const storageKey = `grammar_test_answers_${lessonId}`;
+const submittedKey = `grammar_test_submitted_${lessonId}`;
 
-const getSelectedInput = () => optionInputs.find((input) => input.checked);
+let isSubmitted = localStorage.getItem(submittedKey) === 'true';
+let savedAnswers = null;
+try { savedAnswers = JSON.parse(localStorage.getItem(storageKey)); } catch(e) {}
+
+let userAnswers = Array.isArray(savedAnswers) && savedAnswers.length === questions.length 
+  ? savedAnswers 
+  : Array(questions.length).fill(null);
+
+let currentIndex = 0;
+
+// Timer Logic (45 minutes)
+let timerSeconds = 45 * 60;
+const timerDisplay = document.getElementById("timerDisplay");
+const timerBadge = document.getElementById("timerBadge");
+
+const timerInterval = setInterval(() => {
+  if (timerSeconds > 0) {
+    timerSeconds--;
+    const m = Math.floor(timerSeconds / 60).toString().padStart(2, '0');
+    const s = (timerSeconds % 60).toString().padStart(2, '0');
+    if (timerDisplay) timerDisplay.textContent = `${m}:${s}`;
+
+    if (timerSeconds <= 300 && timerBadge) {
+      timerBadge.className = 'timer-badge-pill danger';
+    } else if (timerSeconds <= 600 && timerBadge) {
+      timerBadge.className = 'timer-badge-pill warning';
+    }
+  } else {
+    clearInterval(timerInterval);
+    finishTest();
+  }
+}, 1000);
+
+
 
 const renderQuestion = () => {
   const currentQuestion = questions[currentIndex];
@@ -100,6 +120,8 @@ const updateUI = () => {
       });
     });
   }
+
+  notifyParent();
 };
 
 optionInputs.forEach((input, index) => {
@@ -131,28 +153,40 @@ nextBtn?.addEventListener("click", () => {
   }
 });
 
-finishBtn?.addEventListener("click", () => {
+const notifyParent = (autoAdvance = false) => {
+  const answered = userAnswers.filter((a) => a !== null).length;
   const total = questions.length;
-  let correct = 0;
 
-  userAnswers.forEach((ans, i) => {
-    if (ans === questions[i].answerIndex) {
-      correct++;
-    }
-  });
+  localStorage.setItem(storageKey, JSON.stringify(userAnswers));
+  if (isSubmitted) localStorage.setItem(submittedKey, 'true');
 
-  const percentage = Math.round((correct / total) * 100);
+  window.parent.postMessage({
+    type: 'GRAMMAR_TEST_PROGRESS',
+    answered,
+    total,
+    isSubmitted,
+    autoAdvance,
+    userAnswers,
+    lessonId
+  }, '*');
+};
 
-  if (resultsScore) resultsScore.textContent = `${correct} / ${total}`;
-  if (resultsPercentage) resultsPercentage.textContent = `Aniqlik: ${percentage}%`;
-  if (resultsOverlay) resultsOverlay.style.display = "flex";
-});
+function finishTest() {
+  isSubmitted = true;
+  if (resultsOverlay) resultsOverlay.style.display = "none";
+  notifyParent(true); // Auto advance to next task in parent frame!
+}
+
+finishBtn?.addEventListener("click", finishTest);
 
 restartBtn?.addEventListener("click", () => {
+  isSubmitted = false;
   userAnswers = Array(questions.length).fill(null);
   currentIndex = 0;
   if (resultsOverlay) resultsOverlay.style.display = "none";
   renderQuestion();
 });
 
+// Initial load
 renderQuestion();
+notifyParent();

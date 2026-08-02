@@ -24,6 +24,74 @@ document.addEventListener('DOMContentLoaded', () => {
     const testFooter = document.getElementById('testFooter');
     const resultFooter = document.getElementById('resultFooter');
     
+    // Timer State (45 minutes = 2700 seconds)
+    const timerBadge = document.getElementById('timerBadge');
+    const timerDisplay = document.getElementById('timerDisplay');
+    const TOTAL_TIME_SECONDS = 45 * 60; 
+    let timeRemaining = TOTAL_TIME_SECONDS;
+    let timerInterval = null;
+    let isSubmitted = false;
+
+    function startTimer() {
+        if (timerInterval) clearInterval(timerInterval);
+        timeRemaining = TOTAL_TIME_SECONDS;
+        updateTimerUI();
+
+        timerInterval = setInterval(() => {
+            if (isSubmitted) {
+                clearInterval(timerInterval);
+                return;
+            }
+
+            timeRemaining--;
+            updateTimerUI();
+
+            if (timeRemaining <= 0) {
+                clearInterval(timerInterval);
+                onTimeExpired();
+            }
+        }, 1000);
+    }
+
+    function updateTimerUI() {
+        if (!timerDisplay) return;
+        const minutes = Math.floor(Math.max(0, timeRemaining) / 60);
+        const seconds = Math.max(0, timeRemaining) % 60;
+        const formatted = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        timerDisplay.textContent = formatted;
+
+        if (timerBadge) {
+            if (timeRemaining <= 5 * 60) { // Less than 5 minutes
+                timerBadge.className = 'timer-pill danger';
+            } else if (timeRemaining <= 15 * 60) { // Less than 15 minutes
+                timerBadge.className = 'timer-pill warning';
+            } else {
+                timerBadge.className = 'timer-pill';
+            }
+        }
+    }
+
+    async function onTimeExpired() {
+        if (isSubmitted) return;
+
+        // Hide confirmation modal if open
+        const modalEl = document.getElementById('submitConfirmModal');
+        if (modalEl) {
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            if (modal) modal.hide();
+        }
+
+        // Add visual banner notifying student
+        const timeoutAlert = document.createElement('div');
+        timeoutAlert.className = 'alert alert-warning text-center fw-bold mb-3 border border-warning';
+        timeoutAlert.innerHTML = '⏱️ 45 daqiqalik vaqt tugadi! Belgilangan javoblaringiz avtomatik qabul qilindi, belgilanmaganlari bo\'sh qoldi.';
+        const testMain = document.getElementById('testMain');
+        if (testMain) testMain.prepend(timeoutAlert);
+
+        // Auto submit test with selected answers
+        await submitTest();
+    }
+
     // State
     let questions = [];
     let currentQuestionIndex = 0;
@@ -54,6 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
             questionContainer.classList.remove('d-none');
             
             renderQuestion();
+            startTimer();
         } catch (error) {
             alert(error.message);
             loadingSpinner.classList.add('d-none');
@@ -144,6 +213,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     async function submitTest() {
+        if (isSubmitted) return;
+        isSubmitted = true;
+        if (timerInterval) clearInterval(timerInterval);
+
         loadingSpinner.classList.remove('d-none');
         questionContainer.classList.add('d-none');
         testFooter.classList.add('d-none');

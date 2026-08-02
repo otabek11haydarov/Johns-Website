@@ -37,17 +37,16 @@
   }
 
   function buildSummaryFn(code) {
-    // Keep the specific task detail summaries based on the code type
     switch (code) {
-      case 'VIDEO':      return (t) => t.videoTask ? `${t.videoTask.duration || '—'} min video` : 'Video lesson';
-      case 'VOCABULARY': return (t) => t.flashcardTask ? `${t.flashcardTask.cards?.length || 0} words` : 'Vocabulary deck';
-      case 'FLASHCARD':  return (t) => t.flashcardTask ? `${t.flashcardTask.cards?.length || 0} cards` : 'Flashcard deck';
-      case 'READING':    return (t) => t.readingTask ? `${t.readingTask.wordCount || 0} words` : 'Reading text';
-      case 'LISTENING':  return () => 'Audio task';
-      case 'WRITING':    return (t) => t.writingTask?.wordLimit ? `Word limit: ${t.writingTask.wordLimit}` : 'Writing prompt';
-      case 'SPEAKING':   return (t) => t.speakingTask?.prompt ? t.speakingTask.prompt.slice(0, 60) + (t.speakingTask.prompt.length > 60 ? '…' : '') : 'Record yourself';
-      case 'GRAMMAR':    return (t) => t.grammarTest ? `${t.grammarTest.questions?.length || 0} questions` : 'Grammar test';
-      case 'TEST':       return (t) => t.testTask ? `${t.testTask.questions?.length || 0} questions` : 'Test';
+      case 'VIDEO':      return (t) => t.videoTask ? `🎬 ${t.videoTask.duration || 5} min video` : 'Video lesson';
+      case 'VOCABULARY': return (t) => t.flashcardTask ? `🎴 ${t.flashcardTask.cards?.length || 0} words • ⏱ 10-25 min study` : 'Vocabulary deck • ⏱ 10-25 min study';
+      case 'FLASHCARD':  return (t) => t.flashcardTask ? `🎴 ${t.flashcardTask.cards?.length || 0} cards • ⏱ 10-25 min study` : 'Flashcard deck • ⏱ 10-25 min study';
+      case 'READING':    return (t) => t.readingTask ? `📖 ${t.readingTask.wordCount || 0} words • ⏱ 10 min` : 'Reading text • ⏱ 10 min';
+      case 'LISTENING':  return () => '🎧 Audio task • ⏱ 10 min';
+      case 'WRITING':    return (t) => t.writingTask?.wordLimit ? `✍️ Limit: ${t.writingTask.wordLimit} words • ⏱ 15 min` : 'Writing prompt • ⏱ 15 min';
+      case 'SPEAKING':   return (t) => t.speakingTask?.prompt ? `🎙️ ${t.speakingTask.prompt.slice(0, 40)}… • ⏱ 5-10 min (A1)` : 'Record yourself • ⏱ 5-10 min (A1)';
+      case 'GRAMMAR':    return (t) => t.grammarTest ? `📝 ${t.grammarTest.questions?.length || 0} questions • ⏱ 45 min test limit` : 'Grammar test • ⏱ 45 min test limit';
+      case 'TEST':       return (t) => t.testTask ? `📝 ${t.testTask.questions?.length || 0} questions • ⏱ 45 min limit` : 'Test • ⏱ 45 min limit';
       default:           return () => `${code} task`;
     }
   }
@@ -87,9 +86,70 @@
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   }
 
+  function estimateDurationDetailed(tasks) {
+    if (!tasks || !tasks.length) return { totalStr: '—', breakdownHtml: '' };
+
+    let totalMins = 0;
+    let items = [];
+
+    tasks.forEach(t => {
+      const type = (t.type || '').toUpperCase();
+      let mins = 0;
+      let label = '';
+      let icon = '📋';
+
+      if (type === 'GRAMMAR' || type === 'TEST') {
+        mins = parseInt(t.grammarTest?.timeLimit || t.testTask?.timeLimit || 45, 10);
+        label = `Grammar Test: ${mins} min limit`;
+        icon = '📝';
+      } else if (type === 'VIDEO') {
+        mins = parseInt(t.videoTask?.duration || 5, 10);
+        label = `Video Lesson: ${mins} min`;
+        icon = '🎬';
+      } else if (type === 'VOCABULARY' || type === 'FLASHCARD') {
+        mins = 15;
+        label = `Vocabulary: 10-25 min`;
+        icon = '🎴';
+      } else if (type === 'SPEAKING') {
+        const lim = Math.ceil(parseInt(t.speakingTask?.durationLimit || 300, 10) / 60) || 5;
+        mins = Math.max(5, Math.min(lim, 10));
+        label = `Speaking (A1): 5-10 min limit`;
+        icon = '🎙️';
+      } else if (type === 'WRITING') {
+        mins = 15;
+        label = `Writing: 15 min`;
+        icon = '✍️';
+      } else if (type === 'READING') {
+        mins = 10;
+        label = `Reading: 10 min`;
+        icon = '📖';
+      } else if (type === 'LISTENING') {
+        mins = parseInt(t.listeningTask?.duration || 10, 10);
+        label = `Listening: ${mins} min`;
+        icon = '🎧';
+      } else {
+        mins = 5;
+        label = `${type}: ${mins} min`;
+      }
+
+      totalMins += mins;
+      items.push({ icon, label });
+    });
+
+    let totalStr = `~${totalMins} min`;
+    if (totalMins >= 60) {
+      const hrs = Math.floor(totalMins / 60);
+      const mins = totalMins % 60;
+      totalStr = mins > 0 ? `~${hrs} hr ${mins} min` : `~${hrs} hr`;
+    }
+
+    const breakdownHtml = items.map(item => `<div class="small text-muted" style="font-size:0.75rem; opacity:0.9; line-height:1.3; margin-top:3px;">${item.icon} ${item.label}</div>`).join('');
+
+    return { totalStr, breakdownHtml };
+  }
+
   function estimateDuration(tasks) {
-    // Very rough estimate: 5 min per task
-    return tasks && tasks.length ? `~${tasks.length * 5} min` : '—';
+    return estimateDurationDetailed(tasks).totalStr;
   }
 
   function showToast(msg, type = 'success') {
@@ -157,9 +217,27 @@
       ? Math.round(allLessons.reduce((s, l) => s + l.taskCount, 0) / total * 10) / 10
       : 0;
 
+    let totalDurationMins = 0;
+    allLessons.forEach(l => {
+      if (Array.isArray(l.tasks) && l.tasks.length > 0) {
+        l.tasks.forEach(t => {
+          const type = (t.type || '').toUpperCase();
+          if (type === 'GRAMMAR' || type === 'TEST') totalDurationMins += (t.grammarTest?.timeLimit || 45);
+          else if (type === 'VIDEO') totalDurationMins += (t.videoTask?.duration || 5);
+          else if (type === 'VOCABULARY' || type === 'FLASHCARD') totalDurationMins += 8;
+          else if (type === 'SPEAKING') totalDurationMins += (Math.ceil((t.speakingTask?.durationLimit || 300) / 60) || 5);
+          else totalDurationMins += 5;
+        });
+      } else {
+        totalDurationMins += (l.taskCount * 5);
+      }
+    });
+
+    const avgDurationMins = total > 0 ? Math.round(totalDurationMins / total) : 0;
+
     if (elTotal)       elTotal.textContent       = total;
     if (elAvgTasks)    elAvgTasks.textContent    = avgTasks;
-    if (elAvgDuration) elAvgDuration.textContent = total > 0 ? `~${Math.round(avgTasks * 5)} min` : '—';
+    if (elAvgDuration) elAvgDuration.textContent = total > 0 ? `~${avgDurationMins} min` : '—';
   }
 
   // ─── Render Lesson Cards ─────────────────────────────────────────────
@@ -210,7 +288,7 @@
 
       <div class="lesson-card__meta">
         <span class="lesson-card__meta-item">📋 ${lesson.taskCount} task${lesson.taskCount !== 1 ? 's' : ''}</span>
-        <span class="lesson-card__meta-item">⏱ ~${lesson.taskCount * 5} min</span>
+        <span class="lesson-card__meta-item">⏱ ${estimateDuration(lesson.tasks)}</span>
       </div>
 
       <div class="lesson-card__divider"></div>
@@ -323,7 +401,15 @@
     document.getElementById('previewModalGroup').textContent = lesson.groupLevel;
     document.getElementById('previewModalTaskCount').textContent = lesson.taskCount + ' task' + (lesson.taskCount !== 1 ? 's' : '');
     document.getElementById('previewModalCreated').textContent = formatDate(lesson.createdAt);
-    document.getElementById('previewModalDuration').textContent = estimateDuration(lesson.tasks);
+
+    const detailedDur = estimateDurationDetailed(lesson.tasks);
+    const durationEl = document.getElementById('previewModalDuration');
+    if (durationEl) {
+      durationEl.innerHTML = `
+        <div class="fw-bold" style="font-size:1.1rem; color:var(--title, #fff);">${detailedDur.totalStr}</div>
+        <div class="mt-2 pt-2 border-top border-secondary text-start">${detailedDur.breakdownHtml}</div>
+      `;
+    }
 
     // Student stats
     const stats = lesson.stats || {};

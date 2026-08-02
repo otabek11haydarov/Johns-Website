@@ -12,12 +12,25 @@
 <body>
     <main class="speaking-main">
         <section class="speaking-box">
+            <h2 class="speaking-title">AI Voice Assistant</h2>
             <p class="speaking-text">
-                Read the prompt, prepare your answer, then use the audio button below.
+                O'qilishi kerak bo'lgan matnni kiriting va tinglash tugmasini bosing.
             </p>
-            <button class="audio-button" id="audioButton" type="button">
-                Audio
-            </button>
+            
+            <div class="textarea-wrapper">
+                <textarea id="speakTextInput" class="speak-textarea" placeholder="Bu yerga matn kiriting..." rows="4"></textarea>
+            </div>
+
+            <div class="audio-controls">
+                <button class="audio-button" id="audioButton" type="button">
+                    <span class="icon">🎙️</span> Tinglash
+                </button>
+            </div>
+            
+            <div id="loadingStatus" class="loading-status" style="display: none;">
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                Ovoz tayyorlanmoqda...
+            </div>
         </section>
     </main>
 

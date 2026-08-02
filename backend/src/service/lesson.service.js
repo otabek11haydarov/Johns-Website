@@ -71,17 +71,16 @@ export async function createLessonWithTasks(data) {
                 });
 
                 if (Array.isArray(config.cards)) {
-                    for (const card of config.cards) {
-                        if (card.word || card.def || card.definition) {
-                            await tx.flashcardItem.create({
-                                data: {
-                                    flashcardTaskId: flashcardTask.id,
-                                    word: card.word || '',
-                                    description: card.def || card.definition || '',
-                                    example: card.ex || card.example || card.exampleSentence || null
-                                }
-                            });
-                        }
+                    const validCards = config.cards.filter(c => c.word || c.def || c.definition);
+                    if (validCards.length > 0) {
+                        await tx.flashcardItem.createMany({
+                            data: validCards.map(card => ({
+                                flashcardTaskId: flashcardTask.id,
+                                word: card.word || '',
+                                description: card.def || card.definition || '',
+                                example: card.ex || card.example || card.exampleSentence || null
+                            }))
+                        });
                     }
                 }
             } else if (type === 'SPEAKING') {
@@ -116,7 +115,6 @@ export async function createLessonWithTasks(data) {
                     }
                 });
             } else if (type === 'GRAMMAR') {
-                // Config holds questions array for grammar
                 const questionsData = Array.isArray(config.questions) ? config.questions : [];
                 
                 const newGrammarTest = await tx.grammarTest.create({
@@ -137,24 +135,21 @@ export async function createLessonWithTasks(data) {
                         }
                     });
 
-                    if (Array.isArray(q.options)) {
-                        for (const opt of q.options) {
-                            await tx.grammarOption.create({
-                                data: {
-                                    questionId: newQuestion.id,
-                                    optionText: opt.optionText || '',
-                                    isCorrect: !!opt.isCorrect
-                                }
-                            });
-                        }
+                    if (Array.isArray(q.options) && q.options.length > 0) {
+                        await tx.grammarOption.createMany({
+                            data: q.options.map(opt => ({
+                                questionId: newQuestion.id,
+                                optionText: opt.optionText || '',
+                                isCorrect: !!opt.isCorrect
+                            }))
+                        });
                     }
                 }
             }
-            // Other types (TEST) will just exist as base tasks for now until their specific models are created/mapped
         }
 
         return newLesson;
-    }, { maxWait: 15000, timeout: 30000 });
+    }, { maxWait: 20000, timeout: 90000 });
 }
 
 /**
@@ -530,93 +525,151 @@ export async function updateLesson(lessonId, data) {
                         data: { order: order, description: config.description || null }
                     });
 
-                    // Update sub-task data
-                    if (type === 'VIDEO' && existingTask.videoTask) {
-                        await tx.videoTask.update({
-                            where: { taskId: existingTask.id },
-                            data: {
-                                videoUrl: config.videoUrl || '',
-                                duration: config.duration ? parseInt(config.duration, 10) : null
-                            }
-                        });
-                    } else if ((type === 'FLASHCARD' || type === 'VOCABULARY') && existingTask.flashcardTask) {
-                        const flashcardTaskId = existingTask.flashcardTask.id;
-                        await tx.flashcardTask.update({
-                            where: { taskId: existingTask.id },
-                            data: { deckName: config.deckName || 'Vocabulary Deck' }
-                        });
+                    // Update sub-task data (or create if missing)
+                    if (type === 'VIDEO') {
+                        if (existingTask.videoTask) {
+                            await tx.videoTask.update({
+                                where: { taskId: existingTask.id },
+                                data: {
+                                    videoUrl: config.videoUrl || '',
+                                    duration: config.duration ? parseInt(config.duration, 10) : null
+                                }
+                            });
+                        } else {
+                            await tx.videoTask.create({
+                                data: {
+                                    taskId: existingTask.id,
+                                    videoUrl: config.videoUrl || '',
+                                    duration: config.duration ? parseInt(config.duration, 10) : null
+                                }
+                            });
+                        }
+                    } else if (type === 'FLASHCARD' || type === 'VOCABULARY') {
+                        let flashcardTaskId;
+                        if (existingTask.flashcardTask) {
+                            flashcardTaskId = existingTask.flashcardTask.id;
+                            await tx.flashcardTask.update({
+                                where: { taskId: existingTask.id },
+                                data: { deckName: config.deckName || 'Vocabulary Deck' }
+                            });
+                            await tx.flashcardItem.deleteMany({ where: { flashcardTaskId } });
+                        } else {
+                            const fc = await tx.flashcardTask.create({
+                                data: { taskId: existingTask.id, deckName: config.deckName || 'Vocabulary Deck' }
+                            });
+                            flashcardTaskId = fc.id;
+                        }
 
                         if (Array.isArray(config.cards)) {
-                            await tx.flashcardItem.deleteMany({ where: { flashcardTaskId } });
-                            for (const card of config.cards) {
-                                if (card.word || card.def || card.definition) {
-                                    await tx.flashcardItem.create({
-                                        data: {
-                                            flashcardTaskId: flashcardTaskId,
-                                            word: card.word || '',
-                                            description: card.def || card.definition || '',
-                                            example: card.ex || card.example || card.exampleSentence || null
-                                        }
-                                    });
-                                }
+                            const validCards = config.cards.filter(c => c.word || c.def || c.definition);
+                            if (validCards.length > 0) {
+                                await tx.flashcardItem.createMany({
+                                    data: validCards.map(card => ({
+                                        flashcardTaskId,
+                                        word: card.word || '',
+                                        description: card.def || card.definition || '',
+                                        example: card.ex || card.example || card.exampleSentence || null
+                                    }))
+                                });
                             }
                         }
-                    } else if (type === 'SPEAKING' && existingTask.speakingTask) {
-                        await tx.speakingTask.update({
-                            where: { taskId: existingTask.id },
-                            data: {
-                                prompt: config.prompt || '',
-                                durationLimit: config.limit ? parseInt(config.limit, 10) : null
-                            }
-                        });
-                    } else if (type === 'WRITING' && existingTask.writingTask) {
-                        await tx.writingTask.update({
-                            where: { taskId: existingTask.id },
-                            data: {
-                                prompt: config.prompt || '',
-                                wordLimit: config.limit ? parseInt(config.limit, 10) : null
-                            }
-                        });
-                    } else if (type === 'READING' && existingTask.readingTask) {
-                        await tx.readingTask.update({
-                            where: { taskId: existingTask.id },
-                            data: {
-                                text: config.text || '',
-                                wordCount: config.text ? config.text.split(/\s+/).length : 0
-                            }
-                        });
-                    } else if (type === 'LISTENING' && existingTask.listeningTask) {
-                        await tx.listeningTask.update({
-                            where: { taskId: existingTask.id },
-                            data: { audioUrl: config.audioUrl || '' }
-                        });
-                    } else if (type === 'GRAMMAR' && existingTask.grammarTest) {
-                        // For grammar, delete old questions and insert new ones
-                        const grammarTestId = existingTask.grammarTest.id;
-                        await tx.grammarQuestion.deleteMany({ where: { grammarTestId } });
+                    } else if (type === 'SPEAKING') {
+                        if (existingTask.speakingTask) {
+                            await tx.speakingTask.update({
+                                where: { taskId: existingTask.id },
+                                data: {
+                                    prompt: config.prompt || '',
+                                    durationLimit: config.limit ? parseInt(config.limit, 10) : null
+                                }
+                            });
+                        } else {
+                            await tx.speakingTask.create({
+                                data: {
+                                    taskId: existingTask.id,
+                                    prompt: config.prompt || '',
+                                    durationLimit: config.limit ? parseInt(config.limit, 10) : null
+                                }
+                            });
+                        }
+                    } else if (type === 'WRITING') {
+                        if (existingTask.writingTask) {
+                            await tx.writingTask.update({
+                                where: { taskId: existingTask.id },
+                                data: {
+                                    prompt: config.prompt || '',
+                                    wordLimit: config.limit ? parseInt(config.limit, 10) : null
+                                }
+                            });
+                        } else {
+                            await tx.writingTask.create({
+                                data: {
+                                    taskId: existingTask.id,
+                                    prompt: config.prompt || '',
+                                    wordLimit: config.limit ? parseInt(config.limit, 10) : null
+                                }
+                            });
+                        }
+                    } else if (type === 'READING') {
+                        if (existingTask.readingTask) {
+                            await tx.readingTask.update({
+                                where: { taskId: existingTask.id },
+                                data: {
+                                    text: config.text || '',
+                                    wordCount: config.text ? config.text.split(/\s+/).length : 0
+                                }
+                            });
+                        } else {
+                            await tx.readingTask.create({
+                                data: {
+                                    taskId: existingTask.id,
+                                    text: config.text || '',
+                                    wordCount: config.text ? config.text.split(/\s+/).length : 0
+                                }
+                            });
+                        }
+                    } else if (type === 'LISTENING') {
+                        if (existingTask.listeningTask) {
+                            await tx.listeningTask.update({
+                                where: { taskId: existingTask.id },
+                                data: { audioUrl: config.audioUrl || '' }
+                            });
+                        } else {
+                            await tx.listeningTask.create({
+                                data: { taskId: existingTask.id, audioUrl: config.audioUrl || '' }
+                            });
+                        }
+                    } else if (type === 'GRAMMAR') {
+                        let grammarTestId;
+                        if (existingTask.grammarTest) {
+                            grammarTestId = existingTask.grammarTest.id;
+                            await tx.grammarQuestion.deleteMany({ where: { grammarTestId } });
+                        } else {
+                            const gt = await tx.grammarTest.create({
+                                data: { taskId: existingTask.id }
+                            });
+                            grammarTestId = gt.id;
+                        }
 
                         const questionsData = Array.isArray(config.questions) ? config.questions : [];
                         for (let i = 0; i < questionsData.length; i++) {
                             const q = questionsData[i];
                             const newQuestion = await tx.grammarQuestion.create({
                                 data: {
-                                    grammarTestId: grammarTestId,
+                                    grammarTestId,
                                     type: q.type || 'MULTIPLE_CHOICE',
                                     questionText: q.questionText || '',
                                     order: i + 1,
                                     explanation: q.explanation || null
                                 }
                             });
-                            if (Array.isArray(q.options)) {
-                                for (const opt of q.options) {
-                                    await tx.grammarOption.create({
-                                        data: {
-                                            questionId: newQuestion.id,
-                                            optionText: opt.optionText || '',
-                                            isCorrect: !!opt.isCorrect
-                                        }
-                                    });
-                                }
+                            if (Array.isArray(q.options) && q.options.length > 0) {
+                                await tx.grammarOption.createMany({
+                                    data: q.options.map(opt => ({
+                                        questionId: newQuestion.id,
+                                        optionText: opt.optionText || '',
+                                        isCorrect: !!opt.isCorrect
+                                    }))
+                                });
                             }
                         }
                     }
@@ -644,17 +697,16 @@ export async function updateLesson(lessonId, data) {
                             data: { taskId: newTask.id, deckName: config.deckName || 'Vocabulary Deck' }
                         });
                         if (Array.isArray(config.cards)) {
-                            for (const card of config.cards) {
-                                if (card.word || card.def || card.definition) {
-                                    await tx.flashcardItem.create({
-                                        data: {
-                                            flashcardTaskId: flashcardTask.id,
-                                            word: card.word || '',
-                                            description: card.def || card.definition || '',
-                                            example: card.ex || card.example || card.exampleSentence || null
-                                        }
-                                    });
-                                }
+                            const validCards = config.cards.filter(c => c.word || c.def || c.definition);
+                            if (validCards.length > 0) {
+                                await tx.flashcardItem.createMany({
+                                    data: validCards.map(card => ({
+                                        flashcardTaskId: flashcardTask.id,
+                                        word: card.word || '',
+                                        description: card.def || card.definition || '',
+                                        example: card.ex || card.example || card.exampleSentence || null
+                                    }))
+                                });
                             }
                         }
                     } else if (type === 'SPEAKING') {
@@ -701,16 +753,14 @@ export async function updateLesson(lessonId, data) {
                                     explanation: q.explanation || null
                                 }
                             });
-                            if (Array.isArray(q.options)) {
-                                for (const opt of q.options) {
-                                    await tx.grammarOption.create({
-                                        data: {
-                                            questionId: newQuestion.id,
-                                            optionText: opt.optionText || '',
-                                            isCorrect: !!opt.isCorrect
-                                        }
-                                    });
-                                }
+                            if (Array.isArray(q.options) && q.options.length > 0) {
+                                await tx.grammarOption.createMany({
+                                    data: q.options.map(opt => ({
+                                        questionId: newQuestion.id,
+                                        optionText: opt.optionText || '',
+                                        isCorrect: !!opt.isCorrect
+                                    }))
+                                });
                             }
                         }
                     }
@@ -719,5 +769,5 @@ export async function updateLesson(lessonId, data) {
         }
 
         return updatedLesson;
-    }, { maxWait: 15000, timeout: 30000 });
+    }, { maxWait: 20000, timeout: 90000 });
 }
