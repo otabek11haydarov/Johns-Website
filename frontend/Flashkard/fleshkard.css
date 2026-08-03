@@ -251,3 +251,45 @@ html, body {
   45% { transform: translateY(-8px) scale(0.985); }
   100% { transform: translateY(0) scale(1); }
 }
+
+/* ── Dark Mode Visibility Fixes ── */
+
+/* Timer heading */
+.flashcard-timer h4,
+.flashcard-timer .text-white {
+  color: #ffffff !important;
+}
+
+/* Timer countdown value */
+.flashcard-timer #timeRemaining {
+  color: #ff6a33 !important;
+  font-weight: 900;
+}
+
+/* Min-time status text (all states) */
+.flashcard-timer .text-muted,
+.flashcard-timer small {
+  color: #94a3b8 !important;
+}
+
+.flashcard-timer .text-warning {
+  color: #fbbf24 !important;
+}
+
+.flashcard-timer .text-success {
+  color: #34d399 !important;
+}
+
+/* Review banner - info state */
+#reviewBanner.alert-info {
+  background: rgba(59, 130, 246, 0.18) !important;
+  border: 1px solid rgba(59, 130, 246, 0.4) !important;
+  color: #93c5fd !important;
+}
+
+/* Review banner - success state (all words learned) */
+#reviewBanner.alert-success {
+  background: rgba(16, 185, 129, 0.18) !important;
+  border: 1px solid rgba(16, 185, 129, 0.4) !important;
+  color: #6ee7b7 !important;
+}

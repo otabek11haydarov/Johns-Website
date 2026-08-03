@@ -7,6 +7,51 @@ const API_URL = window.BASE_URL || "http://127.0.0.1:5000";
 
 let currentAudio = null;
 
+// ── Load Speaking Task data from Backend ──
+const urlParams = new URLSearchParams(window.location.search);
+const lessonId = urlParams.get("lessonId");
+const taskId = urlParams.get("taskId");
+
+async function loadSpeakingData() {
+  if (!lessonId) return;
+
+  try {
+    const res = await fetch(`${API_URL}/api/lessons/${lessonId}`);
+    if (!res.ok) return;
+
+    const json = await res.json();
+    const lesson = json.data || json;
+
+    if (lesson && lesson.tasks && Array.isArray(lesson.tasks)) {
+      // Find the matching speaking task by taskId or by type
+      let speakingTask = null;
+
+      if (taskId) {
+        const matchedTask = lesson.tasks.find(t => t.id === taskId);
+        if (matchedTask && matchedTask.speakingTask) {
+          speakingTask = matchedTask.speakingTask;
+        }
+      }
+
+      // Fallback: find first SPEAKING type task
+      if (!speakingTask) {
+        const firstSpeaking = lesson.tasks.find(t => t.type === "SPEAKING" && t.speakingTask);
+        if (firstSpeaking) {
+          speakingTask = firstSpeaking.speakingTask;
+        }
+      }
+
+      if (speakingTask && speakingTask.prompt) {
+        speakTextInput.value = speakingTask.prompt;
+      }
+    }
+  } catch (err) {
+    console.warn("Speaking task ma'lumotlarini yuklashda xatolik:", err);
+  }
+}
+
+loadSpeakingData();
+
 audioButton?.addEventListener("click", async () => {
   const text = speakTextInput.value.trim();
   
@@ -37,7 +82,7 @@ audioButton?.addEventListener("click", async () => {
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ text, voice: "en_US-lessac-medium" }) // default Piper voice
+      body: JSON.stringify({ text }) // backend will use default voice
     });
 
     if (!response.ok) {
@@ -78,3 +123,4 @@ audioButton?.addEventListener("click", async () => {
     loadingStatus.style.display = "none";
   }
 });
+
